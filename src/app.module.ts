@@ -15,6 +15,7 @@ import { DocumentsModule } from './documents/documents.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { AuthModule } from './auth/auth.module';
 import { graphqlValidationConfig } from './common/config/graphql-validation.config';
+import { SearchModule } from './search/search.module';
 import './common/enums';
 
 @Module({
@@ -47,6 +48,7 @@ import './common/enums';
     forwardRef(() => JobApplicationsModule),
     forwardRef(() => DocumentsModule),
     forwardRef(() => NotificationsModule),
+    SearchModule,
   ],
 })
 export class AppModule {}
