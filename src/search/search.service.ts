@@ -136,10 +136,10 @@ export class SearchService implements OnModuleInit {
       const result = await index.search(query, searchParams);
 
       return {
+        query,
         hits: result.hits as T[],
         estimatedTotalHits: result.estimatedTotalHits,
         processingTimeMs: result.processingTimeMs,
-        query,
         limit: searchParams.limit,
         offset: searchParams.offset,
       };

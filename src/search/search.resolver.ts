@@ -119,39 +119,14 @@ export class SearchResolver {
     @Args('options', { nullable: true }) options?: SearchOptionsType,
   ): Promise<SearchResult> {
     const filterParts: string[] = [];
-
-    if (filters?.workType && filters.workType.length > 0) {
-      filterParts.push(`workType IN [${filters.workType.map((t) => `"${t}"`).join(', ')}]`);
-    }
-
-    if (filters?.jobType && filters.jobType.length > 0) {
-      filterParts.push(`jobType IN [${filters.jobType.map((t) => `"${t}"`).join(', ')}]`);
-    }
-
-    if (filters?.compensation && filters.compensation.length > 0) {
-      filterParts.push(`compensation IN [${filters.compensation.map((c) => `"${c}"`).join(', ')}]`);
-    }
-
-    if (filters?.location) {
-      filterParts.push(`location = "${filters.location}"`);
-    }
-
-    if (filters?.status) {
-      filterParts.push(`status = "${filters.status}"`);
-    }
-
-    if (filters?.recruiterId) {
-      filterParts.push(`recruiterId = "${filters.recruiterId}"`);
-    }
-
-    if (filters?.salaryMin !== undefined) {
-      filterParts.push(`salaryMin >= ${filters.salaryMin}`);
-    }
-
-    if (filters?.salaryMax !== undefined) {
-      filterParts.push(`salaryMax <= ${filters.salaryMax}`);
-    }
-
+    if (filters?.workType && filters.workType.length > 0) filterParts.push(`workType IN [${filters.workType.map((t) => `"${t}"`).join(', ')}]`);
+    if (filters?.jobType && filters.jobType.length > 0) filterParts.push(`jobType IN [${filters.jobType.map((t) => `"${t}"`).join(', ')}]`);
+    if (filters?.compensation && filters.compensation.length > 0) filterParts.push(`compensation IN [${filters.compensation.map((c) => `"${c}"`).join(', ')}]`);
+    if (filters?.location) filterParts.push(`location = "${filters.location}"`);
+    if (filters?.status) filterParts.push(`status = "${filters.status}"`);
+    if (filters?.recruiterId) filterParts.push(`recruiterId = "${filters.recruiterId}"`);
+    if (filters?.salaryMin !== undefined) filterParts.push(`salaryMin >= ${filters.salaryMin}`);
+    if (filters?.salaryMax !== undefined) filterParts.push(`salaryMax <= ${filters.salaryMax}`);
     const filterString = filterParts.length > 0 ? filterParts.join(' AND ') : undefined;
 
     return this.searchService.search('jobs', query, {
@@ -173,11 +148,8 @@ export class SearchResolver {
         'salaryMin',
         'salaryMax',
         'benefits',
-        'recruiterId',
         'status',
         'expiresAt',
-        'createdAt',
-        'updatedAt',
       ],
       highlightPreTag: '<mark>',
       highlightPostTag: '</mark>',
