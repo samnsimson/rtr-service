@@ -1,8 +1,15 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { JobsService } from './jobs.service';
 import { CreateJobInput, JobResponse, UpdateJobInput } from './dto';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { UserRole } from 'src/common/enums';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 
 @Resolver(() => JobResponse)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.RECRUITER, UserRole.ADMIN)
 export class JobsResolver {
   constructor(private readonly jobsService: JobsService) {}
 
@@ -17,17 +24,17 @@ export class JobsResolver {
   }
 
   @Query(() => JobResponse, { name: 'job' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
+  findOne(@Args('id', { type: () => String }) id: string) {
     return this.jobsService.findOne(id);
   }
 
   @Mutation(() => JobResponse)
-  updateJob(@Args('id', { type: () => Int }) id: number, @Args('updateJobInput') updateJobInput: UpdateJobInput) {
+  updateJob(@Args('id', { type: () => String }) id: string, @Args('updateJobInput') updateJobInput: UpdateJobInput) {
     return this.jobsService.update(id, updateJobInput);
   }
 
   @Mutation(() => JobResponse)
-  removeJob(@Args('id', { type: () => Int }) id: number) {
+  removeJob(@Args('id', { type: () => String }) id: string) {
     return this.jobsService.remove(id);
   }
 }
