@@ -1,8 +1,15 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { RecruiterProfileService } from './recruiter-profile.service';
 import { CreateRecruiterProfileInput, RecruiterProfileResponse, UpdateRecruiterProfileInput } from './dto';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { UserRole } from 'src/common/enums';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 
 @Resolver(() => RecruiterProfileResponse)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.RECRUITER, UserRole.ADMIN)
 export class RecruiterProfileResolver {
   constructor(private readonly recruiterProfileService: RecruiterProfileService) {}
 
@@ -21,14 +28,14 @@ export class RecruiterProfileResolver {
   }
 
   @Query(() => RecruiterProfileResponse, { name: 'recruiterProfile' })
-  async findOne(@Args('id', { type: () => Int }) id: number): Promise<RecruiterProfileResponse> {
+  async findOne(@Args('id', { type: () => String }) id: string): Promise<RecruiterProfileResponse> {
     const profile = this.recruiterProfileService.findOne(id);
     return profile;
   }
 
   @Mutation(() => RecruiterProfileResponse)
   async updateRecruiterProfile(
-    @Args('id', { type: () => Int }) id: number,
+    @Args('id', { type: () => String }) id: string,
     @Args('updateRecruiterProfileInput') updateRecruiterProfileInput: UpdateRecruiterProfileInput,
   ): Promise<RecruiterProfileResponse> {
     const profile = this.recruiterProfileService.update(id, updateRecruiterProfileInput);
@@ -36,7 +43,7 @@ export class RecruiterProfileResolver {
   }
 
   @Mutation(() => Boolean)
-  async removeRecruiterProfile(@Args('id', { type: () => Int }) id: number): Promise<boolean> {
+  async removeRecruiterProfile(@Args('id', { type: () => String }) id: string): Promise<boolean> {
     await this.recruiterProfileService.remove(id);
     return true;
   }

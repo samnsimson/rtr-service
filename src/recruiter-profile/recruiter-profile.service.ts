@@ -22,13 +22,13 @@ export class RecruiterProfileService {
     });
   }
 
-  async findOne(id: number): Promise<RecruiterProfile> {
+  async findOne(id: string): Promise<RecruiterProfile> {
     if (!id) {
       throw new BadRequestException('Profile ID is required');
     }
 
     const profile = await this.recruiterProfileRepository.findOne({
-      where: { id: id.toString() },
+      where: { id },
     });
 
     if (!profile) {
@@ -38,7 +38,7 @@ export class RecruiterProfileService {
     return profile;
   }
 
-  async update(id: number, updateRecruiterProfileInput: UpdateRecruiterProfileInput): Promise<RecruiterProfile> {
+  async update(id: string, updateRecruiterProfileInput: UpdateRecruiterProfileInput): Promise<RecruiterProfile> {
     if (!id) {
       throw new BadRequestException('Profile ID is required');
     }
@@ -48,7 +48,7 @@ export class RecruiterProfileService {
     return this.recruiterProfileRepository.save(profile);
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     if (!id) {
       throw new BadRequestException('Profile ID is required');
     }
