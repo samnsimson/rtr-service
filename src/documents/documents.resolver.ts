@@ -1,8 +1,7 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { DocumentsService } from './documents.service';
 import { Document } from './entities/document.entity';
-import { CreateDocumentInput } from './dto/create-document.input';
-import { UpdateDocumentInput } from './dto/update-document.input';
+import { CreateDocumentInput } from './dto';
 
 @Resolver(() => Document)
 export class DocumentsResolver {
@@ -24,8 +23,8 @@ export class DocumentsResolver {
   }
 
   @Mutation(() => Document)
-  updateDocument(@Args('updateDocumentInput') updateDocumentInput: UpdateDocumentInput) {
-    return this.documentsService.update(updateDocumentInput.id, updateDocumentInput);
+  updateDocument(@Args('id', { type: () => Int }) id: number, @Args('updateDocumentInput') updateDocumentInput: CreateDocumentInput) {
+    return this.documentsService.update(id, updateDocumentInput);
   }
 
   @Mutation(() => Document)

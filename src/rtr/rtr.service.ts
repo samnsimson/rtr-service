@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateRTRInput } from './dto/create-rtr.input';
-import { UpdateRTRInput } from './dto/update-rtr.input';
+import { CreateRTRInput, UpdateRTRInput } from './dto';
 
 @Injectable()
 export class RTRService {

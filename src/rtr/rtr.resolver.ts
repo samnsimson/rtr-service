@@ -1,8 +1,7 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { RTRService } from './rtr.service';
 import { RTR } from './entities/rtr.entity';
-import { CreateRTRInput } from './dto/create-rtr.input';
-import { UpdateRTRInput } from './dto/update-rtr.input';
+import { CreateRTRInput, UpdateRTRInput } from './dto';
 
 @Resolver(() => RTR)
 export class RTRResolver {
@@ -13,7 +12,7 @@ export class RTRResolver {
     return this.rtrService.create(createRTRInput);
   }
 
-  @Query(() => [RTR], { name: 'rtr' })
+  @Query(() => [RTR], { name: 'rtrs' })
   findAll() {
     return this.rtrService.findAll();
   }
@@ -24,8 +23,8 @@ export class RTRResolver {
   }
 
   @Mutation(() => RTR)
-  updateRTR(@Args('updateRTRInput') updateRTRInput: UpdateRTRInput) {
-    return this.rtrService.update(updateRTRInput.id, updateRTRInput);
+  updateRTR(@Args('id', { type: () => Int }) id: number, @Args('updateRTRInput') updateRTRInput: UpdateRTRInput) {
+    return this.rtrService.update(id, updateRTRInput);
   }
 
   @Mutation(() => RTR)

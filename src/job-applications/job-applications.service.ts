@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateJobApplicationInput } from './dto/create-job-application.input';
-import { UpdateJobApplicationInput } from './dto/update-job-application.input';
+import { CreateJobApplicationInput, UpdateJobApplicationInput } from './dto';
 
 @Injectable()
 export class JobApplicationsService {

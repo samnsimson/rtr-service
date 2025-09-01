@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateCandidateProfileInput } from './dto/create-candidate-profile.input';
-import { UpdateCandidateProfileInput } from './dto/update-candidate-profile.input';
+import { CreateCandidateProfileInput, UpdateCandidateProfileInput } from './dto';
 
 @Injectable()
 export class CandidateProfileService {

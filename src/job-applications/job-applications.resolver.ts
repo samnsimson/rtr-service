@@ -1,8 +1,7 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { JobApplicationsService } from './job-applications.service';
 import { JobApplication } from './entities/job-application.entity';
-import { CreateJobApplicationInput } from './dto/create-job-application.input';
-import { UpdateJobApplicationInput } from './dto/update-job-application.input';
+import { CreateJobApplicationInput, UpdateJobApplicationInput } from './dto';
 
 @Resolver(() => JobApplication)
 export class JobApplicationsResolver {
@@ -24,8 +23,8 @@ export class JobApplicationsResolver {
   }
 
   @Mutation(() => JobApplication)
-  updateJobApplication(@Args('updateJobApplicationInput') updateJobApplicationInput: UpdateJobApplicationInput) {
-    return this.jobApplicationsService.update(updateJobApplicationInput.id, updateJobApplicationInput);
+  updateJobApplication(@Args('id', { type: () => Int }) id: number, @Args('updateJobApplicationInput') updateJobApplicationInput: UpdateJobApplicationInput) {
+    return this.jobApplicationsService.update(id, updateJobApplicationInput);
   }
 
   @Mutation(() => JobApplication)

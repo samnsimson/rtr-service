@@ -1,8 +1,7 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { CandidateProfileService } from './candidate-profile.service';
 import { CandidateProfile } from './entities/candidate-profile.entity';
-import { CreateCandidateProfileInput } from './dto/create-candidate-profile.input';
-import { UpdateCandidateProfileInput } from './dto/update-candidate-profile.input';
+import { CreateCandidateProfileInput, UpdateCandidateProfileInput } from './dto';
 
 @Resolver(() => CandidateProfile)
 export class CandidateProfileResolver {
@@ -13,7 +12,7 @@ export class CandidateProfileResolver {
     return this.candidateProfileService.create(createCandidateProfileInput);
   }
 
-  @Query(() => [CandidateProfile], { name: 'candidateProfile' })
+  @Query(() => [CandidateProfile], { name: 'candidateProfiles' })
   findAll() {
     return this.candidateProfileService.findAll();
   }
@@ -24,8 +23,11 @@ export class CandidateProfileResolver {
   }
 
   @Mutation(() => CandidateProfile)
-  updateCandidateProfile(@Args('updateCandidateProfileInput') updateCandidateProfileInput: UpdateCandidateProfileInput) {
-    return this.candidateProfileService.update(updateCandidateProfileInput.id, updateCandidateProfileInput);
+  updateCandidateProfile(
+    @Args('id', { type: () => Int }) id: number,
+    @Args('updateCandidateProfileInput') updateCandidateProfileInput: UpdateCandidateProfileInput,
+  ) {
+    return this.candidateProfileService.update(id, updateCandidateProfileInput);
   }
 
   @Mutation(() => CandidateProfile)

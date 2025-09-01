@@ -1,8 +1,7 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { NotificationsService } from './notifications.service';
 import { Notification } from './entities/notification.entity';
-import { CreateNotificationInput } from './dto/create-notification.input';
-import { UpdateNotificationInput } from './dto/update-notification.input';
+import { CreateNotificationInput, UpdateNotificationDto } from './dto';
 
 @Resolver(() => Notification)
 export class NotificationsResolver {
@@ -24,8 +23,8 @@ export class NotificationsResolver {
   }
 
   @Mutation(() => Notification)
-  updateNotification(@Args('updateNotificationInput') updateNotificationInput: UpdateNotificationInput) {
-    return this.notificationsService.update(updateNotificationInput.id, updateNotificationInput);
+  updateNotification(@Args('id', { type: () => Int }) id: number, @Args('updateNotificationInput') updateNotificationInput: UpdateNotificationDto) {
+    return this.notificationsService.update(id, updateNotificationInput);
   }
 
   @Mutation(() => Notification)

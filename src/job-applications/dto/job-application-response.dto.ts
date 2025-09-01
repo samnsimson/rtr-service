@@ -1,0 +1,26 @@
+import { ObjectType, Field } from '@nestjs/graphql';
+import { ApplicationStatus } from '../entities/job-application.entity';
+
+@ObjectType()
+export class JobApplicationResponseDto {
+  @Field()
+  id: string;
+
+  @Field()
+  jobId: string;
+
+  @Field()
+  candidateId: string;
+
+  @Field(() => ApplicationStatus)
+  status: ApplicationStatus;
+
+  @Field({ nullable: true })
+  coverLetter?: string;
+
+  @Field()
+  appliedAt: Date;
+
+  @Field()
+  updatedAt: Date;
+}
