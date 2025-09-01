@@ -243,11 +243,11 @@ type Query {
   me: UserResponse!
   verifyToken: String!
   recruiterProfiles: [RecruiterProfileResponse!]!
-  recruiterProfile(id: Int!): RecruiterProfileResponse!
+  recruiterProfile(id: String!): RecruiterProfileResponse!
   candidateProfiles: [CandidateProfileResponse!]!
-  candidateProfile(id: Int!): CandidateProfileResponse!
+  candidateProfile(id: String!): CandidateProfileResponse!
   jobs: [JobResponse!]!
-  job(id: Int!): JobResponse!
+  job(id: String!): JobResponse!
   rtrs: [RtrResponse!]!
   rtr(id: Int!): RtrResponse!
   rtrHistories: [RTRHistoryResponse!]!
@@ -268,14 +268,14 @@ type Mutation {
   register(registerInput: RegisterInput!): Auth!
   refreshToken(refreshTokenInput: RefreshTokenInput!): Auth!
   createRecruiterProfile(createRecruiterProfileInput: CreateRecruiterProfileInput!): RecruiterProfileResponse!
-  updateRecruiterProfile(id: Int!, updateRecruiterProfileInput: UpdateRecruiterProfileInput!): RecruiterProfileResponse!
-  removeRecruiterProfile(id: Int!): Boolean!
+  updateRecruiterProfile(id: String!, updateRecruiterProfileInput: UpdateRecruiterProfileInput!): RecruiterProfileResponse!
+  removeRecruiterProfile(id: String!): Boolean!
   createCandidateProfile(createCandidateProfileInput: CreateCandidateProfileInput!): CandidateProfileResponse!
-  updateCandidateProfile(id: Int!, updateCandidateProfileInput: UpdateCandidateProfileInput!): CandidateProfileResponse!
-  removeCandidateProfile(id: Int!): CandidateProfileResponse!
+  updateCandidateProfile(id: String!, updateCandidateProfileInput: UpdateCandidateProfileInput!): CandidateProfileResponse!
+  removeCandidateProfile(id: String!): Boolean!
   createJob(createJobInput: CreateJobInput!): JobResponse!
-  updateJob(id: Int!, updateJobInput: UpdateJobInput!): JobResponse!
-  removeJob(id: Int!): JobResponse!
+  updateJob(id: String!, updateJobInput: UpdateJobInput!): JobResponse!
+  removeJob(id: String!): JobResponse!
   createRTR(createRTRInput: CreateRTRInput!): RtrResponse!
   updateRTR(id: Int!, updateRTRInput: UpdateRTRInput!): RtrResponse!
   removeRTR(id: Int!): RtrResponse!

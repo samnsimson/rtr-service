@@ -5,7 +5,9 @@ import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { UserRole } from 'src/common/enums';
+import { CurrentUser } from 'src/common/types';
 import { Roles } from 'src/auth/decorators/roles.decorator';
+import { CurrentUser as CurrentUserDecorator } from 'src/auth/decorators/current-user.decorator';
 
 @Resolver(() => JobResponse)
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -14,8 +16,8 @@ export class JobsResolver {
   constructor(private readonly jobsService: JobsService) {}
 
   @Mutation(() => JobResponse)
-  createJob(@Args('createJobInput') createJobInput: CreateJobInput) {
-    return this.jobsService.create(createJobInput);
+  createJob(@Args('createJobInput') createJobInput: CreateJobInput, @CurrentUserDecorator() user: CurrentUser) {
+    return this.jobsService.create(createJobInput, user);
   }
 
   @Query(() => [JobResponse], { name: 'jobs' })

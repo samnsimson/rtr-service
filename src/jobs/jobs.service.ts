@@ -1,16 +1,23 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateJobInput, UpdateJobInput, JobResponse } from './dto';
 import { Job } from './entities/job.entity';
+import { RecruiterProfile } from '../recruiter-profile/entities/recruiter-profile.entity';
+import { CurrentUser } from '../common/types';
 
 @Injectable()
 export class JobsService {
-  constructor(@InjectRepository(Job) private readonly jobsRepo: Repository<Job>) {}
+  constructor(
+    @InjectRepository(Job) private readonly jobsRepo: Repository<Job>,
+    @InjectRepository(RecruiterProfile) private readonly recruiterProfileRepo: Repository<RecruiterProfile>,
+  ) {}
 
-  async create(createJobInput: CreateJobInput): Promise<JobResponse> {
+  async create(createJobInput: CreateJobInput, user: CurrentUser): Promise<JobResponse> {
+    const recruiterProfile = await this.recruiterProfileRepo.findOne({ where: { userId: user.id } });
+    if (!recruiterProfile) throw new ForbiddenException('Recruiter profile not found');
     const { expiresAt, ...rest } = createJobInput;
-    const job = this.jobsRepo.create({ ...rest, expiresAt: expiresAt ? new Date(expiresAt) : undefined });
+    const job = this.jobsRepo.create({ ...rest, recruiterId: recruiterProfile.id, expiresAt: expiresAt ? new Date(expiresAt) : undefined });
     const saved = await this.jobsRepo.save(job);
     return this.toResponse(saved);
   }

@@ -4,8 +4,9 @@ import { AuthService } from './auth.service';
 import { Auth } from './entities';
 import { LoginInput, RegisterInput, RefreshTokenInput } from './dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { CurrentUser } from './decorators/current-user.decorator';
+import { CurrentUser as CurrentUserDecorator } from './decorators/current-user.decorator';
 import { GraphQLValidate } from '../common/decorators';
+import { CurrentUser } from '../common/types';
 
 @Resolver(() => Auth)
 export class AuthResolver {
@@ -31,7 +32,7 @@ export class AuthResolver {
 
   @Query(() => String)
   @UseGuards(JwtAuthGuard)
-  verifyToken(@CurrentUser() user: any) {
+  verifyToken(@CurrentUserDecorator() user: CurrentUser) {
     return `Token is valid for user: ${user.email}`;
   }
 }

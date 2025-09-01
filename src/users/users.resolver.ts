@@ -6,8 +6,9 @@ import { GraphQLValidate } from '../common/decorators';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { CurrentUser as CurrentUserDecorator } from '../auth/decorators/current-user.decorator';
 import { UserRole } from '../common/enums';
+import { CurrentUser } from '../common/types';
 
 @Resolver(() => UserResponse)
 export class UsersResolver {
@@ -38,7 +39,7 @@ export class UsersResolver {
 
   @Query(() => UserResponse, { name: 'me' })
   @UseGuards(JwtAuthGuard)
-  async getCurrentUser(@CurrentUser() user: any): Promise<UserResponse> {
+  async getCurrentUser(@CurrentUserDecorator() user: CurrentUser): Promise<UserResponse> {
     const currentUser = await this.usersService.findOne(user.id);
     return new UserResponse(currentUser);
   }
