@@ -1,4 +1,4 @@
-import { IsString, IsEnum, IsUUID, IsNumber, IsUrl } from 'class-validator';
+import { IsString, IsEnum, IsUUID, IsNumber } from 'class-validator';
 import { InputType, Field, Int } from '@nestjs/graphql';
 import { DocumentType } from '../../common/enums';
 
@@ -17,12 +17,12 @@ export class CreateDocumentInput {
   type: DocumentType;
 
   @Field()
-  @IsUrl()
+  @IsString()
   url: string;
 
   @Field(() => Int)
   @IsNumber()
-  size: number; // File size in bytes
+  size: number;
 
   @Field()
   @IsString()

@@ -8,30 +8,35 @@ export class RecruiterProfileResolver {
   constructor(private readonly recruiterProfileService: RecruiterProfileService) {}
 
   @Mutation(() => RecruiterProfile)
-  createRecruiterProfile(@Args('createRecruiterProfileInput') createRecruiterProfileInput: CreateRecruiterProfileInput) {
-    return this.recruiterProfileService.create(createRecruiterProfileInput);
+  async createRecruiterProfile(@Args('createRecruiterProfileInput') createRecruiterProfileInput: CreateRecruiterProfileInput): Promise<RecruiterProfile> {
+    const profile = this.recruiterProfileService.create(createRecruiterProfileInput);
+    return profile;
   }
 
   @Query(() => [RecruiterProfile], { name: 'recruiterProfiles' })
-  findAll() {
-    return this.recruiterProfileService.findAll();
+  async findAll(): Promise<RecruiterProfile[]> {
+    const profiles = this.recruiterProfileService.findAll();
+    return profiles;
   }
 
   @Query(() => RecruiterProfile, { name: 'recruiterProfile' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.recruiterProfileService.findOne(id);
+  async findOne(@Args('id', { type: () => Int }) id: number): Promise<RecruiterProfile> {
+    const profile = this.recruiterProfileService.findOne(id);
+    return profile;
   }
 
   @Mutation(() => RecruiterProfile)
-  updateRecruiterProfile(
+  async updateRecruiterProfile(
     @Args('id', { type: () => Int }) id: number,
     @Args('updateRecruiterProfileInput') updateRecruiterProfileInput: UpdateRecruiterProfileInput,
-  ) {
-    return this.recruiterProfileService.update(id, updateRecruiterProfileInput);
+  ): Promise<RecruiterProfile> {
+    const profile = this.recruiterProfileService.update(id, updateRecruiterProfileInput);
+    return profile;
   }
 
-  @Mutation(() => RecruiterProfile)
-  removeRecruiterProfile(@Args('id', { type: () => Int }) id: number) {
-    return this.recruiterProfileService.remove(id);
+  @Mutation(() => Boolean)
+  async removeRecruiterProfile(@Args('id', { type: () => Int }) id: number): Promise<boolean> {
+    await this.recruiterProfileService.remove(id);
+    return true;
   }
 }

@@ -1,17 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
 import { Job } from '../../jobs/entities/job.entity';
 import { CandidateProfile } from '../../candidate-profile/entities/candidate-profile.entity';
+import { ApplicationStatus } from '../../common/enums';
+import { ObjectType } from '@nestjs/graphql';
 
-export enum ApplicationStatus {
-  APPLIED = 'APPLIED',
-  REVIEWING = 'REVIEWING',
-  INTERVIEWING = 'INTERVIEWING',
-  OFFERED = 'OFFERED',
-  ACCEPTED = 'ACCEPTED',
-  REJECTED = 'REJECTED',
-  WITHDRAWN = 'WITHDRAWN',
-}
-
+@ObjectType()
 @Entity('job_applications')
 @Index(['jobId', 'candidateId'], { unique: true })
 export class JobApplication {
@@ -45,9 +38,7 @@ export class JobApplication {
   @JoinColumn({ name: 'jobId' })
   job: Job;
 
-  @ManyToOne(() => CandidateProfile, (candidate) => candidate.applications, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => CandidateProfile, (candidate) => candidate.applications, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'candidateId' })
   candidate: CandidateProfile;
 }

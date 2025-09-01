@@ -1,5 +1,5 @@
 import { ObjectType, Field } from '@nestjs/graphql';
-import { CompanySize } from '../entities/recruiter-profile.entity';
+import { CompanySize } from '../../common/enums';
 
 @ObjectType()
 export class RecruiterProfileResponseDto {
@@ -30,9 +30,9 @@ export class RecruiterProfileResponseDto {
   @Field({ nullable: true })
   linkedinUrl?: string;
 
-  @Field(() => Date)
+  @Field()
   createdAt: Date;
 
-  @Field(() => Date)
+  @Field()
   updatedAt: Date;
 }

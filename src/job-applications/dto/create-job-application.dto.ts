@@ -1,6 +1,6 @@
 import { IsString, IsOptional, IsEnum, IsUUID } from 'class-validator';
 import { InputType, Field } from '@nestjs/graphql';
-import { ApplicationStatus } from '../entities/job-application.entity';
+import { ApplicationStatus } from '../../common/enums';
 
 @InputType()
 export class CreateJobApplicationInput {

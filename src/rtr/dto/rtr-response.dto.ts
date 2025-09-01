@@ -1,8 +1,8 @@
 import { ObjectType, Field } from '@nestjs/graphql';
-import { RTRStatus } from '../entities/rtr.entity';
+import { RTRStatus } from '../../common/enums';
 
 @ObjectType()
-export class RTRResponseDto {
+export class RtrResponseDto {
   @Field()
   id: string;
 

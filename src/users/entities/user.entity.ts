@@ -4,13 +4,10 @@ import { CandidateProfile } from '../../candidate-profile/entities/candidate-pro
 import { RTR } from '../../rtr/entities/rtr.entity';
 import { RTRHistory } from '../../rtr-history/entities/rtr-history.entity';
 import { Notification } from '../../notifications/entities/notification.entity';
+import { UserRole } from '../../common/enums';
+import { ObjectType } from '@nestjs/graphql';
 
-export enum UserRole {
-  ADMIN = 'ADMIN',
-  RECRUITER = 'RECRUITER',
-  CANDIDATE = 'CANDIDATE',
-}
-
+@ObjectType()
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')

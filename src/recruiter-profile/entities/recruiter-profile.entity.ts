@@ -2,15 +2,10 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 import { User } from '../../users/entities/user.entity';
 import { Job } from '../../jobs/entities/job.entity';
 import { RTR } from '../../rtr/entities/rtr.entity';
+import { CompanySize } from '../../common/enums';
+import { ObjectType } from '@nestjs/graphql';
 
-export enum CompanySize {
-  STARTUP = 'STARTUP',
-  SMALL = 'SMALL',
-  MEDIUM = 'MEDIUM',
-  LARGE = 'LARGE',
-  ENTERPRISE = 'ENTERPRISE',
-}
-
+@ObjectType()
 @Entity('recruiter_profiles')
 export class RecruiterProfile {
   @PrimaryGeneratedColumn('uuid')

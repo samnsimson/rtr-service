@@ -13,6 +13,7 @@ import { RTRHistoryModule } from './rtr-history/rtr-history.module';
 import { JobApplicationsModule } from './job-applications/job-applications.module';
 import { DocumentsModule } from './documents/documents.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import './common/enums';
 
 @Module({
   imports: [
@@ -26,7 +27,6 @@ import { NotificationsModule } from './notifications/notifications.module';
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: configService.get<string>('NODE_ENV') !== 'production',
         logging: configService.get<string>('NODE_ENV') === 'development',
-        connectTimeoutMS: 3000,
       }),
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({

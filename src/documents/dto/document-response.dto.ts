@@ -1,5 +1,5 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
-import { DocumentType } from '../entities/document.entity';
+import { DocumentType } from '../../common/enums';
 
 @ObjectType()
 export class DocumentResponseDto {

@@ -5,17 +5,10 @@ import { Job } from '../../jobs/entities/job.entity';
 import { RTRHistory } from '../../rtr-history/entities/rtr-history.entity';
 import { Document } from '../../documents/entities/document.entity';
 import { User } from '../../users/entities/user.entity';
+import { RTRStatus } from '../../common/enums';
+import { ObjectType } from '@nestjs/graphql';
 
-export enum RTRStatus {
-  DRAFT = 'DRAFT',
-  PENDING = 'PENDING',
-  SENT = 'SENT',
-  VIEWED = 'VIEWED',
-  SIGNED = 'SIGNED',
-  EXPIRED = 'EXPIRED',
-  REJECTED = 'REJECTED',
-}
-
+@ObjectType()
 @Entity('rtrs')
 export class RTR {
   @PrimaryGeneratedColumn('uuid')

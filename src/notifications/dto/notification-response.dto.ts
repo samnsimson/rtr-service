@@ -1,5 +1,5 @@
 import { ObjectType, Field } from '@nestjs/graphql';
-import { NotificationType } from '../entities/notification.entity';
+import { NotificationType } from '../../common/enums';
 
 @ObjectType()
 export class NotificationResponseDto {

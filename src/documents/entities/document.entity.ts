@@ -1,14 +1,9 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { RTR } from '../../rtr/entities/rtr.entity';
+import { DocumentType } from '../../common/enums';
+import { ObjectType } from '@nestjs/graphql';
 
-export enum DocumentType {
-  RTR_FORM = 'RTR_FORM',
-  RESUME = 'RESUME',
-  COVER_LETTER = 'COVER_LETTER',
-  CONTRACT = 'CONTRACT',
-  OTHER = 'OTHER',
-}
-
+@ObjectType()
 @Entity('documents')
 export class Document {
   @PrimaryGeneratedColumn('uuid')

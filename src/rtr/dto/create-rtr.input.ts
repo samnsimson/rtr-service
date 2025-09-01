@@ -3,7 +3,7 @@ import { InputType, Field } from '@nestjs/graphql';
 import { RTRStatus } from '../../common/enums';
 
 @InputType()
-export class CreateRTRInput {
+export class CreateRtrInput {
   @Field()
   @IsUUID()
   candidateId: string;

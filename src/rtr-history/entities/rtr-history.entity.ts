@@ -1,7 +1,9 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { RTR } from '../../rtr/entities/rtr.entity';
 import { User } from '../../users/entities/user.entity';
+import { ObjectType } from '@nestjs/graphql';
 
+@ObjectType()
 @Entity('rtr_history')
 export class RTRHistory {
   @PrimaryGeneratedColumn('uuid')

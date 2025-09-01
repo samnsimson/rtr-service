@@ -2,35 +2,10 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 import { RecruiterProfile } from '../../recruiter-profile/entities/recruiter-profile.entity';
 import { RTR } from '../../rtr/entities/rtr.entity';
 import { JobApplication } from '../../job-applications/entities/job-application.entity';
+import { WorkType, JobType, CompensationType, JobStatus } from '../../common/enums';
+import { ObjectType } from '@nestjs/graphql';
 
-export enum WorkType {
-  REMOTE = 'REMOTE',
-  HYBRID = 'HYBRID',
-  ON_SITE = 'ON_SITE',
-}
-
-export enum JobType {
-  FULL_TIME = 'FULL_TIME',
-  PART_TIME = 'PART_TIME',
-  CONTRACT = 'CONTRACT',
-  INTERNSHIP = 'INTERNSHIP',
-  FREELANCE = 'FREELANCE',
-}
-
-export enum CompensationType {
-  SALARY = 'SALARY',
-  HOURLY = 'HOURLY',
-  PROJECT_BASED = 'PROJECT_BASED',
-  COMMISSION = 'COMMISSION',
-}
-
-export enum JobStatus {
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
-  CLOSED = 'CLOSED',
-  DRAFT = 'DRAFT',
-}
-
+@ObjectType()
 @Entity('jobs')
 export class Job {
   @PrimaryGeneratedColumn('uuid')

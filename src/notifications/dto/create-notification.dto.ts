@@ -1,6 +1,6 @@
 import { IsString, IsEnum, IsUUID, IsBoolean, IsOptional, IsObject } from 'class-validator';
 import { InputType, Field } from '@nestjs/graphql';
-import { NotificationType } from '../entities/notification.entity';
+import { NotificationType } from '../../common/enums';
 
 @InputType()
 export class CreateNotificationInput {

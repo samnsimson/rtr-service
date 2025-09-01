@@ -1,25 +1,59 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateRecruiterProfileInput, UpdateRecruiterProfileInput } from './dto';
+import { RecruiterProfile } from './entities/recruiter-profile.entity';
 
 @Injectable()
 export class RecruiterProfileService {
-  create(createRecruiterProfileInput: CreateRecruiterProfileInput) {
-    return 'This action adds a new recruiterProfile';
+  constructor(
+    @InjectRepository(RecruiterProfile)
+    private readonly recruiterProfileRepository: Repository<RecruiterProfile>,
+  ) {}
+
+  async create(createRecruiterProfileInput: CreateRecruiterProfileInput): Promise<RecruiterProfile> {
+    const profile = this.recruiterProfileRepository.create(createRecruiterProfileInput);
+    return this.recruiterProfileRepository.save(profile);
   }
 
-  findAll() {
-    return `This action returns all recruiterProfile`;
+  async findAll(): Promise<RecruiterProfile[]> {
+    return this.recruiterProfileRepository.find({
+      order: { createdAt: 'DESC' },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} recruiterProfile`;
+  async findOne(id: number): Promise<RecruiterProfile> {
+    if (!id) {
+      throw new BadRequestException('Profile ID is required');
+    }
+
+    const profile = await this.recruiterProfileRepository.findOne({
+      where: { id: id.toString() },
+    });
+
+    if (!profile) {
+      throw new NotFoundException(`Recruiter profile with ID ${id} not found`);
+    }
+
+    return profile;
   }
 
-  update(id: number, updateRecruiterProfileInput: UpdateRecruiterProfileInput) {
-    return `This action updates a #${id} recruiterProfile`;
+  async update(id: number, updateRecruiterProfileInput: UpdateRecruiterProfileInput): Promise<RecruiterProfile> {
+    if (!id) {
+      throw new BadRequestException('Profile ID is required');
+    }
+
+    const profile = await this.findOne(id);
+    Object.assign(profile, updateRecruiterProfileInput);
+    return this.recruiterProfileRepository.save(profile);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} recruiterProfile`;
+  async remove(id: number): Promise<void> {
+    if (!id) {
+      throw new BadRequestException('Profile ID is required');
+    }
+
+    const profile = await this.findOne(id);
+    await this.recruiterProfileRepository.remove(profile);
   }
 }

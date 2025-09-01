@@ -1,15 +1,9 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
+import { NotificationType } from '../../common/enums';
+import { ObjectType } from '@nestjs/graphql';
 
-export enum NotificationType {
-  INFO = 'INFO',
-  SUCCESS = 'SUCCESS',
-  WARNING = 'WARNING',
-  ERROR = 'ERROR',
-  RTR_UPDATE = 'RTR_UPDATE',
-  JOB_UPDATE = 'JOB_UPDATE',
-}
-
+@ObjectType()
 @Entity('notifications')
 export class Notification {
   @PrimaryGeneratedColumn('uuid')

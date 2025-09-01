@@ -2,14 +2,10 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 import { User } from '../../users/entities/user.entity';
 import { JobApplication } from '../../job-applications/entities/job-application.entity';
 import { RTR } from '../../rtr/entities/rtr.entity';
+import { RemotePreference } from '../../common/enums';
+import { ObjectType } from '@nestjs/graphql';
 
-export enum RemotePreference {
-  ANY = 'ANY',
-  REMOTE_ONLY = 'REMOTE_ONLY',
-  HYBRID_ONLY = 'HYBRID_ONLY',
-  ON_SITE_ONLY = 'ON_SITE_ONLY',
-}
-
+@ObjectType()
 @Entity('candidate_profiles')
 export class CandidateProfile {
   @PrimaryGeneratedColumn('uuid')
