@@ -1,12 +1,15 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { UsersService } from './users.service';
+import { User } from './entities/user.entity';
 import { CreateUserInput, UpdateUserInput, UserResponse } from './dto';
+import { GraphQLValidate } from '../common/decorators';
 
-@Resolver(() => UserResponse)
+@Resolver(() => User)
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
 
   @Mutation(() => UserResponse)
+  @GraphQLValidate()
   async createUser(@Args('createUserInput') createUserInput: CreateUserInput): Promise<UserResponse> {
     const user = await this.usersService.create(createUserInput);
     return new UserResponse(user);
@@ -25,6 +28,7 @@ export class UsersResolver {
   }
 
   @Mutation(() => UserResponse)
+  @GraphQLValidate()
   async updateUser(@Args('id') id: string, @Args('updateUserInput') updateUserInput: UpdateUserInput): Promise<UserResponse> {
     const user = await this.usersService.update(id, updateUserInput);
     return new UserResponse(user);

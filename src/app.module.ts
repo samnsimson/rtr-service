@@ -13,6 +13,7 @@ import { RTRHistoryModule } from './rtr-history/rtr-history.module';
 import { JobApplicationsModule } from './job-applications/job-applications.module';
 import { DocumentsModule } from './documents/documents.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { graphqlValidationConfig } from './common/config/graphql-validation.config';
 import './common/enums';
 
 @Module({
@@ -33,6 +34,7 @@ import './common/enums';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       graphiql: true,
+      ...graphqlValidationConfig,
     }),
     UsersModule,
     RecruiterProfileModule,
