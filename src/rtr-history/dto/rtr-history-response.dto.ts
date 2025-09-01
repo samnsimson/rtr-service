@@ -1,7 +1,7 @@
 import { ObjectType, Field } from '@nestjs/graphql';
 
 @ObjectType()
-export class RTRHistoryResponseDto {
+export class RTRHistoryResponse {
   @Field()
   id: string;
 

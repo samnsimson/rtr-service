@@ -1,35 +1,36 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { RecruiterProfileService } from './recruiter-profile.service';
-import { RecruiterProfile } from './entities/recruiter-profile.entity';
-import { CreateRecruiterProfileInput, UpdateRecruiterProfileInput } from './dto';
+import { CreateRecruiterProfileInput, RecruiterProfileResponse, UpdateRecruiterProfileInput } from './dto';
 
-@Resolver(() => RecruiterProfile)
+@Resolver(() => RecruiterProfileResponse)
 export class RecruiterProfileResolver {
   constructor(private readonly recruiterProfileService: RecruiterProfileService) {}
 
-  @Mutation(() => RecruiterProfile)
-  async createRecruiterProfile(@Args('createRecruiterProfileInput') createRecruiterProfileInput: CreateRecruiterProfileInput): Promise<RecruiterProfile> {
+  @Mutation(() => RecruiterProfileResponse)
+  async createRecruiterProfile(
+    @Args('createRecruiterProfileInput') createRecruiterProfileInput: CreateRecruiterProfileInput,
+  ): Promise<RecruiterProfileResponse> {
     const profile = this.recruiterProfileService.create(createRecruiterProfileInput);
     return profile;
   }
 
-  @Query(() => [RecruiterProfile], { name: 'recruiterProfiles' })
-  async findAll(): Promise<RecruiterProfile[]> {
+  @Query(() => [RecruiterProfileResponse], { name: 'recruiterProfiles' })
+  async findAll(): Promise<RecruiterProfileResponse[]> {
     const profiles = this.recruiterProfileService.findAll();
     return profiles;
   }
 
-  @Query(() => RecruiterProfile, { name: 'recruiterProfile' })
-  async findOne(@Args('id', { type: () => Int }) id: number): Promise<RecruiterProfile> {
+  @Query(() => RecruiterProfileResponse, { name: 'recruiterProfile' })
+  async findOne(@Args('id', { type: () => Int }) id: number): Promise<RecruiterProfileResponse> {
     const profile = this.recruiterProfileService.findOne(id);
     return profile;
   }
 
-  @Mutation(() => RecruiterProfile)
+  @Mutation(() => RecruiterProfileResponse)
   async updateRecruiterProfile(
     @Args('id', { type: () => Int }) id: number,
     @Args('updateRecruiterProfileInput') updateRecruiterProfileInput: UpdateRecruiterProfileInput,
-  ): Promise<RecruiterProfile> {
+  ): Promise<RecruiterProfileResponse> {
     const profile = this.recruiterProfileService.update(id, updateRecruiterProfileInput);
     return profile;
   }

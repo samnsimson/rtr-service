@@ -2,35 +2,394 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type User {
-  """
-  Example field (placeholder)
-  """
-  exampleField: Int!
+type UserResponse {
+  id: String!
+  email: String!
+  name: String!
+  role: UserRole!
+  avatar: String
+  phone: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""The role of the user in the system"""
+enum UserRole {
+  ADMIN
+  RECRUITER
+  CANDIDATE
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type RecruiterProfileResponse {
+  id: String!
+  userId: String!
+  companyName: String!
+  companyWebsite: String
+  industry: String
+  companySize: CompanySize
+  location: String
+  bio: String
+  linkedinUrl: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""The size of the company"""
+enum CompanySize {
+  STARTUP
+  SMALL
+  MEDIUM
+  LARGE
+  ENTERPRISE
+}
+
+type CandidateProfileResponse {
+  id: String!
+  userId: String!
+  title: String
+  experience: Int
+  skills: [String!]
+  resumeUrl: String
+  linkedinUrl: String
+  portfolioUrl: String
+  location: String
+  willingToRelocate: Boolean!
+  remotePreference: RemotePreference!
+  expectedSalary: Int
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""The remote work preference of a candidate"""
+enum RemotePreference {
+  ANY
+  REMOTE_ONLY
+  HYBRID_ONLY
+  ON_SITE_ONLY
+}
+
+type JobResponse {
+  id: String!
+  title: String!
+  company: String!
+  description: String!
+  requirements: [String!]!
+  location: String!
+  workType: WorkType!
+  jobType: JobType!
+  compensation: CompensationType!
+  salaryMin: Int
+  salaryMax: Int
+  benefits: [String!]!
+  recruiterId: String!
+  status: JobStatus!
+  expiresAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""The type of work arrangement for a job"""
+enum WorkType {
+  REMOTE
+  HYBRID
+  ON_SITE
+}
+
+"""The type of employment for a job"""
+enum JobType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  INTERNSHIP
+  FREELANCE
+}
+
+"""The type of compensation for a job"""
+enum CompensationType {
+  SALARY
+  HOURLY
+  PROJECT_BASED
+  COMMISSION
+}
+
+"""The current status of a job posting"""
+enum JobStatus {
+  ACTIVE
+  INACTIVE
+  CLOSED
+  DRAFT
+}
+
+type RtrResponse {
+  id: String!
+  candidateId: String!
+  recruiterId: String!
+  jobId: String
+  status: RTRStatus!
+  notes: String
+  expiresAt: DateTime
+  signedAt: DateTime
+  viewedAt: DateTime
+  userId: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""The status of a Right to Represent agreement"""
+enum RTRStatus {
+  DRAFT
+  PENDING
+  SENT
+  VIEWED
+  SIGNED
+  EXPIRED
+  REJECTED
+}
+
+type RTRHistoryResponse {
+  id: String!
+  rtrId: String!
+  userId: String!
+  action: String!
+  details: String
+  createdAt: DateTime!
+}
+
+type JobApplicationResponse {
+  id: String!
+  jobId: String!
+  candidateId: String!
+  status: ApplicationStatus!
+  coverLetter: String
+  appliedAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""The status of a job application"""
+enum ApplicationStatus {
+  APPLIED
+  REVIEWING
+  INTERVIEWING
+  OFFERED
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+type DocumentResponse {
+  id: String!
+  rtrId: String!
+  name: String!
+  type: DocumentType!
+  url: String!
+  size: Int!
+  mimeType: String!
+  uploadedAt: DateTime!
+}
+
+"""The type of document being stored"""
+enum DocumentType {
+  RTR_FORM
+  RESUME
+  COVER_LETTER
+  CONTRACT
+  OTHER
+}
+
+type NotificationResponse {
+  id: String!
+  userId: String!
+  title: String!
+  message: String!
+  type: NotificationType!
+  isRead: Boolean!
+  data: String
+  createdAt: DateTime!
+}
+
+"""The type of notification being sent"""
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+  RTR_UPDATE
+  JOB_UPDATE
 }
 
 type Query {
-  users: [User!]!
-  user(id: Int!): User!
+  users: [UserResponse!]!
+  user(id: String!): UserResponse!
+  recruiterProfiles: [RecruiterProfileResponse!]!
+  recruiterProfile(id: Int!): RecruiterProfileResponse!
+  candidateProfiles: [CandidateProfileResponse!]!
+  candidateProfile(id: Int!): CandidateProfileResponse!
+  jobs: [JobResponse!]!
+  job(id: Int!): JobResponse!
+  rtrs: [RtrResponse!]!
+  rtr(id: Int!): RtrResponse!
+  rtrHistories: [RTRHistoryResponse!]!
+  rtrHistory(id: Int!): RTRHistoryResponse!
+  jobApplications: [JobApplicationResponse!]!
+  jobApplication(id: Int!): JobApplicationResponse!
+  documents: [DocumentResponse!]!
+  document(id: Int!): DocumentResponse!
+  notifications: [NotificationResponse!]!
+  notification(id: Int!): NotificationResponse!
 }
 
 type Mutation {
-  createUser(createUserInput: CreateUserInput!): User!
-  updateUser(updateUserInput: UpdateUserInput!): User!
-  removeUser(id: Int!): User!
+  createUser(createUserInput: CreateUserInput!): UserResponse!
+  updateUser(id: String!, updateUserInput: UpdateUserInput!): UserResponse!
+  removeUser(id: String!): Boolean!
+  createRecruiterProfile(createRecruiterProfileInput: CreateRecruiterProfileInput!): RecruiterProfileResponse!
+  updateRecruiterProfile(id: Int!, updateRecruiterProfileInput: UpdateRecruiterProfileInput!): RecruiterProfileResponse!
+  removeRecruiterProfile(id: Int!): Boolean!
+  createCandidateProfile(createCandidateProfileInput: CreateCandidateProfileInput!): CandidateProfileResponse!
+  updateCandidateProfile(id: Int!, updateCandidateProfileInput: UpdateCandidateProfileInput!): CandidateProfileResponse!
+  removeCandidateProfile(id: Int!): CandidateProfileResponse!
+  createJob(createJobInput: CreateJobInput!): JobResponse!
+  updateJob(id: Int!, updateJobInput: UpdateJobInput!): JobResponse!
+  removeJob(id: Int!): JobResponse!
+  createRTR(createRTRInput: CreateRTRInput!): RtrResponse!
+  updateRTR(id: Int!, updateRTRInput: UpdateRTRInput!): RtrResponse!
+  removeRTR(id: Int!): RtrResponse!
+  createRTRHistory(createRTRHistoryInput: CreateRTRHistoryInput!): RTRHistoryResponse!
+  updateRTRHistory(id: Int!, updateRTRHistoryInput: CreateRTRHistoryInput!): RTRHistoryResponse!
+  removeRTRHistory(id: Int!): RTRHistoryResponse!
+  createJobApplication(createJobApplicationInput: CreateJobApplicationInput!): JobApplicationResponse!
+  updateJobApplication(id: Int!, updateJobApplicationInput: UpdateJobApplicationInput!): JobApplicationResponse!
+  removeJobApplication(id: Int!): JobApplicationResponse!
+  createDocument(createDocumentInput: CreateDocumentInput!): DocumentResponse!
+  updateDocument(id: Int!, updateDocumentInput: CreateDocumentInput!): DocumentResponse!
+  removeDocument(id: Int!): DocumentResponse!
+  createNotification(createNotificationInput: CreateNotificationInput!): NotificationResponse!
+  updateNotification(id: Int!, updateNotificationInput: UpdateNotificationInput!): NotificationResponse!
+  removeNotification(id: Int!): NotificationResponse!
 }
 
 input CreateUserInput {
-  """
-  Example field (placeholder)
-  """
-  exampleField: Int!
+  email: String!
+  name: String!
+  password: String!
+  role: UserRole
+  avatar: String
+  phone: String
 }
 
 input UpdateUserInput {
-  """
-  Example field (placeholder)
-  """
-  exampleField: Int
-  id: Int!
+  id: String!
+}
+
+input CreateRecruiterProfileInput {
+  userId: String!
+  companyName: String!
+  companyWebsite: String
+  industry: String
+  companySize: CompanySize
+  location: String
+  bio: String
+  linkedinUrl: String
+}
+
+input UpdateRecruiterProfileInput {
+  id: String!
+}
+
+input CreateCandidateProfileInput {
+  userId: String!
+  title: String
+  experience: Int
+  skills: [String!]
+  resumeUrl: String
+  linkedinUrl: String
+  portfolioUrl: String
+  location: String
+  willingToRelocate: Boolean
+  remotePreference: RemotePreference
+  expectedSalary: Int
+}
+
+input UpdateCandidateProfileInput {
+  id: String!
+}
+
+input CreateJobInput {
+  title: String!
+  company: String!
+  description: String!
+  requirements: [String!]!
+  location: String!
+  workType: WorkType!
+  jobType: JobType!
+  compensation: CompensationType!
+  salaryMin: Int
+  salaryMax: Int
+  benefits: [String!]!
+  recruiterId: String!
+  status: JobStatus
+  expiresAt: String
+}
+
+input UpdateJobInput {
+  id: String!
+}
+
+input CreateRTRInput {
+  candidateId: String!
+  recruiterId: String!
+  jobId: String
+  status: RTRStatus
+  notes: String
+  expiresAt: String
+  userId: String
+}
+
+input UpdateRTRInput {
+  id: String!
+}
+
+input CreateRTRHistoryInput {
+  rtrId: String!
+  userId: String!
+  action: String!
+  details: String
+}
+
+input CreateJobApplicationInput {
+  jobId: String!
+  candidateId: String!
+  status: ApplicationStatus
+  coverLetter: String
+}
+
+input UpdateJobApplicationInput {
+  id: String!
+}
+
+input CreateDocumentInput {
+  rtrId: String!
+  name: String!
+  type: DocumentType!
+  url: String!
+  size: Int!
+  mimeType: String!
+}
+
+input CreateNotificationInput {
+  userId: String!
+  title: String!
+  message: String!
+  type: NotificationType!
+  isRead: Boolean
+  data: String
+}
+
+input UpdateNotificationInput {
+  id: String!
 }

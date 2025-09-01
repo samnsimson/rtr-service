@@ -2,7 +2,7 @@ import { ObjectType, Field } from '@nestjs/graphql';
 import { CompanySize } from '../../common/enums';
 
 @ObjectType()
-export class RecruiterProfileResponseDto {
+export class RecruiterProfileResponse {
   @Field()
   id: string;
 

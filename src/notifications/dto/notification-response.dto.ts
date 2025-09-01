@@ -2,7 +2,7 @@ import { ObjectType, Field } from '@nestjs/graphql';
 import { NotificationType } from '../../common/enums';
 
 @ObjectType()
-export class NotificationResponseDto {
+export class NotificationResponse {
   @Field()
   id: string;
 

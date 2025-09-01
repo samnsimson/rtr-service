@@ -2,7 +2,7 @@ import { ObjectType, Field, Int } from '@nestjs/graphql';
 import { RemotePreference } from '../../common/enums';
 
 @ObjectType()
-export class CandidateProfileResponseDto {
+export class CandidateProfileResponse {
   @Field()
   id: string;
 

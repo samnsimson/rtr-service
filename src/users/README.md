@@ -46,7 +46,7 @@ This module provides comprehensive user management functionality with TypeORM in
 
 - `CreateUserInput`: For creating new users
 - `UpdateUserInput`: For updating existing users
-- `UserResponseDto`: For API responses (password excluded)
+- `UserResponse`: For API responses (password excluded)
 
 ## Security Features
 

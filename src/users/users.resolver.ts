@@ -1,34 +1,33 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { UsersService } from './users.service';
-import { User } from './entities/user.entity';
-import { CreateUserInput, UpdateUserInput, UserResponseDto } from './dto';
+import { CreateUserInput, UpdateUserInput, UserResponse } from './dto';
 
-@Resolver(() => User)
+@Resolver(() => UserResponse)
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
 
-  @Mutation(() => UserResponseDto)
-  async createUser(@Args('createUserInput') createUserInput: CreateUserInput): Promise<UserResponseDto> {
+  @Mutation(() => UserResponse)
+  async createUser(@Args('createUserInput') createUserInput: CreateUserInput): Promise<UserResponse> {
     const user = await this.usersService.create(createUserInput);
-    return new UserResponseDto(user);
+    return new UserResponse(user);
   }
 
-  @Query(() => [UserResponseDto], { name: 'users' })
-  async findAll(): Promise<UserResponseDto[]> {
+  @Query(() => [UserResponse], { name: 'users' })
+  async findAll(): Promise<UserResponse[]> {
     const users = await this.usersService.findAll();
-    return users.map((user) => new UserResponseDto(user));
+    return users.map((user) => new UserResponse(user));
   }
 
-  @Query(() => UserResponseDto, { name: 'user' })
-  async findOne(@Args('id') id: string): Promise<UserResponseDto> {
+  @Query(() => UserResponse, { name: 'user' })
+  async findOne(@Args('id') id: string): Promise<UserResponse> {
     const user = await this.usersService.findOne(id);
-    return new UserResponseDto(user);
+    return new UserResponse(user);
   }
 
-  @Mutation(() => UserResponseDto)
-  async updateUser(@Args('id') id: string, @Args('updateUserInput') updateUserInput: UpdateUserInput): Promise<UserResponseDto> {
+  @Mutation(() => UserResponse)
+  async updateUser(@Args('id') id: string, @Args('updateUserInput') updateUserInput: UpdateUserInput): Promise<UserResponse> {
     const user = await this.usersService.update(id, updateUserInput);
-    return new UserResponseDto(user);
+    return new UserResponse(user);
   }
 
   @Mutation(() => Boolean)

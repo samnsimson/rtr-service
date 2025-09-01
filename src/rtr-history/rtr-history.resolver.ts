@@ -1,33 +1,32 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { RTRHistoryService } from './rtr-history.service';
-import { RTRHistory } from './entities/rtr-history.entity';
-import { CreateRTRHistoryInput } from './dto';
+import { CreateRTRHistoryInput, RTRHistoryResponse } from './dto';
 
-@Resolver(() => RTRHistory)
+@Resolver(() => RTRHistoryResponse)
 export class RTRHistoryResolver {
   constructor(private readonly rtrHistoryService: RTRHistoryService) {}
 
-  @Mutation(() => RTRHistory)
+  @Mutation(() => RTRHistoryResponse)
   createRTRHistory(@Args('createRTRHistoryInput') createRTRHistoryInput: CreateRTRHistoryInput) {
     return this.rtrHistoryService.create(createRTRHistoryInput);
   }
 
-  @Query(() => [RTRHistory], { name: 'rtrHistories' })
+  @Query(() => [RTRHistoryResponse], { name: 'rtrHistories' })
   findAll() {
     return this.rtrHistoryService.findAll();
   }
 
-  @Query(() => RTRHistory, { name: 'rtrHistory' })
+  @Query(() => RTRHistoryResponse, { name: 'rtrHistory' })
   findOne(@Args('id', { type: () => Int }) id: number) {
     return this.rtrHistoryService.findOne(id);
   }
 
-  @Mutation(() => RTRHistory)
+  @Mutation(() => RTRHistoryResponse)
   updateRTRHistory(@Args('id', { type: () => Int }) id: number, @Args('updateRTRHistoryInput') updateRTRHistoryInput: CreateRTRHistoryInput) {
     return this.rtrHistoryService.update(id, updateRTRHistoryInput);
   }
 
-  @Mutation(() => RTRHistory)
+  @Mutation(() => RTRHistoryResponse)
   removeRTRHistory(@Args('id', { type: () => Int }) id: number) {
     return this.rtrHistoryService.remove(id);
   }

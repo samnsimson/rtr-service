@@ -1,33 +1,32 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { JobsService } from './jobs.service';
-import { Job } from './entities/job.entity';
-import { CreateJobInput, UpdateJobInput } from './dto';
+import { CreateJobInput, JobResponse, UpdateJobInput } from './dto';
 
-@Resolver(() => Job)
+@Resolver(() => JobResponse)
 export class JobsResolver {
   constructor(private readonly jobsService: JobsService) {}
 
-  @Mutation(() => Job)
+  @Mutation(() => JobResponse)
   createJob(@Args('createJobInput') createJobInput: CreateJobInput) {
     return this.jobsService.create(createJobInput);
   }
 
-  @Query(() => [Job], { name: 'jobs' })
+  @Query(() => [JobResponse], { name: 'jobs' })
   findAll() {
     return this.jobsService.findAll();
   }
 
-  @Query(() => Job, { name: 'job' })
+  @Query(() => JobResponse, { name: 'job' })
   findOne(@Args('id', { type: () => Int }) id: number) {
     return this.jobsService.findOne(id);
   }
 
-  @Mutation(() => Job)
+  @Mutation(() => JobResponse)
   updateJob(@Args('id', { type: () => Int }) id: number, @Args('updateJobInput') updateJobInput: UpdateJobInput) {
     return this.jobsService.update(id, updateJobInput);
   }
 
-  @Mutation(() => Job)
+  @Mutation(() => JobResponse)
   removeJob(@Args('id', { type: () => Int }) id: number) {
     return this.jobsService.remove(id);
   }

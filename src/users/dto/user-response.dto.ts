@@ -2,7 +2,7 @@ import { ObjectType, Field } from '@nestjs/graphql';
 import { UserRole } from '../../common/enums';
 
 @ObjectType()
-export class UserResponseDto {
+export class UserResponse {
   @Field()
   id: string;
 
@@ -27,7 +27,7 @@ export class UserResponseDto {
   @Field()
   updatedAt: Date;
 
-  constructor(props: Partial<UserResponseDto>) {
+  constructor(props: Partial<UserResponse>) {
     Object.assign(this, props);
   }
 }

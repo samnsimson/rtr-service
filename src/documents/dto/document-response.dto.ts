@@ -2,7 +2,7 @@ import { ObjectType, Field, Int } from '@nestjs/graphql';
 import { DocumentType } from '../../common/enums';
 
 @ObjectType()
-export class DocumentResponseDto {
+export class DocumentResponse {
   @Field()
   id: string;
 

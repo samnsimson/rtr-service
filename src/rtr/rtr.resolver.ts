@@ -1,33 +1,32 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { RTRService } from './rtr.service';
-import { RTR } from './entities/rtr.entity';
-import { CreateRTRInput, UpdateRTRInput } from './dto';
+import { CreateRTRInput, RtrResponse, UpdateRTRInput } from './dto';
 
-@Resolver(() => RTR)
+@Resolver(() => RtrResponse)
 export class RTRResolver {
   constructor(private readonly rtrService: RTRService) {}
 
-  @Mutation(() => RTR)
+  @Mutation(() => RtrResponse)
   createRTR(@Args('createRTRInput') createRTRInput: CreateRTRInput) {
     return this.rtrService.create(createRTRInput);
   }
 
-  @Query(() => [RTR], { name: 'rtrs' })
+  @Query(() => [RtrResponse], { name: 'rtrs' })
   findAll() {
     return this.rtrService.findAll();
   }
 
-  @Query(() => RTR, { name: 'rtr' })
+  @Query(() => RtrResponse, { name: 'rtr' })
   findOne(@Args('id', { type: () => Int }) id: number) {
     return this.rtrService.findOne(id);
   }
 
-  @Mutation(() => RTR)
+  @Mutation(() => RtrResponse)
   updateRTR(@Args('id', { type: () => Int }) id: number, @Args('updateRTRInput') updateRTRInput: UpdateRTRInput) {
     return this.rtrService.update(id, updateRTRInput);
   }
 
-  @Mutation(() => RTR)
+  @Mutation(() => RtrResponse)
   removeRTR(@Args('id', { type: () => Int }) id: number) {
     return this.rtrService.remove(id);
   }
