@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
@@ -13,6 +13,7 @@ import { RTRHistoryModule } from './rtr-history/rtr-history.module';
 import { JobApplicationsModule } from './job-applications/job-applications.module';
 import { DocumentsModule } from './documents/documents.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { AuthModule } from './auth/auth.module';
 import { graphqlValidationConfig } from './common/config/graphql-validation.config';
 import './common/enums';
 
@@ -36,15 +37,16 @@ import './common/enums';
       graphiql: true,
       ...graphqlValidationConfig,
     }),
-    UsersModule,
-    RecruiterProfileModule,
-    CandidateProfileModule,
-    JobsModule,
-    RTRModule,
-    RTRHistoryModule,
-    JobApplicationsModule,
-    DocumentsModule,
-    NotificationsModule,
+    forwardRef(() => UsersModule),
+    forwardRef(() => AuthModule),
+    forwardRef(() => RecruiterProfileModule),
+    forwardRef(() => CandidateProfileModule),
+    forwardRef(() => JobsModule),
+    forwardRef(() => RTRModule),
+    forwardRef(() => RTRHistoryModule),
+    forwardRef(() => JobApplicationsModule),
+    forwardRef(() => DocumentsModule),
+    forwardRef(() => NotificationsModule),
   ],
 })
 export class AppModule {}

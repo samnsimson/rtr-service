@@ -1,0 +1,37 @@
+import { Resolver, Mutation, Args, Query } from '@nestjs/graphql';
+import { AuthService } from './auth.service';
+import { Auth } from './entities';
+import { LoginInput, RegisterInput, RefreshTokenInput } from './dto';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { CurrentUser } from './decorators/current-user.decorator';
+import { GraphQLValidate } from '../common/decorators';
+
+@Resolver(() => Auth)
+export class AuthResolver {
+  constructor(private readonly authService: AuthService) {}
+
+  @Mutation(() => Auth)
+  @GraphQLValidate()
+  async login(@Args('loginInput') loginInput: LoginInput) {
+    return this.authService.login(loginInput);
+  }
+
+  @Mutation(() => Auth)
+  @GraphQLValidate()
+  async register(@Args('registerInput') registerInput: RegisterInput) {
+    return this.authService.register(registerInput);
+  }
+
+  @Mutation(() => Auth)
+  @GraphQLValidate()
+  async refreshToken(@Args('refreshTokenInput') refreshTokenInput: RefreshTokenInput) {
+    return this.authService.refreshToken(refreshTokenInput.refreshToken);
+  }
+
+  @Query(() => String)
+  @UseGuards(JwtAuthGuard)
+  verifyToken(@CurrentUser() user: any) {
+    return `Token is valid for user: ${user.email}`;
+  }
+}
