@@ -8,8 +8,8 @@ import { join } from 'path';
 import { RecruiterProfileModule } from './recruiter-profile/recruiter-profile.module';
 import { CandidateProfileModule } from './candidate-profile/candidate-profile.module';
 import { JobsModule } from './jobs/jobs.module';
-import { RtrModule } from './rtr/rtr.module';
-import { RtrHistoryModule } from './rtr-history/rtr-history.module';
+import { RTRModule } from './rtr/rtr.module';
+import { RTRHistoryModule } from './rtr-history/rtr-history.module';
 import { JobApplicationsModule } from './job-applications/job-applications.module';
 import { DocumentsModule } from './documents/documents.module';
 import { NotificationsModule } from './notifications/notifications.module';
@@ -37,8 +37,8 @@ import { NotificationsModule } from './notifications/notifications.module';
     RecruiterProfileModule,
     CandidateProfileModule,
     JobsModule,
-    RtrModule,
-    RtrHistoryModule,
+    RTRModule,
+    RTRHistoryModule,
     JobApplicationsModule,
     DocumentsModule,
     NotificationsModule,

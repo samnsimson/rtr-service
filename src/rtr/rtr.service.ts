@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CreateRtrInput } from './dto/create-rtr.input';
-import { UpdateRtrInput } from './dto/update-rtr.input';
+import { CreateRTRInput } from './dto/create-rtr.input';
+import { UpdateRTRInput } from './dto/update-rtr.input';
 
 @Injectable()
-export class RtrService {
-  create(createRtrInput: CreateRtrInput) {
+export class RTRService {
+  create(createRTRInput: CreateRTRInput) {
     return 'This action adds a new rtr';
   }
 
@@ -16,7 +16,7 @@ export class RtrService {
     return `This action returns a #${id} rtr`;
   }
 
-  update(id: number, updateRtrInput: UpdateRtrInput) {
+  update(id: number, updateRTRInput: UpdateRTRInput) {
     return `This action updates a #${id} rtr`;
   }
 

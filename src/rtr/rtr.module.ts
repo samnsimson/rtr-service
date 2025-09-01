@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { RtrService } from './rtr.service';
-import { RtrResolver } from './rtr.resolver';
+import { RTRService } from './rtr.service';
+import { RTRResolver } from './rtr.resolver';
 
 @Module({
-  providers: [RtrResolver, RtrService],
+  providers: [RTRResolver, RTRService],
 })
-export class RtrModule {}
+export class RTRModule {}

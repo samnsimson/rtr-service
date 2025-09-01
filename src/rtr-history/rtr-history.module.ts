@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { RtrHistoryService } from './rtr-history.service';
-import { RtrHistoryResolver } from './rtr-history.resolver';
+import { RTRHistoryService } from './rtr-history.service';
+import { RTRHistoryResolver } from './rtr-history.resolver';
 
 @Module({
-  providers: [RtrHistoryResolver, RtrHistoryService],
+  providers: [RTRHistoryResolver, RTRHistoryService],
 })
-export class RtrHistoryModule {}
+export class RTRHistoryModule {}

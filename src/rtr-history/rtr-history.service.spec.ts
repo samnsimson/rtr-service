@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { RtrHistoryService } from './rtr-history.service';
+import { RTRHistoryService } from './rtr-history.service';
 
-describe('RtrHistoryService', () => {
-  let service: RtrHistoryService;
+describe('RTRHistoryService', () => {
+  let service: RTRHistoryService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [RtrHistoryService],
+      providers: [RTRHistoryService],
     }).compile();
 
-    service = module.get<RtrHistoryService>(RtrHistoryService);
+    service = module.get<RTRHistoryService>(RTRHistoryService);
   });
 
   it('should be defined', () => {
