@@ -12,21 +12,30 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const status = exception.getStatus();
     const exceptionResponse = exception.getResponse();
 
-    // Log the error
-    this.logger.error(`HTTP Exception: ${status} - ${request.method} ${request.url}`, exception.stack);
+    // Safely handle both HTTP and GraphQL contexts
+    if (request && response) {
+      // HTTP context - log with request details
+      this.logger.error(`HTTP Exception: ${status} - ${request.method} ${request.url}`, exception.stack);
 
-    // Format the error response
-    const errorResponse = {
-      statusCode: status,
-      timestamp: new Date().toISOString(),
-      path: request.url,
-      method: request.method,
-      message: this.extractMessage(exceptionResponse),
-      errors: this.extractErrors(exceptionResponse),
-    };
+      // Format the error response
+      const errorResponse = {
+        statusCode: status,
+        timestamp: new Date().toISOString(),
+        path: request.url,
+        method: request.method,
+        message: this.extractMessage(exceptionResponse),
+        errors: this.extractErrors(exceptionResponse),
+      };
 
-    // Send the formatted error response
-    response.status(status).json(errorResponse);
+      // Send the formatted error response
+      response.status(status).json(errorResponse);
+    } else {
+      // GraphQL or other context - log without request details
+      this.logger.error(`Exception: ${status}`, exception.stack);
+
+      // For non-HTTP contexts, just log the error
+      // The GraphQLExceptionFilter should handle GraphQL errors
+    }
   }
 
   private extractMessage(exceptionResponse: any): string {

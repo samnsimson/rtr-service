@@ -35,12 +35,6 @@ import './common/enums';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       graphiql: true,
-      context: ({ req }) => {
-        const token = req.headers.authorization?.replace('Bearer ', '');
-        let user: any = null;
-        if (token) user = { token };
-        return { req, user };
-      },
       ...graphqlValidationConfig,
     }),
     forwardRef(() => UsersModule),

@@ -22,7 +22,7 @@ export class UsersResolver {
 
   @Query(() => [UserResponse], { name: 'users' })
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.CANDIDATE)
   async findAll(): Promise<UserResponse[]> {
     const users = await this.usersService.findAll();
     return users.map((user) => new UserResponse(user));
