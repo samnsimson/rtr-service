@@ -26,4 +26,8 @@ export class UserResponseDto {
 
   @Field()
   updatedAt: Date;
+
+  constructor(props: Partial<UserResponseDto>) {
+    Object.assign(this, props);
+  }
 }
