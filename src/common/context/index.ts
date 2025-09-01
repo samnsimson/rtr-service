@@ -1,2 +1,1 @@
-export { ContextModule } from './context.module';
-export { GraphQLContextFactory } from './graphql-context.factory';
+// Context module exports - currently empty as we're using simple GraphQL context
