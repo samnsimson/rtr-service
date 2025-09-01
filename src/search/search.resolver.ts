@@ -54,6 +54,18 @@ class SearchOptionsType {
   highlightPostTag?: string;
 }
 
+class JobSearchFiltersInput {
+  workType?: string[];
+  jobType?: string[];
+  compensation?: string[];
+  location?: string;
+  status?: string;
+  recruiterId?: string;
+  salaryMin?: number;
+  salaryMax?: number;
+  hasBenefits?: boolean;
+}
+
 class IndexType {
   name: string;
   primaryKey?: string;
@@ -97,6 +109,182 @@ export class SearchResolver {
       cropLength: options?.cropLength,
       highlightPreTag: options?.highlightPreTag,
       highlightPostTag: options?.highlightPostTag,
+    });
+  }
+
+  @Query(() => SearchResultType, { name: 'searchJobs' })
+  async searchJobs(
+    @Args('query') query: string,
+    @Args('filters', { nullable: true }) filters?: JobSearchFiltersInput,
+    @Args('options', { nullable: true }) options?: SearchOptionsType,
+  ): Promise<SearchResult> {
+    const filterParts: string[] = [];
+
+    if (filters?.workType && filters.workType.length > 0) {
+      filterParts.push(`workType IN [${filters.workType.map((t) => `"${t}"`).join(', ')}]`);
+    }
+
+    if (filters?.jobType && filters.jobType.length > 0) {
+      filterParts.push(`jobType IN [${filters.jobType.map((t) => `"${t}"`).join(', ')}]`);
+    }
+
+    if (filters?.compensation && filters.compensation.length > 0) {
+      filterParts.push(`compensation IN [${filters.compensation.map((c) => `"${c}"`).join(', ')}]`);
+    }
+
+    if (filters?.location) {
+      filterParts.push(`location = "${filters.location}"`);
+    }
+
+    if (filters?.status) {
+      filterParts.push(`status = "${filters.status}"`);
+    }
+
+    if (filters?.recruiterId) {
+      filterParts.push(`recruiterId = "${filters.recruiterId}"`);
+    }
+
+    if (filters?.salaryMin !== undefined) {
+      filterParts.push(`salaryMin >= ${filters.salaryMin}`);
+    }
+
+    if (filters?.salaryMax !== undefined) {
+      filterParts.push(`salaryMax <= ${filters.salaryMax}`);
+    }
+
+    const filterString = filterParts.length > 0 ? filterParts.join(' AND ') : undefined;
+
+    return this.searchService.search('jobs', query, {
+      limit: options?.limit,
+      offset: options?.offset,
+      filter: filterString,
+      sort: options?.sort,
+      attributesToHighlight: ['title', 'description', 'requirements', 'company'],
+      attributesToRetrieve: [
+        'id',
+        'title',
+        'company',
+        'description',
+        'requirements',
+        'location',
+        'workType',
+        'jobType',
+        'compensation',
+        'salaryMin',
+        'salaryMax',
+        'benefits',
+        'recruiterId',
+        'status',
+        'expiresAt',
+        'createdAt',
+        'updatedAt',
+      ],
+      highlightPreTag: '<mark>',
+      highlightPostTag: '</mark>',
+    });
+  }
+
+  @Query(() => SearchResultType, { name: 'searchJobsByLocation' })
+  async searchJobsByLocation(@Args('location') location: string, @Args('options', { nullable: true }) options?: SearchOptionsType): Promise<SearchResult> {
+    return this.searchService.search('jobs', '', {
+      limit: options?.limit,
+      offset: options?.offset,
+      sort: options?.sort,
+      filter: `location = "${location}"`,
+    });
+  }
+
+  @Query(() => SearchResultType, { name: 'searchJobsByWorkType' })
+  async searchJobsByWorkType(
+    @Args('workType', { type: () => [String] }) workType: string[],
+    @Args('options', { nullable: true }) options?: SearchOptionsType,
+  ): Promise<SearchResult> {
+    return this.searchService.search('jobs', '', {
+      limit: options?.limit,
+      offset: options?.offset,
+      sort: options?.sort,
+      filter: `workType IN [${workType.map((t) => `"${t}"`).join(', ')}]`,
+    });
+  }
+
+  @Query(() => SearchResultType, { name: 'searchJobsBySalaryRange' })
+  async searchJobsBySalaryRange(
+    @Args('minSalary') minSalary: number,
+    @Args('maxSalary') maxSalary: number,
+    @Args('options', { nullable: true }) options?: SearchOptionsType,
+  ): Promise<SearchResult> {
+    return this.searchService.search('jobs', '', {
+      limit: options?.limit,
+      offset: options?.offset,
+      sort: options?.sort,
+      filter: `salaryMin >= ${minSalary} AND salaryMax <= ${maxSalary}`,
+    });
+  }
+
+  @Query(() => SearchResultType, { name: 'searchJobsByCompany' })
+  async searchJobsByCompany(@Args('company') company: string, @Args('options', { nullable: true }) options?: SearchOptionsType): Promise<SearchResult> {
+    return this.searchService.search('jobs', company, {
+      limit: options?.limit,
+      offset: options?.offset,
+      sort: options?.sort,
+    });
+  }
+
+  @Query(() => SearchResultType, { name: 'searchJobsBySkills' })
+  async searchJobsBySkills(
+    @Args('skills', { type: () => [String] }) skills: string[],
+    @Args('options', { nullable: true }) options?: SearchOptionsType,
+  ): Promise<SearchResult> {
+    const skillsQuery = skills.join(' ');
+    return this.searchService.search('jobs', skillsQuery, {
+      limit: options?.limit,
+      offset: options?.offset,
+      sort: options?.sort,
+    });
+  }
+
+  @Query(() => SearchResultType, { name: 'getRecentJobs' })
+  async getRecentJobs(@Args('limit', { nullable: true }) limit?: number): Promise<SearchResult> {
+    return this.searchService.search('jobs', '', {
+      limit: limit || 10,
+      sort: ['createdAt:desc'],
+    });
+  }
+
+  @Query(() => SearchResultType, { name: 'getJobsByRecruiter' })
+  async getJobsByRecruiter(@Args('recruiterId') recruiterId: string, @Args('options', { nullable: true }) options?: SearchOptionsType): Promise<SearchResult> {
+    return this.searchService.search('jobs', '', {
+      limit: options?.limit,
+      offset: options?.offset,
+      sort: options?.sort,
+      filter: `recruiterId = "${recruiterId}"`,
+    });
+  }
+
+  @Query(() => SearchResultType, { name: 'getActiveJobs' })
+  async getActiveJobs(@Args('options', { nullable: true }) options?: SearchOptionsType): Promise<SearchResult> {
+    return this.searchService.search('jobs', '', {
+      limit: options?.limit,
+      offset: options?.offset,
+      sort: options?.sort,
+      filter: 'status = "ACTIVE"',
+    });
+  }
+
+  @Query(() => SearchResultType, { name: 'getExpiringJobs' })
+  async getExpiringJobs(
+    @Args('daysUntilExpiry', { nullable: true }) daysUntilExpiry?: number,
+    @Args('options', { nullable: true }) options?: SearchOptionsType,
+  ): Promise<SearchResult> {
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + (daysUntilExpiry || 7));
+
+    const filterString = `expiresAt <= "${expiryDate.toISOString()}" AND status = "ACTIVE"`;
+
+    return this.searchService.search('jobs', '', {
+      ...options,
+      filter: filterString,
+      sort: ['expiresAt:asc'],
     });
   }
 
