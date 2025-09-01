@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateNotificationInput, UpdateNotificationDto } from './dto';
+import { CreateNotificationInput, UpdateNotificationInput } from './dto';
 
 @Injectable()
 export class NotificationsService {
@@ -15,7 +15,7 @@ export class NotificationsService {
     return `This action returns a #${id} notification`;
   }
 
-  update(id: number, updateNotificationInput: UpdateNotificationDto) {
+  update(id: number, updateNotificationInput: UpdateNotificationInput) {
     return `This action updates a #${id} notification`;
   }
 

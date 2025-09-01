@@ -33,8 +33,8 @@ export class Notification {
   @Column({ default: false })
   isRead: boolean;
 
-  @Column('json', { nullable: true })
-  data: any; // Additional data for the notification
+  @Column('text', { nullable: true })
+  data?: string; // Changed from 'any' to 'string' for GraphQL compatibility
 
   @CreateDateColumn()
   createdAt: Date;

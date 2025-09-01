@@ -3,4 +3,4 @@ import { InputType } from '@nestjs/graphql';
 import { CreateNotificationInput } from './create-notification.dto';
 
 @InputType()
-export class UpdateNotificationDto extends PartialType(CreateNotificationInput) {}
+export class UpdateNotificationInput extends PartialType(CreateNotificationInput) {}

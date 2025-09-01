@@ -30,9 +30,9 @@ export class RecruiterProfileResponseDto {
   @Field({ nullable: true })
   linkedinUrl?: string;
 
-  @Field()
+  @Field(() => Date)
   createdAt: Date;
 
-  @Field()
+  @Field(() => Date)
   updatedAt: Date;
 }

@@ -22,7 +22,7 @@ export class NotificationResponseDto {
   isRead: boolean;
 
   @Field({ nullable: true })
-  data?: any;
+  data?: string;
 
   @Field()
   createdAt: Date;

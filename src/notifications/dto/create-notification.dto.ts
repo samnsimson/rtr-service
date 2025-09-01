@@ -25,8 +25,8 @@ export class CreateNotificationInput {
   @IsBoolean()
   isRead?: boolean;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @IsOptional()
   @IsObject()
-  data?: any; // Additional data for the notification
+  data?: string; // Changed from 'any' to 'string' for GraphQL compatibility
 }

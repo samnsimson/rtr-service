@@ -26,6 +26,7 @@ import { NotificationsModule } from './notifications/notifications.module';
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: configService.get<string>('NODE_ENV') !== 'production',
         logging: configService.get<string>('NODE_ENV') === 'development',
+        connectTimeoutMS: 3000,
       }),
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
