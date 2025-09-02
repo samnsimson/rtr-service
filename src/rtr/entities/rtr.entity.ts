@@ -33,11 +33,7 @@ export class RTR {
   organizationId: string;
 
   @Field(() => RTRStatus)
-  @Column({
-    type: 'enum',
-    enum: RTRStatus,
-    default: RTRStatus.PENDING,
-  })
+  @Column({ type: 'enum', enum: RTRStatus, default: RTRStatus.PENDING })
   status: RTRStatus;
 
   @Field(() => String, { nullable: true })
