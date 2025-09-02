@@ -5,6 +5,8 @@ import { RTR } from '../../rtr/entities/rtr.entity';
 import { RTRHistory } from '../../rtr-history/entities/rtr-history.entity';
 import { Notification } from '../../notifications/entities/notification.entity';
 import { Organization } from '../../organizations/entities/organization.entity';
+import { Subscription } from '../../subscriptions/entities/subscription.entity';
+import { Payment } from '../../payments/entities/payment.entity';
 import { UserRole } from '../../common/enums';
 import { ObjectType, Field } from '@nestjs/graphql';
 
@@ -84,6 +86,14 @@ export class User {
   @Field(() => [Notification], { nullable: true })
   @OneToMany(() => Notification, (notification) => notification.user)
   notifications: Notification[];
+
+  @Field(() => [Subscription], { nullable: true })
+  @OneToMany(() => Subscription, (subscription) => subscription.user)
+  subscriptions: Subscription[];
+
+  @Field(() => [Payment], { nullable: true })
+  @OneToMany(() => Payment, (payment) => payment.user)
+  payments: Payment[];
 
   @Field(() => [User], { nullable: true })
   @OneToMany(() => User, (user) => user.createdBy)

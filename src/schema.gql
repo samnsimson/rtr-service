@@ -226,6 +226,113 @@ enum NotificationType {
   JOB_UPDATE
 }
 
+type SubscriptionPlan {
+  id: String!
+  name: String!
+  description: String!
+  planType: PlanType!
+  billingInterval: BillingInterval!
+  price: Float!
+  currency: String!
+  maxUsers: Float!
+  maxJobs: Float!
+  maxRTRs: Float!
+  stripePriceId: String
+  stripeProductId: String
+  isActive: Boolean!
+  features: [String!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  subscriptions: [Subscription!]
+}
+
+enum PlanType {
+  STANDARD
+  PREMIUM
+}
+
+enum BillingInterval {
+  MONTHLY
+  YEARLY
+}
+
+type Payment {
+  id: String!
+  userId: String!
+  organizationId: String
+  subscriptionId: String
+  stripePaymentIntentId: String
+  stripeChargeId: String
+  stripeInvoiceId: String
+  status: PaymentStatus!
+  paymentMethod: PaymentMethod!
+  amount: Float!
+  currency: String!
+  description: String
+  failureReason: String
+  paidAt: DateTime
+  refundedAt: DateTime
+  refundedAmount: Float
+  receiptUrl: String
+  invoiceUrl: String
+  metadata: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  user: User!
+  organization: Organization
+  subscription: Subscription
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum PaymentMethod {
+  CARD
+  BANK_TRANSFER
+  WALLET
+  OTHER
+}
+
+type Subscription {
+  id: String!
+  userId: String!
+  organizationId: String
+  planId: String!
+  stripeSubscriptionId: String
+  stripeCustomerId: String
+  status: SubscriptionStatus!
+  startDate: DateTime!
+  endDate: DateTime
+  nextBillingDate: DateTime
+  cancelledAt: DateTime
+  cancellationReason: String
+  autoRenew: Boolean!
+  amount: Float!
+  currency: String!
+  planType: PlanType!
+  billingInterval: BillingInterval!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  user: User!
+  organization: Organization
+  plan: SubscriptionPlan!
+  payments: [Payment!]
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  CANCELLED
+  PAST_DUE
+  UNPAID
+}
+
 type Organization {
   id: String!
   name: String!
@@ -248,6 +355,8 @@ type Organization {
   rtrHistory: [RTRHistory!]
   documents: [Document!]
   notifications: [Notification!]
+  subscriptions: [Subscription!]
+  payments: [Payment!]
 }
 
 """The size of the company"""
@@ -295,6 +404,8 @@ type User {
   rtrs: [RTR!]
   rtrHistory: [RTRHistory!]
   notifications: [Notification!]
+  subscriptions: [Subscription!]
+  payments: [Payment!]
   createdUsers: [User!]
   createdBy: User
   createdById: String
@@ -536,6 +647,17 @@ type Query {
   getJobsByRecruiter(recruiterId: String!, options: SearchOptionsInput): SearchResultType!
   getActiveJobs(options: SearchOptionsInput): SearchResultType!
   getExpiringJobs(daysUntilExpiry: Float, options: SearchOptionsInput): SearchResultType!
+  payments: [Payment!]!
+  payment(id: String!): Payment!
+  organizationPayments(organizationId: String!): [Payment!]!
+  userPayments(userId: String!): [Payment!]!
+  subscriptions: [Subscription!]!
+  subscription(id: String!): Subscription!
+  activeSubscription: Subscription
+  organizationSubscriptions(organizationId: String!): [Subscription!]!
+  subscriptionPlans: [SubscriptionPlan!]!
+  subscriptionPlan(id: String!): SubscriptionPlan!
+  subscriptionPlansByType(planType: PlanType!): [SubscriptionPlan!]!
 }
 
 input SearchOptionsInput {
@@ -648,6 +770,11 @@ type Mutation {
   indexSingleJob(jobId: String!): Boolean!
   removeJobFromIndex(jobId: String!): Boolean!
   updateJobInIndex(jobId: String!): Boolean!
+  createPayment(createPaymentInput: CreatePaymentInput!): Payment!
+  processPayment(processPaymentInput: ProcessPaymentInput!): Payment!
+  createSubscription(createSubscriptionInput: CreateSubscriptionInput!): Subscription!
+  updateSubscription(id: String!, updateSubscriptionInput: UpdateSubscriptionInput!): Subscription!
+  cancelSubscription(id: String!, reason: String): Subscription!
 }
 
 input CreateUserInput {
@@ -860,4 +987,35 @@ input IndexConfigInput {
 input DocumentToIndexInput {
   """Document ID"""
   id: String!
+}
+
+input CreatePaymentInput {
+  subscriptionId: String
+  organizationId: String
+  amount: Float!
+  currency: String!
+  paymentMethod: PaymentMethod
+  description: String
+  savePaymentMethod: Boolean
+}
+
+input ProcessPaymentInput {
+  subscriptionId: String!
+  paymentMethodId: String
+  customerId: String
+}
+
+input CreateSubscriptionInput {
+  planId: String!
+  organizationId: String
+  planType: PlanType!
+  billingInterval: BillingInterval!
+  autoRenew: Boolean
+}
+
+input UpdateSubscriptionInput {
+  status: SubscriptionStatus
+  autoRenew: Boolean
+  cancellationReason: String
+  cancelledAt: String
 }

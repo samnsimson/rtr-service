@@ -9,6 +9,8 @@ import { JobApplication } from '../../job-applications/entities/job-application.
 import { RTRHistory } from '../../rtr-history/entities/rtr-history.entity';
 import { Document } from '../../documents/entities/document.entity';
 import { Notification } from '../../notifications/entities/notification.entity';
+import { Subscription } from '../../subscriptions/entities/subscription.entity';
+import { Payment } from '../../payments/entities/payment.entity';
 import { CompanySize } from '../../common/enums';
 
 @ObjectType()
@@ -102,4 +104,12 @@ export class Organization {
   @Field(() => [Notification], { nullable: true })
   @OneToMany(() => Notification, (notification) => notification.organization)
   notifications: Notification[];
+
+  @Field(() => [Subscription], { nullable: true })
+  @OneToMany(() => Subscription, (subscription) => subscription.organization)
+  subscriptions: Subscription[];
+
+  @Field(() => [Payment], { nullable: true })
+  @OneToMany(() => Payment, (payment) => payment.organization)
+  payments: Payment[];
 }

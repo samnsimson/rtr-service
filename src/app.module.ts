@@ -17,6 +17,8 @@ import { AuthModule } from './auth/auth.module';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { graphqlValidationConfig } from './common/config/graphql-validation.config';
 import { SearchModule } from './search/search.module';
+import { PaymentsModule } from './payments/payments.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import './common/enums';
 
 @Module({
@@ -51,6 +53,8 @@ import './common/enums';
     forwardRef(() => NotificationsModule),
     OrganizationsModule,
     SearchModule,
+    PaymentsModule,
+    SubscriptionsModule,
   ],
 })
 export class AppModule {}
