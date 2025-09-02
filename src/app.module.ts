@@ -19,6 +19,7 @@ import { graphqlValidationConfig } from './common/config/graphql-validation.conf
 import { SearchModule } from './search/search.module';
 import { PaymentsModule } from './payments/payments.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { EmailModule } from './email/email.module';
 import './common/enums';
 
 @Module({
@@ -55,6 +56,7 @@ import './common/enums';
     SearchModule,
     PaymentsModule,
     SubscriptionsModule,
+    EmailModule,
   ],
 })
 export class AppModule {}

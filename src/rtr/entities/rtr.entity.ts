@@ -46,7 +46,7 @@ export class RTR {
 
   @Field(() => Date, { nullable: true })
   @Column({ nullable: true })
-  expiresAt: Date;
+  expiresAt: Date | null;
 
   @Field(() => Date, { nullable: true })
   @Column({ nullable: true })
