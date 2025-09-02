@@ -2,7 +2,7 @@ import { ObjectType, Field } from '@nestjs/graphql';
 import { UserRole } from '../../common/enums';
 
 @ObjectType()
-class Organization {
+class Org {
   @Field()
   id: string;
 
@@ -21,8 +21,8 @@ class AuthUser {
   @Field(() => UserRole)
   role: UserRole;
 
-  @Field(() => Organization, { nullable: true })
-  organization?: Organization;
+  @Field(() => Org, { nullable: true })
+  organization?: Org;
 
   @Field()
   isActive: boolean;

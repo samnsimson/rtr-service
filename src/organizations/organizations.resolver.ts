@@ -3,7 +3,7 @@ import { UseGuards } from '@nestjs/common';
 import { OrganizationsService } from './organizations.service';
 import { Organization } from './entities/organization.entity';
 import { User } from '../users/entities/user.entity';
-import { CreateOrganizationInput, UpdateOrganizationInput, CreateUserInput } from './dto';
+import { CreateOrganizationInput, UpdateOrganizationInput, CreateOrganizationUserInput } from './dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -57,7 +57,7 @@ export class OrganizationsResolver {
   @Mutation(() => User, { name: 'createOrganizationUser' })
   async createOrganizationUser(
     @Args('organizationId') organizationId: string,
-    @Args('createUserInput') createUserInput: CreateUserInput,
+    @Args('createUserInput') createUserInput: CreateOrganizationUserInput,
     @AuthUser() user: CurrentUserType,
   ): Promise<User> {
     return this.organizationsService.createUser(organizationId, createUserInput, user.id);

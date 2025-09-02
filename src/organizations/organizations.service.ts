@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { Organization } from './entities/organization.entity';
 import { User } from '../users/entities/user.entity';
 import { UserRole } from '../common/enums';
-import { CreateOrganizationInput, UpdateOrganizationInput, CreateUserInput } from './dto';
+import { CreateOrganizationInput, UpdateOrganizationInput, CreateOrganizationUserInput } from './dto';
 
 @Injectable()
 export class OrganizationsService {
@@ -71,7 +71,7 @@ export class OrganizationsService {
     return true;
   }
 
-  async createUser(organizationId: string, createUserInput: CreateUserInput, creatorId: string): Promise<User> {
+  async createUser(organizationId: string, createUserInput: CreateOrganizationUserInput, creatorId: string): Promise<User> {
     // Check if creator has permission to create users in this organization
     const creator = await this.userRepo.findOne({ where: { id: creatorId } });
     if (!creator || creator.organizationId !== organizationId || ![UserRole.ORGANIZATION_OWNER, UserRole.ORGANIZATION_ADMIN].includes(creator.role)) {

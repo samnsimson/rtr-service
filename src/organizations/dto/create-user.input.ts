@@ -2,7 +2,7 @@ import { InputType, Field } from '@nestjs/graphql';
 import { UserRole } from '../../common/enums';
 
 @InputType()
-export class CreateUserInput {
+export class CreateOrganizationUserInput {
   @Field(() => String)
   email: string;
 

@@ -2,22 +2,30 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type UserResponse {
+type JobApplication {
   id: String!
-  email: String!
-  name: String!
-  role: UserRole!
-  avatar: String
-  phone: String
-  createdAt: DateTime!
+  jobId: String!
+  candidateId: String!
+  organizationId: String
+  status: ApplicationStatus!
+  coverLetter: String
+  notes: String
+  appliedAt: DateTime!
   updatedAt: DateTime!
+  job: Job!
+  candidate: CandidateProfile!
+  organization: Organization
 }
 
-"""The role of the user in the system"""
-enum UserRole {
-  ADMIN
-  RECRUITER
-  CANDIDATE
+"""The status of a job application"""
+enum ApplicationStatus {
+  APPLIED
+  REVIEWING
+  INTERVIEWING
+  OFFERED
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
 }
 
 """
@@ -25,59 +33,30 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type AuthUser {
-  id: String!
-  email: String!
-  name: String!
-  role: UserRole!
-  avatar: String
-  phone: String
-}
-
-type Auth {
-  accessToken: String!
-  refreshToken: String!
-  user: AuthUser!
-}
-
-type RecruiterProfileResponse {
-  id: String!
-  userId: String!
-  companyName: String!
-  companyWebsite: String
-  industry: String
-  companySize: CompanySize
-  location: String
-  bio: String
-  linkedinUrl: String
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
-"""The size of the company"""
-enum CompanySize {
-  STARTUP
-  SMALL
-  MEDIUM
-  LARGE
-  ENTERPRISE
-}
-
-type CandidateProfileResponse {
+type CandidateProfile {
   id: String!
   userId: String!
   title: String
-  experience: Int
+  bio: String
+  experience: Float
   skills: [String!]
+  education: String
+  experienceLevel: String
   resumeUrl: String
   linkedinUrl: String
   portfolioUrl: String
   location: String
   willingToRelocate: Boolean!
   remotePreference: RemotePreference!
-  expectedSalary: Int
+  expectedSalary: Float
+  organizationId: String
+  isActive: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
+  user: User!
+  organization: Organization
+  applications: [JobApplication!]
+  rtrs: [RTR!]
 }
 
 """The remote work preference of a candidate"""
@@ -88,7 +67,83 @@ enum RemotePreference {
   ON_SITE_ONLY
 }
 
-type JobResponse {
+type RTRHistory {
+  id: String!
+  rtrId: String!
+  userId: String!
+  organizationId: String
+  action: String!
+  details: String
+  ipAddress: String
+  userAgent: String
+  createdAt: DateTime!
+  rtr: RTR!
+  user: User!
+  organization: Organization
+}
+
+type Document {
+  id: String!
+  rtrId: String!
+  userId: String
+  organizationId: String
+  name: String!
+  type: DocumentType!
+  url: String!
+  size: Float!
+  mimeType: String!
+  description: String
+  isActive: Boolean!
+  uploadedAt: DateTime!
+  rtr: RTR!
+  user: User
+  organization: Organization
+}
+
+"""The type of document being stored"""
+enum DocumentType {
+  RTR_FORM
+  RESUME
+  COVER_LETTER
+  CONTRACT
+  OTHER
+}
+
+type RTR {
+  id: String!
+  candidateId: String!
+  recruiterId: String!
+  jobId: String
+  organizationId: String
+  status: RTRStatus!
+  notes: String
+  expiresAt: DateTime
+  signedAt: DateTime
+  viewedAt: DateTime
+  userId: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  candidate: CandidateProfile!
+  recruiter: RecruiterProfile!
+  organization: Organization
+  job: Job
+  history: [RTRHistory!]
+  documents: [Document!]
+  user: User
+}
+
+"""The status of a Right to Represent agreement"""
+enum RTRStatus {
+  DRAFT
+  PENDING
+  SENT
+  VIEWED
+  SIGNED
+  EXPIRED
+  REJECTED
+}
+
+type Job {
   id: String!
   title: String!
   company: String!
@@ -98,14 +153,19 @@ type JobResponse {
   workType: WorkType!
   jobType: JobType!
   compensation: CompensationType!
-  salaryMin: Int
-  salaryMax: Int
+  salaryMin: Float
+  salaryMax: Float
   benefits: [String!]!
   recruiterId: String!
+  organizationId: String
   status: JobStatus!
   expiresAt: DateTime
   createdAt: DateTime!
   updatedAt: DateTime!
+  recruiter: RecruiterProfile!
+  organization: Organization
+  rtrs: [RTR!]
+  applications: [JobApplication!]
 }
 
 """The type of work arrangement for a job"""
@@ -140,6 +200,198 @@ enum JobStatus {
   DRAFT
 }
 
+type Notification {
+  id: String!
+  userId: String!
+  organizationId: String
+  title: String!
+  message: String!
+  type: NotificationType!
+  isRead: Boolean!
+  data: String
+  actionUrl: String
+  priority: String
+  createdAt: DateTime!
+  user: User!
+  organization: Organization
+}
+
+"""The type of notification being sent"""
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+  RTR_UPDATE
+  JOB_UPDATE
+}
+
+type Organization {
+  id: String!
+  name: String!
+  website: String
+  industry: String
+  companySize: CompanySize
+  location: String
+  description: String
+  linkedinUrl: String
+  logo: String
+  isActive: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  users: [User!]!
+  jobs: [Job!]
+  rtrs: [RTR!]
+  candidateProfiles: [CandidateProfile!]
+  recruiterProfiles: [RecruiterProfile!]
+  jobApplications: [JobApplication!]
+  rtrHistory: [RTRHistory!]
+  documents: [Document!]
+  notifications: [Notification!]
+}
+
+"""The size of the company"""
+enum CompanySize {
+  STARTUP
+  SMALL
+  MEDIUM
+  LARGE
+  ENTERPRISE
+}
+
+type RecruiterProfile {
+  id: String!
+  userId: String!
+  title: String
+  bio: String
+  linkedinUrl: String
+  avatar: String
+  organizationId: String
+  isActive: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  user: User!
+  organization: Organization
+  jobs: [Job!]
+  rtrs: [RTR!]
+}
+
+type User {
+  id: String!
+  email: String!
+  name: String
+  password: String
+  role: UserRole!
+  avatar: String
+  phone: String
+  organizationId: String
+  isActive: Boolean!
+  isEmailVerified: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  organization: Organization
+  recruiterProfile: RecruiterProfile
+  candidateProfile: CandidateProfile
+  rtrs: [RTR!]
+  rtrHistory: [RTRHistory!]
+  notifications: [Notification!]
+  createdUsers: [User!]
+  createdBy: User
+  createdById: String
+}
+
+"""The role of the user in the system"""
+enum UserRole {
+  ADMIN
+  ORGANIZATION_OWNER
+  ORGANIZATION_ADMIN
+  RECRUITER
+  RECRUITER_MANAGER
+  CANDIDATE
+}
+
+type UserResponse {
+  id: String!
+  email: String!
+  name: String!
+  role: UserRole!
+  avatar: String
+  phone: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Org {
+  id: String!
+  name: String!
+}
+
+type AuthUser {
+  id: String!
+  name: String!
+  role: UserRole!
+  organization: Org
+  isActive: Boolean!
+  isEmailVerified: Boolean!
+}
+
+type Auth {
+  accessToken: String!
+  refreshToken: String!
+  user: AuthUser!
+}
+
+type RecruiterProfileResponse {
+  id: String!
+  userId: String!
+  title: String
+  bio: String
+  linkedinUrl: String
+  avatar: String
+  organizationId: String
+  isActive: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type CandidateProfileResponse {
+  id: String!
+  userId: String!
+  title: String
+  experience: Int
+  skills: [String!]
+  resumeUrl: String
+  linkedinUrl: String
+  portfolioUrl: String
+  location: String
+  willingToRelocate: Boolean!
+  remotePreference: RemotePreference!
+  expectedSalary: Int
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type JobResponse {
+  id: String!
+  title: String!
+  company: String!
+  description: String!
+  requirements: [String!]!
+  location: String!
+  workType: WorkType!
+  jobType: JobType!
+  compensation: CompensationType!
+  salaryMin: Int
+  salaryMax: Int
+  benefits: [String!]!
+  recruiterId: String!
+  organizationId: String
+  status: JobStatus!
+  expiresAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type RtrResponse {
   id: String!
   candidateId: String!
@@ -153,17 +405,6 @@ type RtrResponse {
   userId: String
   createdAt: DateTime!
   updatedAt: DateTime!
-}
-
-"""The status of a Right to Represent agreement"""
-enum RTRStatus {
-  DRAFT
-  PENDING
-  SENT
-  VIEWED
-  SIGNED
-  EXPIRED
-  REJECTED
 }
 
 type RTRHistoryResponse {
@@ -185,17 +426,6 @@ type JobApplicationResponse {
   updatedAt: DateTime!
 }
 
-"""The status of a job application"""
-enum ApplicationStatus {
-  APPLIED
-  REVIEWING
-  INTERVIEWING
-  OFFERED
-  ACCEPTED
-  REJECTED
-  WITHDRAWN
-}
-
 type DocumentResponse {
   id: String!
   rtrId: String!
@@ -205,15 +435,6 @@ type DocumentResponse {
   size: Int!
   mimeType: String!
   uploadedAt: DateTime!
-}
-
-"""The type of document being stored"""
-enum DocumentType {
-  RTR_FORM
-  RESUME
-  COVER_LETTER
-  CONTRACT
-  OTHER
 }
 
 type NotificationResponse {
@@ -227,14 +448,52 @@ type NotificationResponse {
   createdAt: DateTime!
 }
 
-"""The type of notification being sent"""
-enum NotificationType {
-  INFO
-  SUCCESS
-  WARNING
-  ERROR
-  RTR_UPDATE
-  JOB_UPDATE
+type SearchResultType {
+  """Search result hits"""
+  hits: [String!]!
+
+  """Estimated total number of hits"""
+  estimatedTotalHits: Int!
+
+  """Processing time in milliseconds"""
+  processingTimeMs: Int!
+
+  """Search query"""
+  query: String!
+
+  """Number of results returned"""
+  limit: Int!
+
+  """Pagination offset"""
+  offset: Int!
+}
+
+type IndexStatsType {
+  """Number of documents in index"""
+  numberOfDocuments: Int!
+
+  """Whether index is currently being built"""
+  isIndexing: Boolean!
+
+  """Field distribution statistics"""
+  fieldDistribution: String!
+}
+
+type IndexType {
+  """Index name"""
+  name: String!
+
+  """Primary key field"""
+  primaryKey: String
+
+  """Searchable attributes"""
+  searchableAttributes: [String!]
+
+  """Filterable attributes"""
+  filterableAttributes: [String!]
+
+  """Sortable attributes"""
+  sortableAttributes: [String!]
 }
 
 type Query {
@@ -242,12 +501,18 @@ type Query {
   user(id: String!): UserResponse!
   me: UserResponse!
   verifyToken: String!
+  organizations: [Organization!]!
+  organization(id: String!): Organization!
+  organizationUsers(organizationId: String!): [User!]!
+  organizationStats(organizationId: String!): String!
   recruiterProfiles: [RecruiterProfileResponse!]!
   recruiterProfile(id: String!): RecruiterProfileResponse!
   candidateProfiles: [CandidateProfileResponse!]!
   candidateProfile(id: String!): CandidateProfileResponse!
   jobs: [JobResponse!]!
   job(id: String!): JobResponse!
+  jobsByOrganization(organizationId: String!): [JobResponse!]!
+  jobsByRecruiter(recruiterId: String!): [JobResponse!]!
   rtrs: [RtrResponse!]!
   rtr(id: Int!): RtrResponse!
   rtrHistories: [RTRHistoryResponse!]!
@@ -258,6 +523,77 @@ type Query {
   document(id: Int!): DocumentResponse!
   notifications: [NotificationResponse!]!
   notification(id: Int!): NotificationResponse!
+  listIndexes: [IndexType!]!
+  getIndexStats(indexName: String!): IndexStatsType!
+  search(indexName: String!, query: String!, options: SearchOptionsInput): SearchResultType!
+  searchJobs(query: String!, filters: JobSearchFiltersInput, options: SearchOptionsInput): SearchResultType!
+  searchJobsByLocation(location: String!, options: SearchOptionsInput): SearchResultType!
+  searchJobsByWorkType(workType: [String!]!, options: SearchOptionsInput): SearchResultType!
+  searchJobsBySalaryRange(minSalary: Float!, maxSalary: Float!, options: SearchOptionsInput): SearchResultType!
+  searchJobsByCompany(company: String!, options: SearchOptionsInput): SearchResultType!
+  searchJobsBySkills(skills: [String!]!, options: SearchOptionsInput): SearchResultType!
+  getRecentJobs(limit: Float): SearchResultType!
+  getJobsByRecruiter(recruiterId: String!, options: SearchOptionsInput): SearchResultType!
+  getActiveJobs(options: SearchOptionsInput): SearchResultType!
+  getExpiringJobs(daysUntilExpiry: Float, options: SearchOptionsInput): SearchResultType!
+}
+
+input SearchOptionsInput {
+  """Number of results to return"""
+  limit: Int
+
+  """Pagination offset"""
+  offset: Int
+
+  """Filter string or array"""
+  filter: [String!]
+
+  """Sort criteria"""
+  sort: [String!]
+
+  """Attributes to retrieve"""
+  attributesToRetrieve: [String!]
+
+  """Attributes to highlight"""
+  attributesToHighlight: [String!]
+
+  """Attributes to crop"""
+  attributesToCrop: [String!]
+
+  """Crop length for text"""
+  cropLength: Int
+
+  """Highlight pre-tag"""
+  highlightPreTag: String
+
+  """Highlight post-tag"""
+  highlightPostTag: String
+}
+
+input JobSearchFiltersInput {
+  """Work type filters"""
+  workType: [String!]
+
+  """Job type filters"""
+  jobType: [String!]
+
+  """Compensation type filters"""
+  compensation: [String!]
+
+  """Location filter"""
+  location: String
+
+  """Status filter"""
+  status: String
+
+  """Recruiter ID filter"""
+  recruiterId: String
+
+  """Minimum salary filter"""
+  salaryMin: Int
+
+  """Maximum salary filter"""
+  salaryMax: Int
 }
 
 type Mutation {
@@ -267,6 +603,12 @@ type Mutation {
   login(loginInput: LoginInput!): Auth!
   register(registerInput: RegisterInput!): Auth!
   refreshToken(refreshTokenInput: RefreshTokenInput!): Auth!
+  createOrganization(createOrganizationInput: CreateOrganizationInput!): Organization!
+  updateOrganization(id: String!, updateOrganizationInput: UpdateOrganizationInput!): Organization!
+  removeOrganization(id: String!): Boolean!
+  createOrganizationUser(organizationId: String!, createUserInput: CreateOrganizationUserInput!): User!
+  updateUserRole(organizationId: String!, userId: String!, newRole: String!): User!
+  removeUserFromOrganization(organizationId: String!, userId: String!): Boolean!
   createRecruiterProfile(createRecruiterProfileInput: CreateRecruiterProfileInput!): RecruiterProfileResponse!
   updateRecruiterProfile(id: String!, updateRecruiterProfileInput: UpdateRecruiterProfileInput!): RecruiterProfileResponse!
   removeRecruiterProfile(id: String!): Boolean!
@@ -291,6 +633,21 @@ type Mutation {
   createNotification(createNotificationInput: CreateNotificationInput!): NotificationResponse!
   updateNotification(id: Int!, updateNotificationInput: UpdateNotificationInput!): NotificationResponse!
   removeNotification(id: Int!): NotificationResponse!
+  createIndex(config: IndexConfigInput!): Boolean!
+  addDocuments(indexName: String!, documents: [DocumentToIndexInput!]!): Boolean!
+  updateDocuments(indexName: String!, documents: [DocumentToIndexInput!]!): Boolean!
+  deleteDocuments(indexName: String!, documentIds: [String!]!): Boolean!
+  deleteAllDocuments(indexName: String!): Boolean!
+  reindex(indexName: String!, documents: [DocumentToIndexInput!]!): Boolean!
+  deleteIndex(indexName: String!): Boolean!
+  indexJobs(batchSize: Float): Boolean!
+  indexUsers(batchSize: Float): Boolean!
+  indexCandidateProfiles(batchSize: Float): Boolean!
+  indexRecruiterProfiles(batchSize: Float): Boolean!
+  reindexAll(batchSize: Float): Boolean!
+  indexSingleJob(jobId: String!): Boolean!
+  removeJobFromIndex(jobId: String!): Boolean!
+  updateJobInIndex(jobId: String!): Boolean!
 }
 
 input CreateUserInput {
@@ -300,10 +657,17 @@ input CreateUserInput {
   role: UserRole
   avatar: String
   phone: String
+  organizationId: String
 }
 
 input UpdateUserInput {
-  id: String!
+  email: String
+  name: String
+  password: String
+  role: UserRole
+  avatar: String
+  phone: String
+  organizationId: String
 }
 
 input LoginInput {
@@ -322,6 +686,38 @@ input RegisterInput {
 
 input RefreshTokenInput {
   refreshToken: String!
+}
+
+input CreateOrganizationInput {
+  name: String!
+  website: String
+  industry: String
+  companySize: CompanySize
+  location: String
+  description: String
+  linkedinUrl: String
+  logo: String
+}
+
+input UpdateOrganizationInput {
+  name: String
+  website: String
+  industry: String
+  companySize: CompanySize
+  location: String
+  description: String
+  linkedinUrl: String
+  logo: String
+  id: String!
+}
+
+input CreateOrganizationUserInput {
+  email: String!
+  name: String!
+  password: String!
+  role: UserRole
+  phone: String
+  avatar: String
 }
 
 input CreateRecruiterProfileInput {
@@ -429,5 +825,39 @@ input CreateNotificationInput {
 }
 
 input UpdateNotificationInput {
+  id: String!
+}
+
+input IndexConfigInput {
+  """Index name"""
+  name: String!
+
+  """Primary key field"""
+  primaryKey: String
+
+  """Searchable attributes"""
+  searchableAttributes: [String!]
+
+  """Filterable attributes"""
+  filterableAttributes: [String!]
+
+  """Sortable attributes"""
+  sortableAttributes: [String!]
+
+  """Ranking rules"""
+  rankingRules: [String!]
+
+  """Distinct attribute"""
+  distinctAttribute: String
+
+  """Stop words"""
+  stopWords: [String!]
+
+  """Synonyms mapping"""
+  synonyms: String
+}
+
+input DocumentToIndexInput {
+  """Document ID"""
   id: String!
 }
