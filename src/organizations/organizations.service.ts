@@ -66,7 +66,7 @@ export class OrganizationsService {
     await this.organizationRepo.save(organization);
 
     // Remove all users from organization
-    await this.userRepo.update({ organizationId: id }, { organizationId: null });
+    await this.userRepo.update({ organizationId: id }, { organizationId: null as any });
 
     return true;
   }

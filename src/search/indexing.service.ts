@@ -158,13 +158,12 @@ export class IndexingService {
         const documents: DocumentToIndex[] = profiles.map((profile) => ({
           id: profile.id,
           userId: profile.userId,
-          companyName: profile.companyName,
-          companyWebsite: profile.companyWebsite,
-          industry: profile.industry,
-          companySize: profile.companySize,
-          location: profile.location,
+          title: profile.title,
           bio: profile.bio,
           linkedinUrl: profile.linkedinUrl,
+          avatar: profile.avatar,
+          organizationId: profile.organizationId,
+          isActive: profile.isActive,
           createdAt: profile.createdAt,
           updatedAt: profile.updatedAt,
         }));

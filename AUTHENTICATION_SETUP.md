@@ -153,7 +153,7 @@ async findOne(@Args('id') id: string): Promise<UserResponse> {
 ```typescript
 @Query(() => UserResponse, { name: 'me' })
 @UseGuards(JwtAuthGuard)
-async getCurrentUser(@CurrentUser() user: any): Promise<UserResponse> {
+async getCurrentUser(@AuthUser()user: any): Promise<UserResponse> {
   // Any authenticated user can access this
   return this.usersService.findOne(user.id);
 }
@@ -165,7 +165,7 @@ async getCurrentUser(@CurrentUser() user: any): Promise<UserResponse> {
 @Mutation(() => UserResponse)
 @UseGuards(JwtAuthGuard)
 async updateProfile(
-  @CurrentUser() user: any,
+  @AuthUser()user: any,
   @Args('updateUserInput') updateUserInput: UpdateUserInput
 ): Promise<UserResponse> {
   // user object contains: { id, email, role }

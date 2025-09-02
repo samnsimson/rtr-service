@@ -34,7 +34,7 @@ export class RecruiterProfile {
 
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
-  organizationId: string;
+  organizationId: string | null;
 
   @Field(() => Boolean)
   @Column({ default: true })
