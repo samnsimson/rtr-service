@@ -1,9 +1,21 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { Field, InputType } from '@nestjs/graphql';
-import { CreateJobApplicationInput } from './create-job-application.dto';
+import { IsString, IsOptional, IsEnum, IsUUID } from 'class-validator';
+import { InputType, Field } from '@nestjs/graphql';
+import { ApplicationStatus } from '../../common/enums';
 
 @InputType()
-export class UpdateJobApplicationInput extends PartialType(CreateJobApplicationInput) {
-  @Field()
-  id: string;
+export class UpdateJobApplicationInput {
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsEnum(ApplicationStatus)
+  status?: ApplicationStatus;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  coverLetter?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  notes?: string;
 }

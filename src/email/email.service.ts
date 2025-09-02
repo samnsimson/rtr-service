@@ -89,4 +89,75 @@ export class EmailService {
       </html>
     `;
   }
+
+  sendApplicationNotification(recruiterEmail: string, candidateName: string, jobTitle: string, coverLetter?: string): void {
+    try {
+      this.logger.log(`Sending application notification email to: ${recruiterEmail}`);
+      this.logger.log(`Job: ${jobTitle}, Candidate: ${candidateName}`);
+
+      const emailContent = this.generateApplicationNotificationEmail(candidateName, jobTitle, coverLetter);
+      this.logger.log('Application notification email content:', emailContent);
+
+      // In production, you would use your email service here:
+      // await this.emailProvider.send({
+      //   to: recruiterEmail,
+      //   subject: `New Application for ${jobTitle}`,
+      //   html: emailContent,
+      // });
+    } catch (error) {
+      this.logger.error('Failed to send application notification email:', error);
+      throw new Error('Failed to send application notification email');
+    }
+  }
+
+  sendApplicationStatusUpdate(candidateEmail: string, candidateName: string, jobTitle: string, status: string): void {
+    try {
+      this.logger.log(`Sending application status update email to: ${candidateEmail}`);
+      this.logger.log(`Job: ${jobTitle}, Status: ${status}`);
+
+      const emailContent = this.generateApplicationStatusUpdateEmail(candidateName, jobTitle, status);
+      this.logger.log('Application status update email content:', emailContent);
+
+      // In production, you would use your email service here:
+      // await this.emailProvider.send({
+      //   to: candidateEmail,
+      //   subject: `Application Status Update for ${jobTitle}`,
+      //   html: emailContent,
+      // });
+    } catch (error) {
+      this.logger.error('Failed to send application status update email:', error);
+      throw new Error('Failed to send application status update email');
+    }
+  }
+
+  private generateApplicationNotificationEmail(candidateName: string, jobTitle: string, coverLetter?: string): string {
+    const coverLetterSection = coverLetter ? `<p><strong>Cover Letter:</strong></p><p>${coverLetter}</p>` : '';
+
+    return `
+      <html>
+        <body>
+          <h2>New Job Application</h2>
+          <p>You have received a new application for the position: <strong>${jobTitle}</strong>.</p>
+          <p><strong>Candidate:</strong> ${candidateName}</p>
+          ${coverLetterSection}
+          <p>Please review the application in your dashboard.</p>
+          <p>Best regards,<br>The Job Applications Team</p>
+        </body>
+      </html>
+    `;
+  }
+
+  private generateApplicationStatusUpdateEmail(candidateName: string, jobTitle: string, status: string): string {
+    return `
+      <html>
+        <body>
+          <h2>Application Status Update</h2>
+          <p>Dear ${candidateName},</p>
+          <p>Your application for the position <strong>${jobTitle}</strong> has been updated to: <strong>${status}</strong>.</p>
+          <p>Thank you for your interest in this position.</p>
+          <p>Best regards,<br>The Job Applications Team</p>
+        </body>
+      </html>
+    `;
+  }
 }

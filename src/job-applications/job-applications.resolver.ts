@@ -1,33 +1,96 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, ResolveField, Parent } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
 import { JobApplicationsService } from './job-applications.service';
 import { CreateJobApplicationInput, JobApplicationResponse, UpdateJobApplicationInput } from './dto';
+import { JobApplication } from './entities/job-application.entity';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { AuthUser } from '../auth/decorators/current-user.decorator';
+import { UserRole } from '../common/enums';
+import { CurrentUser } from '../common/types';
 
-@Resolver(() => JobApplicationResponse)
+@Resolver(() => JobApplication)
 export class JobApplicationsResolver {
   constructor(private readonly jobApplicationsService: JobApplicationsService) {}
 
-  @Mutation(() => JobApplicationResponse)
-  createJobApplication(@Args('createJobApplicationInput') createJobApplicationInput: CreateJobApplicationInput) {
-    return this.jobApplicationsService.create(createJobApplicationInput);
+  @Mutation(() => JobApplication, { name: 'createJobApplication' })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.CANDIDATE, UserRole.RECRUITER, UserRole.RECRUITER_MANAGER, UserRole.ORGANIZATION_ADMIN, UserRole.ORGANIZATION_OWNER, UserRole.ADMIN)
+  async createJobApplication(
+    @Args('createJobApplicationInput') createJobApplicationInput: CreateJobApplicationInput,
+    @AuthUser() user: CurrentUser,
+  ): Promise<JobApplication> {
+    return this.jobApplicationsService.create(createJobApplicationInput, user);
   }
 
-  @Query(() => [JobApplicationResponse], { name: 'jobApplications' })
-  findAll() {
-    return this.jobApplicationsService.findAll();
+  @Query(() => [JobApplication], { name: 'jobApplications' })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.CANDIDATE, UserRole.RECRUITER, UserRole.RECRUITER_MANAGER, UserRole.ORGANIZATION_ADMIN, UserRole.ORGANIZATION_OWNER, UserRole.ADMIN)
+  async findAll(@AuthUser() user: CurrentUser): Promise<JobApplication[]> {
+    return this.jobApplicationsService.findAll(user);
   }
 
-  @Query(() => JobApplicationResponse, { name: 'jobApplication' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.jobApplicationsService.findOne(id);
+  @Query(() => JobApplication, { name: 'jobApplication' })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.CANDIDATE, UserRole.RECRUITER, UserRole.RECRUITER_MANAGER, UserRole.ORGANIZATION_ADMIN, UserRole.ORGANIZATION_OWNER, UserRole.ADMIN)
+  async findOne(@Args('id', { type: () => String }) id: string, @AuthUser() user: CurrentUser): Promise<JobApplication> {
+    return this.jobApplicationsService.findOne(id, user);
   }
 
-  @Mutation(() => JobApplicationResponse)
-  updateJobApplication(@Args('id', { type: () => Int }) id: number, @Args('updateJobApplicationInput') updateJobApplicationInput: UpdateJobApplicationInput) {
-    return this.jobApplicationsService.update(id, updateJobApplicationInput);
+  @Mutation(() => JobApplication, { name: 'updateJobApplication' })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.CANDIDATE, UserRole.RECRUITER, UserRole.RECRUITER_MANAGER, UserRole.ORGANIZATION_ADMIN, UserRole.ORGANIZATION_OWNER, UserRole.ADMIN)
+  async updateJobApplication(
+    @Args('id', { type: () => String }) id: string,
+    @Args('updateJobApplicationInput') updateJobApplicationInput: UpdateJobApplicationInput,
+    @AuthUser() user: CurrentUser,
+  ): Promise<JobApplication> {
+    return this.jobApplicationsService.update(id, updateJobApplicationInput, user);
   }
 
-  @Mutation(() => JobApplicationResponse)
-  removeJobApplication(@Args('id', { type: () => Int }) id: number) {
-    return this.jobApplicationsService.remove(id);
+  @Mutation(() => JobApplication, { name: 'removeJobApplication' })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.CANDIDATE, UserRole.RECRUITER, UserRole.RECRUITER_MANAGER, UserRole.ORGANIZATION_ADMIN, UserRole.ORGANIZATION_OWNER, UserRole.ADMIN)
+  async removeJobApplication(@Args('id', { type: () => String }) id: string, @AuthUser() user: CurrentUser): Promise<JobApplication> {
+    return this.jobApplicationsService.remove(id, user);
+  }
+
+  @Query(() => [JobApplication], { name: 'jobApplicationsByJob' })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.RECRUITER, UserRole.RECRUITER_MANAGER, UserRole.ORGANIZATION_ADMIN, UserRole.ORGANIZATION_OWNER, UserRole.ADMIN)
+  async findByJob(@Args('jobId', { type: () => String }) jobId: string, @AuthUser() user: CurrentUser): Promise<JobApplication[]> {
+    return this.jobApplicationsService.findByJob(jobId, user);
+  }
+
+  @Query(() => [JobApplication], { name: 'jobApplicationsByCandidate' })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.CANDIDATE, UserRole.RECRUITER, UserRole.RECRUITER_MANAGER, UserRole.ORGANIZATION_ADMIN, UserRole.ORGANIZATION_OWNER, UserRole.ADMIN)
+  async findByCandidate(@Args('candidateId', { type: () => String }) candidateId: string, @AuthUser() user: CurrentUser): Promise<JobApplication[]> {
+    return this.jobApplicationsService.findByCandidate(candidateId, user);
+  }
+
+  @Query(() => String, { name: 'applicationStats' })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.CANDIDATE, UserRole.RECRUITER, UserRole.RECRUITER_MANAGER, UserRole.ORGANIZATION_ADMIN, UserRole.ORGANIZATION_OWNER, UserRole.ADMIN)
+  async getApplicationStats(@AuthUser() user: CurrentUser): Promise<string> {
+    const stats = await this.jobApplicationsService.getApplicationStats(user);
+    return JSON.stringify(stats);
+  }
+
+  // Resolve fields for relations
+  @ResolveField(() => String, { name: 'job' })
+  async getJob(@Parent() application: JobApplication): Promise<string> {
+    return application.jobId;
+  }
+
+  @ResolveField(() => String, { name: 'candidate' })
+  async getCandidate(@Parent() application: JobApplication): Promise<string> {
+    return application.candidateId;
+  }
+
+  @ResolveField(() => String, { name: 'organization', nullable: true })
+  async getOrganization(@Parent() application: JobApplication): Promise<string | null> {
+    return application.organizationId;
   }
 }

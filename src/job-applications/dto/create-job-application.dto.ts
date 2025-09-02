@@ -21,4 +21,9 @@ export class CreateJobApplicationInput {
   @IsOptional()
   @IsString()
   coverLetter?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  notes?: string;
 }
