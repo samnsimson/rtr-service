@@ -8,13 +8,12 @@ import { DEFAULT_INDEX_CONFIGS } from './search.config';
 export class SearchService implements OnModuleInit {
   private readonly logger = new Logger(SearchService.name);
   private client: MeiliSearch;
-  private indexes: Map<string, Index> = new Map();
 
   constructor(private configService: ConfigService) {
     this.client = new MeiliSearch({
-      host: this.configService.get<string>('search.host', ''),
-      apiKey: this.configService.get<string>('search.apiKey', ''),
-      timeout: this.configService.get<number>('search.timeout', 3000),
+      host: this.configService.get<string>('MEILISEARCH_HOST', ''),
+      apiKey: this.configService.get<string>('MEILISEARCH_API_KEY', ''),
+      timeout: this.configService.get<number>('MEILISEARCH_TIMEOUT', 3000),
     });
   }
 
@@ -35,7 +34,6 @@ export class SearchService implements OnModuleInit {
       } catch (error: any) {
         if (error instanceof MeiliSearchError) {
           this.logger.log(`Index '${config.name}' already exists`);
-          this.indexes.set(config.name, this.client.index(config.name));
         } else {
           this.logger.error(`Failed to initialize index '${config.name}'`, error);
         }
@@ -48,7 +46,6 @@ export class SearchService implements OnModuleInit {
       await this.client.createIndex(config.name, { primaryKey: config.primaryKey });
       const index = this.client.index(config.name);
       await this.configureIndex(index, config);
-      this.indexes.set(config.name, index);
       return index;
     } catch (error: any) {
       this.logger.error(`Failed to create index '${config.name}'`, error);
@@ -73,7 +70,7 @@ export class SearchService implements OnModuleInit {
 
   async addDocuments(indexName: string, documents: DocumentToIndex[]): Promise<void> {
     try {
-      const index = this.indexes.get(indexName) || this.client.index(indexName);
+      const index = this.client.index(indexName);
       await index.addDocuments(documents);
       this.logger.log(`Added ${documents.length} documents to index '${indexName}'`);
     } catch (error) {
@@ -84,7 +81,7 @@ export class SearchService implements OnModuleInit {
 
   async updateDocuments(indexName: string, documents: DocumentToIndex[]): Promise<void> {
     try {
-      const index = this.indexes.get(indexName) || this.client.index(indexName);
+      const index = this.client.index(indexName);
       await index.updateDocuments(documents);
       this.logger.log(`Updated ${documents.length} documents in index '${indexName}'`);
     } catch (error) {
@@ -95,7 +92,7 @@ export class SearchService implements OnModuleInit {
 
   async deleteDocuments(indexName: string, documentIds: string[]): Promise<void> {
     try {
-      const index = this.indexes.get(indexName) || this.client.index(indexName);
+      const index = this.client.index(indexName);
       await index.deleteDocuments(documentIds);
       this.logger.log(`Deleted ${documentIds.length} documents from index '${indexName}'`);
     } catch (error) {
@@ -106,7 +103,7 @@ export class SearchService implements OnModuleInit {
 
   async deleteAllDocuments(indexName: string): Promise<void> {
     try {
-      const index = this.indexes.get(indexName) || this.client.index(indexName);
+      const index = this.client.index(indexName);
       await index.deleteAllDocuments();
       this.logger.log(`Deleted all documents from index '${indexName}'`);
     } catch (error) {
@@ -117,7 +114,7 @@ export class SearchService implements OnModuleInit {
 
   async search<T = any>(indexName: string, query: string, options: SearchOptions = {}): Promise<SearchResult<T>> {
     try {
-      const index = this.indexes.get(indexName) || this.client.index(indexName);
+      const index = this.client.index(indexName);
 
       const searchParams = {
         q: query,
@@ -136,10 +133,10 @@ export class SearchService implements OnModuleInit {
       const result = await index.search(query, searchParams);
 
       return {
-        query,
         hits: result.hits as T[],
         estimatedTotalHits: result.estimatedTotalHits,
         processingTimeMs: result.processingTimeMs,
+        query,
         limit: searchParams.limit,
         offset: searchParams.offset,
       };
@@ -151,7 +148,7 @@ export class SearchService implements OnModuleInit {
 
   async getIndexStats(indexName: string): Promise<IndexStats> {
     try {
-      const index = this.indexes.get(indexName) || this.client.index(indexName);
+      const index = this.client.index(indexName);
       const { numberOfDocuments, isIndexing, fieldDistribution } = await index.getStats();
       return { numberOfDocuments, isIndexing, fieldDistribution };
     } catch (error) {
@@ -163,7 +160,6 @@ export class SearchService implements OnModuleInit {
   async deleteIndex(indexName: string): Promise<void> {
     try {
       await this.client.deleteIndex(indexName);
-      this.indexes.delete(indexName);
       this.logger.log(`Index '${indexName}' deleted successfully`);
     } catch (error) {
       this.logger.error(`Failed to delete index '${indexName}'`, error);
@@ -173,7 +169,7 @@ export class SearchService implements OnModuleInit {
 
   async reindex(indexName: string, documents: DocumentToIndex[]): Promise<void> {
     try {
-      const index = this.indexes.get(indexName) || this.client.index(indexName);
+      const index = this.client.index(indexName);
       await index.deleteAllDocuments();
       await index.addDocuments(documents);
       this.logger.log(`Reindexed ${documents.length} documents for index '${indexName}'`);
@@ -184,7 +180,7 @@ export class SearchService implements OnModuleInit {
   }
 
   getIndex(indexName: string): Index {
-    return this.indexes.get(indexName) || this.client.index(indexName);
+    return this.client.index(indexName);
   }
 
   async listIndexes(): Promise<IndexesResults<Array<Index>>> {

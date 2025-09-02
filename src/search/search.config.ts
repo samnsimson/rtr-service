@@ -1,11 +1,3 @@
-import { registerAs } from '@nestjs/config';
-
-export default registerAs('search', () => ({
-  host: process.env.MEILISEARCH_HOST || 'http://localhost:7700',
-  apiKey: process.env.MEILISEARCH_API_KEY || '',
-  timeout: parseInt(process.env.MEILISEARCH_TIMEOUT || '10000'),
-}));
-
 export const DEFAULT_INDEX_CONFIGS = {
   jobs: {
     name: 'jobs',

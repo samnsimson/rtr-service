@@ -7,72 +7,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../common/enums';
 import { SearchResult, IndexStats } from '../common/types/search.types';
 import { Index, IndexesResults } from 'meilisearch';
-
-// GraphQL types
-class SearchResultType<T = any> {
-  hits: T[];
-  estimatedTotalHits: number;
-  processingTimeMs: number;
-  query: string;
-  limit: number;
-  offset: number;
-}
-
-class IndexConfigType {
-  name: string;
-  primaryKey?: string;
-  searchableAttributes?: string[];
-  filterableAttributes?: string[];
-  sortableAttributes?: string[];
-  rankingRules?: string[];
-  distinctAttribute?: string;
-  stopWords?: string[];
-  synonyms?: Record<string, string[]>;
-}
-
-class DocumentToIndexType {
-  id: string;
-  [key: string]: any;
-}
-
-class IndexStatsType {
-  numberOfDocuments: number;
-  isIndexing: boolean;
-  fieldDistribution: Record<string, number>;
-}
-
-class SearchOptionsType {
-  limit?: number;
-  offset?: number;
-  filter?: string | string[];
-  sort?: string[];
-  attributesToRetrieve?: string[];
-  attributesToHighlight?: string[];
-  attributesToCrop?: string[];
-  cropLength?: number;
-  highlightPreTag?: string;
-  highlightPostTag?: string;
-}
-
-class JobSearchFiltersInput {
-  workType?: string[];
-  jobType?: string[];
-  compensation?: string[];
-  location?: string;
-  status?: string;
-  recruiterId?: string;
-  salaryMin?: number;
-  salaryMax?: number;
-  hasBenefits?: boolean;
-}
-
-class IndexType {
-  name: string;
-  primaryKey?: string;
-  searchableAttributes?: string[];
-  filterableAttributes?: string[];
-  sortableAttributes?: string[];
-}
+import { SearchResultType, IndexStatsType, SearchOptionsInput, IndexConfigInput, DocumentToIndexInput, JobSearchFiltersInput, IndexType } from './dto';
 
 @Resolver(() => SearchResultType)
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -96,7 +31,7 @@ export class SearchResolver {
   async search(
     @Args('indexName') indexName: string,
     @Args('query') query: string,
-    @Args('options', { nullable: true }) options?: SearchOptionsType,
+    @Args('options', { nullable: true }) options?: SearchOptionsInput,
   ): Promise<SearchResult> {
     return this.searchService.search(indexName, query, {
       limit: options?.limit,
@@ -116,7 +51,7 @@ export class SearchResolver {
   async searchJobs(
     @Args('query') query: string,
     @Args('filters', { nullable: true }) filters?: JobSearchFiltersInput,
-    @Args('options', { nullable: true }) options?: SearchOptionsType,
+    @Args('options', { nullable: true }) options?: SearchOptionsInput,
   ): Promise<SearchResult> {
     const filterParts: string[] = [];
     if (filters?.workType && filters.workType.length > 0) filterParts.push(`workType IN [${filters.workType.map((t) => `"${t}"`).join(', ')}]`);
@@ -157,7 +92,7 @@ export class SearchResolver {
   }
 
   @Query(() => SearchResultType, { name: 'searchJobsByLocation' })
-  async searchJobsByLocation(@Args('location') location: string, @Args('options', { nullable: true }) options?: SearchOptionsType): Promise<SearchResult> {
+  async searchJobsByLocation(@Args('location') location: string, @Args('options', { nullable: true }) options?: SearchOptionsInput): Promise<SearchResult> {
     return this.searchService.search('jobs', '', {
       limit: options?.limit,
       offset: options?.offset,
@@ -169,7 +104,7 @@ export class SearchResolver {
   @Query(() => SearchResultType, { name: 'searchJobsByWorkType' })
   async searchJobsByWorkType(
     @Args('workType', { type: () => [String] }) workType: string[],
-    @Args('options', { nullable: true }) options?: SearchOptionsType,
+    @Args('options', { nullable: true }) options?: SearchOptionsInput,
   ): Promise<SearchResult> {
     return this.searchService.search('jobs', '', {
       limit: options?.limit,
@@ -183,7 +118,7 @@ export class SearchResolver {
   async searchJobsBySalaryRange(
     @Args('minSalary') minSalary: number,
     @Args('maxSalary') maxSalary: number,
-    @Args('options', { nullable: true }) options?: SearchOptionsType,
+    @Args('options', { nullable: true }) options?: SearchOptionsInput,
   ): Promise<SearchResult> {
     return this.searchService.search('jobs', '', {
       limit: options?.limit,
@@ -194,7 +129,7 @@ export class SearchResolver {
   }
 
   @Query(() => SearchResultType, { name: 'searchJobsByCompany' })
-  async searchJobsByCompany(@Args('company') company: string, @Args('options', { nullable: true }) options?: SearchOptionsType): Promise<SearchResult> {
+  async searchJobsByCompany(@Args('company') company: string, @Args('options', { nullable: true }) options?: SearchOptionsInput): Promise<SearchResult> {
     return this.searchService.search('jobs', company, {
       limit: options?.limit,
       offset: options?.offset,
@@ -205,7 +140,7 @@ export class SearchResolver {
   @Query(() => SearchResultType, { name: 'searchJobsBySkills' })
   async searchJobsBySkills(
     @Args('skills', { type: () => [String] }) skills: string[],
-    @Args('options', { nullable: true }) options?: SearchOptionsType,
+    @Args('options', { nullable: true }) options?: SearchOptionsInput,
   ): Promise<SearchResult> {
     const skillsQuery = skills.join(' ');
     return this.searchService.search('jobs', skillsQuery, {
@@ -224,7 +159,7 @@ export class SearchResolver {
   }
 
   @Query(() => SearchResultType, { name: 'getJobsByRecruiter' })
-  async getJobsByRecruiter(@Args('recruiterId') recruiterId: string, @Args('options', { nullable: true }) options?: SearchOptionsType): Promise<SearchResult> {
+  async getJobsByRecruiter(@Args('recruiterId') recruiterId: string, @Args('options', { nullable: true }) options?: SearchOptionsInput): Promise<SearchResult> {
     return this.searchService.search('jobs', '', {
       limit: options?.limit,
       offset: options?.offset,
@@ -234,7 +169,7 @@ export class SearchResolver {
   }
 
   @Query(() => SearchResultType, { name: 'getActiveJobs' })
-  async getActiveJobs(@Args('options', { nullable: true }) options?: SearchOptionsType): Promise<SearchResult> {
+  async getActiveJobs(@Args('options', { nullable: true }) options?: SearchOptionsInput): Promise<SearchResult> {
     return this.searchService.search('jobs', '', {
       limit: options?.limit,
       offset: options?.offset,
@@ -246,7 +181,7 @@ export class SearchResolver {
   @Query(() => SearchResultType, { name: 'getExpiringJobs' })
   async getExpiringJobs(
     @Args('daysUntilExpiry', { nullable: true }) daysUntilExpiry?: number,
-    @Args('options', { nullable: true }) options?: SearchOptionsType,
+    @Args('options', { nullable: true }) options?: SearchOptionsInput,
   ): Promise<SearchResult> {
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + (daysUntilExpiry || 7));
@@ -262,7 +197,7 @@ export class SearchResolver {
 
   @Mutation(() => Boolean, { name: 'createIndex' })
   @Roles(UserRole.ADMIN)
-  async createIndex(@Args('config') config: IndexConfigType): Promise<boolean> {
+  async createIndex(@Args('config') config: IndexConfigInput): Promise<boolean> {
     try {
       await this.searchService.createIndex({
         name: config.name,
@@ -286,7 +221,7 @@ export class SearchResolver {
   @Roles(UserRole.ADMIN, UserRole.RECRUITER)
   async addDocuments(
     @Args('indexName') indexName: string,
-    @Args('documents', { type: () => [DocumentToIndexType] }) documents: DocumentToIndexType[],
+    @Args('documents', { type: () => [DocumentToIndexInput] }) documents: DocumentToIndexInput[],
   ): Promise<boolean> {
     try {
       await this.searchService.addDocuments(indexName, documents);
@@ -301,7 +236,7 @@ export class SearchResolver {
   @Roles(UserRole.ADMIN, UserRole.RECRUITER)
   async updateDocuments(
     @Args('indexName') indexName: string,
-    @Args('documents', { type: () => [DocumentToIndexType] }) documents: DocumentToIndexType[],
+    @Args('documents', { type: () => [DocumentToIndexInput] }) documents: DocumentToIndexInput[],
   ): Promise<boolean> {
     try {
       await this.searchService.updateDocuments(indexName, documents);
@@ -340,7 +275,7 @@ export class SearchResolver {
   @Roles(UserRole.ADMIN)
   async reindex(
     @Args('indexName') indexName: string,
-    @Args('documents', { type: () => [DocumentToIndexType] }) documents: DocumentToIndexType[],
+    @Args('documents', { type: () => [DocumentToIndexInput] }) documents: DocumentToIndexInput[],
   ): Promise<boolean> {
     try {
       await this.searchService.reindex(indexName, documents);
