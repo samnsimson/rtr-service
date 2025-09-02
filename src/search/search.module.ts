@@ -8,9 +8,10 @@ import { Job } from '../jobs/entities/job.entity';
 import { User } from '../users/entities/user.entity';
 import { CandidateProfile } from '../candidate-profile/entities/candidate-profile.entity';
 import { RecruiterProfile } from '../recruiter-profile/entities/recruiter-profile.entity';
+import { Organization } from '../organizations/entities/organization.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Job, User, CandidateProfile, RecruiterProfile])],
+  imports: [TypeOrmModule.forFeature([Job, User, CandidateProfile, RecruiterProfile, Organization])],
   providers: [SearchService, IndexingService, SearchResolver, IndexingResolver],
   exports: [SearchService, IndexingService],
 })

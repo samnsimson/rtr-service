@@ -7,4 +7,8 @@ export interface CurrentUser {
   role: UserRole;
   avatar?: string;
   phone?: string;
+  organizationId?: string;
+  isActive: boolean;
+  isEmailVerified: boolean;
+  createdById?: string;
 }

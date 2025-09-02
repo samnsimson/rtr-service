@@ -14,6 +14,7 @@ import { JobApplicationsModule } from './job-applications/job-applications.modul
 import { DocumentsModule } from './documents/documents.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { AuthModule } from './auth/auth.module';
+import { OrganizationsModule } from './organizations/organizations.module';
 import { graphqlValidationConfig } from './common/config/graphql-validation.config';
 import { SearchModule } from './search/search.module';
 import './common/enums';
@@ -48,6 +49,7 @@ import './common/enums';
     forwardRef(() => JobApplicationsModule),
     forwardRef(() => DocumentsModule),
     forwardRef(() => NotificationsModule),
+    OrganizationsModule,
     SearchModule,
   ],
 })

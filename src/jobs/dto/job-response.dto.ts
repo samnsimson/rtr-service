@@ -42,6 +42,9 @@ export class JobResponse {
   @Field()
   recruiterId: string;
 
+  @Field({ nullable: true })
+  organizationId?: string;
+
   @Field(() => JobStatus)
   status: JobStatus;
 
