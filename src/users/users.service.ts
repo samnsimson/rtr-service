@@ -3,12 +3,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserInput, UpdateUserInput } from './dto';
 import { User } from './entities/user.entity';
+import { Organization } from '../organizations/entities/organization.entity';
 import { UserRole } from '../common/enums';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectRepository(User) private readonly userRepository: Repository<User>) {}
+  constructor(
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(Organization) private readonly organizationRepository: Repository<Organization>,
+  ) {}
 
   async create(createUserInput: CreateUserInput): Promise<User> {
     const existingUser = await this.userRepository.findOne({ where: { email: createUserInput.email } });
@@ -27,14 +31,21 @@ export class UsersService {
 
   async findOne(id: string): Promise<User> {
     if (!id) throw new BadRequestException('User ID is required');
-    const user = await this.userRepository.findOne({ where: { id }, select: ['id', 'email', 'name', 'role', 'avatar', 'phone', 'createdAt', 'updatedAt'] });
+    const user = await this.userRepository.findOne({
+      where: { id },
+      select: ['id', 'email', 'name', 'role', 'avatar', 'phone', 'organizationId', 'isActive', 'isEmailVerified', 'createdAt', 'updatedAt'],
+      relations: ['organization'],
+    });
     if (!user) throw new NotFoundException(`User with ID ${id} not found`);
     return user;
   }
 
   async findByEmail(email: string): Promise<User> {
     if (!email) throw new BadRequestException('Email is required');
-    const user = await this.userRepository.findOne({ where: { email } });
+    const user = await this.userRepository.findOne({
+      where: { email },
+      relations: ['organization'],
+    });
     if (!user) throw new NotFoundException(`User with email ${email} not found`);
     return user;
   }

@@ -32,4 +32,9 @@ export class CreateUserInput {
   @IsOptional()
   @IsString()
   phone?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  organizationId?: string;
 }

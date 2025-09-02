@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { AuthResolver } from './auth.resolver';
 import { UsersModule } from '../users/users.module';
+import { OrganizationsModule } from '../organizations/organizations.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -14,6 +15,7 @@ import { RolesGuard } from './guards/roles.guard';
 @Module({
   imports: [
     forwardRef(() => UsersModule),
+    forwardRef(() => OrganizationsModule),
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
