@@ -12,9 +12,9 @@ type JobApplication {
   notes: String
   appliedAt: DateTime!
   updatedAt: DateTime!
-  job: Job!
-  candidate: CandidateProfile!
-  organization: Organization
+  job: String!
+  candidate: String!
+  organization: String
 }
 
 """The status of a job application"""
@@ -503,21 +503,6 @@ type JobResponse {
   updatedAt: DateTime!
 }
 
-type RtrResponse {
-  id: String!
-  candidateId: String!
-  recruiterId: String!
-  jobId: String
-  status: RTRStatus!
-  notes: String
-  expiresAt: DateTime
-  signedAt: DateTime
-  viewedAt: DateTime
-  userId: String
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
 type RTRHistoryResponse {
   id: String!
   rtrId: String!
@@ -525,16 +510,6 @@ type RTRHistoryResponse {
   action: String!
   details: String
   createdAt: DateTime!
-}
-
-type JobApplicationResponse {
-  id: String!
-  jobId: String!
-  candidateId: String!
-  status: ApplicationStatus!
-  coverLetter: String
-  appliedAt: DateTime!
-  updatedAt: DateTime!
 }
 
 type DocumentResponse {
@@ -624,12 +599,18 @@ type Query {
   job(id: String!): JobResponse!
   jobsByOrganization(organizationId: String!): [JobResponse!]!
   jobsByRecruiter(recruiterId: String!): [JobResponse!]!
-  rtrs: [RtrResponse!]!
-  rtr(id: Int!): RtrResponse!
+  rtrs: [RTR!]!
+  rtr(id: String!): RTR!
+  rtrsByCandidate(candidateId: String!): [RTR!]!
+  rtrsByRecruiter(recruiterId: String!): [RTR!]!
+  rtrsByJob(jobId: String!): [RTR!]!
   rtrHistories: [RTRHistoryResponse!]!
   rtrHistory(id: Int!): RTRHistoryResponse!
-  jobApplications: [JobApplicationResponse!]!
-  jobApplication(id: Int!): JobApplicationResponse!
+  jobApplications: [JobApplication!]!
+  jobApplication(id: String!): JobApplication!
+  jobApplicationsByJob(jobId: String!): [JobApplication!]!
+  jobApplicationsByCandidate(candidateId: String!): [JobApplication!]!
+  applicationStats: String!
   documents: [DocumentResponse!]!
   document(id: Int!): DocumentResponse!
   notifications: [NotificationResponse!]!
@@ -740,15 +721,18 @@ type Mutation {
   createJob(createJobInput: CreateJobInput!): JobResponse!
   updateJob(id: String!, updateJobInput: UpdateJobInput!): JobResponse!
   removeJob(id: String!): JobResponse!
-  createRTR(createRTRInput: CreateRTRInput!): RtrResponse!
-  updateRTR(id: Int!, updateRTRInput: UpdateRTRInput!): RtrResponse!
-  removeRTR(id: Int!): RtrResponse!
+  createRTR(createRtrInput: CreateRTRInput!): RTR!
+  updateRTR(id: String!, updateRtrInput: UpdateRTRInput!): RTR!
+  removeRTR(id: String!): Boolean!
+  approveRTR(id: String!): RTR!
+  rejectRTR(id: String!, reason: String!): RTR!
+  markRTRAsViewed(id: String!): RTR!
   createRTRHistory(createRTRHistoryInput: CreateRTRHistoryInput!): RTRHistoryResponse!
   updateRTRHistory(id: Int!, updateRTRHistoryInput: CreateRTRHistoryInput!): RTRHistoryResponse!
   removeRTRHistory(id: Int!): RTRHistoryResponse!
-  createJobApplication(createJobApplicationInput: CreateJobApplicationInput!): JobApplicationResponse!
-  updateJobApplication(id: Int!, updateJobApplicationInput: UpdateJobApplicationInput!): JobApplicationResponse!
-  removeJobApplication(id: Int!): JobApplicationResponse!
+  createJobApplication(createJobApplicationInput: CreateJobApplicationInput!): JobApplication!
+  updateJobApplication(id: String!, updateJobApplicationInput: UpdateJobApplicationInput!): JobApplication!
+  removeJobApplication(id: String!): JobApplication!
   createDocument(createDocumentInput: CreateDocumentInput!): DocumentResponse!
   updateDocument(id: Int!, updateDocumentInput: CreateDocumentInput!): DocumentResponse!
   removeDocument(id: Int!): DocumentResponse!
@@ -927,10 +911,13 @@ input CreateJobApplicationInput {
   candidateId: String!
   status: ApplicationStatus
   coverLetter: String
+  notes: String
 }
 
 input UpdateJobApplicationInput {
-  id: String!
+  status: String
+  coverLetter: String
+  notes: String
 }
 
 input CreateDocumentInput {

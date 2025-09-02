@@ -45,16 +45,16 @@ export class RTR {
   notes: string;
 
   @Field(() => Date, { nullable: true })
-  @Column({ nullable: true })
+  @Column({ type: 'timestamptz', nullable: true })
   expiresAt: Date | null;
 
   @Field(() => Date, { nullable: true })
-  @Column({ nullable: true })
-  signedAt: Date;
+  @Column({ type: 'timestamptz', nullable: true })
+  signedAt: Date | null;
 
   @Field(() => Date, { nullable: true })
-  @Column({ nullable: true })
-  viewedAt: Date;
+  @Column({ type: 'timestamptz', nullable: true })
+  viewedAt: Date | null;
 
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
