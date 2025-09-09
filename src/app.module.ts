@@ -44,9 +44,9 @@ import './common/enums';
       ...graphqlValidationConfig,
     }),
     JwtModule.registerAsync({
+      global: true,
       imports: [ConfigModule],
       inject: [ConfigService],
-      global: true,
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
         signOptions: { expiresIn: '1h' },

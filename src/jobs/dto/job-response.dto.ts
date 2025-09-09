@@ -1,5 +1,6 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
 import { WorkType, JobType, CompensationType, JobStatus } from '../../common/enums';
+import { PaginatedResponse } from 'src/common/dto/paginated-response.dto';
 
 @ObjectType()
 export class JobResponse {
@@ -56,4 +57,29 @@ export class JobResponse {
 
   @Field()
   updatedAt: Date;
+}
+
+@ObjectType()
+export class JobResponsePaginated implements PaginatedResponse<JobResponse> {
+  @Field(() => [JobResponse])
+  data: JobResponse[];
+
+  @Field(() => Int)
+  total: number;
+
+  @Field(() => Int)
+  page: number;
+
+  @Field(() => Int)
+  limit: number;
+
+  @Field(() => Int)
+  totalPages: number;
+
+  constructor(partial?: Partial<JobResponsePaginated>) {
+    Object.assign(this, partial);
+    this.page = partial?.page || 1;
+    this.limit = partial?.limit || 10;
+    this.totalPages = Math.ceil(this.total / this.limit);
+  }
 }

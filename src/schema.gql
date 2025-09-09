@@ -503,6 +503,14 @@ type JobResponse {
   updatedAt: DateTime!
 }
 
+type JobResponsePaginated {
+  data: [JobResponse!]!
+  total: Int!
+  page: Int!
+  limit: Int!
+  totalPages: Int!
+}
+
 type RTRHistoryResponse {
   id: String!
   rtrId: String!
@@ -595,7 +603,7 @@ type Query {
   recruiterProfile(id: String!): RecruiterProfileResponse!
   candidateProfiles: [CandidateProfileResponse!]!
   candidateProfile(id: String!): CandidateProfileResponse!
-  jobs: [JobResponse!]!
+  jobs(pagination: PaginationDto): JobResponsePaginated!
   job(id: String!): JobResponse!
   jobsByOrganization(organizationId: String!): [JobResponse!]!
   jobsByRecruiter(recruiterId: String!): [JobResponse!]!
@@ -639,6 +647,11 @@ type Query {
   subscriptionPlans: [SubscriptionPlan!]!
   subscriptionPlan(id: String!): SubscriptionPlan!
   subscriptionPlansByType(planType: PlanType!): [SubscriptionPlan!]!
+}
+
+input PaginationDto {
+  limit: Int = 10
+  page: Int = 1
 }
 
 input SearchOptionsInput {

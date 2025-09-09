@@ -1,5 +1,4 @@
 import { Module, forwardRef } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { AuthResolver } from './auth.resolver';
@@ -13,7 +12,7 @@ import { RolesGuard } from './guards/roles.guard';
 
 @Module({
   imports: [PassportModule, forwardRef(() => UsersModule), forwardRef(() => OrganizationsModule)],
-  providers: [AuthResolver, AuthService, JwtStrategy, LocalStrategy, JwtAuthGuard, LocalAuthGuard, RolesGuard, JwtService],
+  providers: [AuthResolver, AuthService, JwtStrategy, LocalStrategy, JwtAuthGuard, LocalAuthGuard, RolesGuard],
   exports: [AuthService, JwtAuthGuard, LocalAuthGuard, RolesGuard],
 })
 export class AuthModule {}

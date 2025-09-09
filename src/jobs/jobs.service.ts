@@ -6,6 +6,7 @@ import { Job } from './entities/job.entity';
 import { RecruiterProfile } from '../recruiter-profile/entities/recruiter-profile.entity';
 import { CurrentUser } from '../common/types';
 import { CreateJobInput } from './dto/create-job.input';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class JobsService {
@@ -30,16 +31,13 @@ export class JobsService {
     return this.toResponse(saved);
   }
 
-  async findAll(user?: CurrentUser): Promise<JobResponse[]> {
+  async findAll(user: CurrentUser, { page = 1, limit = 10 }: PaginationDto): Promise<[JobResponse[], number]> {
     let query = this.jobsRepo.createQueryBuilder('job');
-
-    // If user has organization, filter by organization
-    if (user?.organizationId) {
-      query = query.where('job.organizationId = :organizationId', { organizationId: user.organizationId });
-    }
-
-    const jobs = await query.getMany();
-    return jobs.map(this.toResponse);
+    if (user.organizationId) query = query.where('job.organizationId = :organizationId', { organizationId: user.organizationId });
+    query = query.skip((page - 1) * limit).take(limit);
+    query = query.orderBy('job.createdAt', 'DESC');
+    const [jobs, count] = await query.getManyAndCount();
+    return [jobs.map(this.toResponse), count];
   }
 
   async findOne(id: string, user?: CurrentUser): Promise<JobResponse> {

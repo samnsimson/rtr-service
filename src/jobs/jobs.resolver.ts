@@ -1,6 +1,6 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { JobsService } from './jobs.service';
-import { JobResponse, UpdateJobInput } from './dto';
+import { JobResponse, JobResponsePaginated, UpdateJobInput } from './dto';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
@@ -9,6 +9,7 @@ import { CurrentUser } from 'src/common/types';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { AuthUser } from 'src/common/decorators/current-user.decorator';
 import { CreateJobInput } from './dto/create-job.input';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Resolver(() => JobResponse)
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -21,9 +22,10 @@ export class JobsResolver {
     return this.jobsService.create(createJobInput, user);
   }
 
-  @Query(() => [JobResponse], { name: 'jobs' })
-  findAll(@AuthUser() user: CurrentUser) {
-    return this.jobsService.findAll(user);
+  @Query(() => JobResponsePaginated, { name: 'jobs' })
+  async findAll(@AuthUser() user: CurrentUser, @Args('pagination', { type: () => PaginationDto, nullable: true }) pagination: PaginationDto) {
+    const [data, total] = await this.jobsService.findAll(user, pagination);
+    return new JobResponsePaginated({ data, total, ...pagination });
   }
 
   @Query(() => JobResponse, { name: 'job' })
