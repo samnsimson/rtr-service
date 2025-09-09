@@ -56,8 +56,8 @@ export class AuthService {
         const user = await this.usersService.create(registerInput);
         const organizationData = { name: `${user.name}'s Organization` };
         const organization = await this.organizationsService.createOrganization(organizationData, user.id);
-        await this.usersService.update(user.id, { organizationId: organization.id, role: UserRole.ORGANIZATION_OWNER });
-        return this.authResponse(user, organization);
+        const updatedUser = await this.usersService.update(user.id, { organizationId: organization.id, role: UserRole.ORGANIZATION_OWNER });
+        return this.authResponse(updatedUser, organization);
       }
       throw error;
     }

@@ -15,11 +15,12 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   canActivate(context: ExecutionContext): boolean {
-    const ctx = GqlExecutionContext.create(context);
-    const { req } = ctx.getContext();
-    const token = req.headers.authorization?.replace('Bearer ', '');
-    if (!token) throw new UnauthorizedException('No token provided');
     try {
+      const ctx = GqlExecutionContext.create(context);
+      const { req } = ctx.getContext();
+      const token = req.headers.authorization?.replace('Bearer ', '');
+      console.log('🚀 ~ JwtAuthGuard ~ canActivate ~ token:', token);
+      if (!token) throw new UnauthorizedException('No token provided');
       const payload = this.jwtService.verify(token);
       req.user = { id: payload.sub, email: payload.email, role: payload.role };
       return true;

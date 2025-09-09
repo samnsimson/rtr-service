@@ -20,6 +20,7 @@ import { SearchModule } from './search/search.module';
 import { PaymentsModule } from './payments/payments.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { EmailModule } from './email/email.module';
+import { JwtModule } from '@nestjs/jwt';
 import './common/enums';
 
 @Module({
@@ -42,6 +43,15 @@ import './common/enums';
       graphiql: true,
       ...graphqlValidationConfig,
     }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      global: true,
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: '1h' },
+      }),
+    }),
     forwardRef(() => UsersModule),
     forwardRef(() => AuthModule),
     forwardRef(() => RecruiterProfileModule),
@@ -52,11 +62,11 @@ import './common/enums';
     forwardRef(() => JobApplicationsModule),
     forwardRef(() => DocumentsModule),
     forwardRef(() => NotificationsModule),
-    OrganizationsModule,
-    SearchModule,
-    PaymentsModule,
-    SubscriptionsModule,
-    EmailModule,
+    forwardRef(() => OrganizationsModule),
+    forwardRef(() => SearchModule),
+    forwardRef(() => PaymentsModule),
+    forwardRef(() => SubscriptionsModule),
+    forwardRef(() => EmailModule),
   ],
 })
 export class AppModule {}

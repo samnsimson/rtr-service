@@ -3,7 +3,7 @@ import { UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Auth } from './entities';
 import { LoginInput, RegisterInput, RefreshTokenInput } from './dto';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { AuthUser } from '../common/decorators/current-user.decorator';
 import { GraphQLValidate } from '../common/decorators';
 import { CurrentUser } from '../common/types';
