@@ -3,10 +3,10 @@ import { UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserInput, UpdateUserInput, UserResponse } from './dto';
 import { GraphQLValidate } from '../common/decorators';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { AuthUser } from '../auth/decorators/current-user.decorator';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
+import { AuthUser } from '../common/decorators/current-user.decorator';
 import { UserRole } from '../common/enums';
 import { CurrentUser } from '../common/types';
 
@@ -23,7 +23,7 @@ export class UsersResolver {
 
   @Query(() => [UserResponse], { name: 'users' })
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.CANDIDATE)
+  @Roles(UserRole.ORGANIZATION_OWNER, UserRole.ADMIN, UserRole.CANDIDATE)
   async findAll(): Promise<UserResponse[]> {
     const users = await this.usersService.findAll();
     return users.map((user) => new UserResponse(user));
@@ -31,7 +31,7 @@ export class UsersResolver {
 
   @Query(() => UserResponse, { name: 'user' })
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.RECRUITER, UserRole.CANDIDATE)
+  @Roles(UserRole.ORGANIZATION_OWNER, UserRole.ADMIN, UserRole.RECRUITER, UserRole.CANDIDATE)
   async findOne(@Args('id') id: string): Promise<UserResponse> {
     const user = await this.usersService.findOne(id);
     return new UserResponse(user);
@@ -46,7 +46,7 @@ export class UsersResolver {
 
   @Mutation(() => UserResponse)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ORGANIZATION_OWNER, UserRole.ADMIN)
   @GraphQLValidate()
   async updateUser(@Args('id') id: string, @Args('updateUserInput') updateUserInput: UpdateUserInput): Promise<UserResponse> {
     const user = await this.usersService.update(id, updateUserInput);
@@ -55,7 +55,7 @@ export class UsersResolver {
 
   @Mutation(() => Boolean)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ORGANIZATION_OWNER, UserRole.ADMIN)
   async removeUser(@Args('id') id: string): Promise<boolean> {
     await this.usersService.remove(id);
     return true;

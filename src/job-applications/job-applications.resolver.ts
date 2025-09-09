@@ -1,12 +1,12 @@
 import { Resolver, Query, Mutation, Args, ResolveField, Parent } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { JobApplicationsService } from './job-applications.service';
-import { CreateJobApplicationInput, JobApplicationResponse, UpdateJobApplicationInput } from './dto';
+import { CreateJobApplicationInput, UpdateJobApplicationInput } from './dto';
 import { JobApplication } from './entities/job-application.entity';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { AuthUser } from '../auth/decorators/current-user.decorator';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
+import { AuthUser } from '../common/decorators/current-user.decorator';
 import { UserRole } from '../common/enums';
 import { CurrentUser } from '../common/types';
 
@@ -80,17 +80,17 @@ export class JobApplicationsResolver {
 
   // Resolve fields for relations
   @ResolveField(() => String, { name: 'job' })
-  async getJob(@Parent() application: JobApplication): Promise<string> {
+  getJob(@Parent() application: JobApplication): string {
     return application.jobId;
   }
 
   @ResolveField(() => String, { name: 'candidate' })
-  async getCandidate(@Parent() application: JobApplication): Promise<string> {
+  getCandidate(@Parent() application: JobApplication): string {
     return application.candidateId;
   }
 
   @ResolveField(() => String, { name: 'organization', nullable: true })
-  async getOrganization(@Parent() application: JobApplication): Promise<string | null> {
+  getOrganization(@Parent() application: JobApplication): string | null {
     return application.organizationId;
   }
 }

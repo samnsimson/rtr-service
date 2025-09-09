@@ -1,7 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { UserRole } from '../../common/enums';
+import { UserRole } from '../enums';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -9,6 +9,7 @@ export class RolesGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>('roles', [context.getHandler(), context.getClass()]);
+    console.log('🚀 ~ RolesGuard ~ canActivate ~ requiredRoles:', requiredRoles);
     if (!requiredRoles) return true;
     const ctx = GqlExecutionContext.create(context);
     const { req } = ctx.getContext();

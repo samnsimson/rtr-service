@@ -4,11 +4,11 @@ import { SubscriptionsService } from './subscriptions.service';
 import { Subscription } from './entities/subscription.entity';
 import { SubscriptionPlan } from './entities/subscription-plan.entity';
 import { CreateSubscriptionInput, UpdateSubscriptionInput } from './dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
 import { UserRole } from '../common/enums';
-import { AuthUser } from '../auth/decorators/current-user.decorator';
+import { AuthUser } from '../common/decorators/current-user.decorator';
 import { CurrentUser as CurrentUserType } from '../common/types';
 
 @Resolver(() => Subscription)

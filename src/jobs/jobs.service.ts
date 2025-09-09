@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateJobInput, UpdateJobInput, JobResponse } from './dto';
+import { UpdateJobInput, JobResponse } from './dto';
 import { Job } from './entities/job.entity';
 import { RecruiterProfile } from '../recruiter-profile/entities/recruiter-profile.entity';
 import { CurrentUser } from '../common/types';
+import { CreateJobInput } from './dto/create-job.input';
 
 @Injectable()
 export class JobsService {

@@ -876,7 +876,6 @@ input CreateJobInput {
   salaryMin: Int
   salaryMax: Int
   benefits: [String!]!
-  recruiterId: String!
   status: JobStatus
   expiresAt: String
 }

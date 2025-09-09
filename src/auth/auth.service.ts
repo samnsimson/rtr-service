@@ -1,9 +1,11 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { OrganizationsService } from '../organizations/organizations.service';
 import { LoginInput, RegisterInput } from './dto';
 import { UserRole } from '../common/enums';
+import { Organization } from 'src/organizations/entities/organization.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -23,10 +25,8 @@ export class AuthService {
     }
   }
 
-  async login(loginInput: LoginInput) {
-    const user = await this.validateUser(loginInput.email, loginInput.password);
-    if (!user) throw new UnauthorizedException('Invalid credentials');
-    const payload = { email: user.email, sub: user.id, role: user.role, organizationId: user.organizationId };
+  authResponse(user: User, organization: Organization) {
+    const payload = { email: user.email, sub: user.id, role: user.role, organizationId: organization.id };
     return {
       accessToken: this.jwtService.sign(payload),
       refreshToken: this.jwtService.sign(payload, { expiresIn: '7d' }),
@@ -34,38 +34,33 @@ export class AuthService {
         id: user.id,
         name: user.name,
         role: user.role,
-        organization: user.organization ? { id: user.organization.id, name: user.organization.name } : null,
+        organization: organization ? { id: organization.id, name: organization.name } : null,
         isActive: user.isActive,
         isEmailVerified: user.isEmailVerified,
       },
     };
   }
 
+  async login(loginInput: LoginInput) {
+    const user = await this.validateUser(loginInput.email, loginInput.password);
+    if (!user) throw new UnauthorizedException('Invalid credentials');
+    return this.authResponse(user, user.organization);
+  }
+
   async register(registerInput: RegisterInput) {
-    const existingUser = await this.usersService.findByEmail(registerInput.email);
-    if (existingUser) throw new ConflictException('User with this email already exists');
-
-    // Create user first
-    const user = await this.usersService.create(registerInput);
-    const organizationData = { name: `${user.name}'s Organization` };
-    const organization = await this.organizationsService.createOrganization(organizationData, user.id);
-    await this.usersService.update(user.id, { organizationId: organization.id, role: UserRole.ORGANIZATION_OWNER });
-
-    // Get updated user with organization data
-    const updatedUser = await this.usersService.findOne(user.id);
-    const payload = { email: updatedUser.email, sub: updatedUser.id, role: updatedUser.role, organizationId: updatedUser.organizationId };
-    return {
-      accessToken: this.jwtService.sign(payload),
-      refreshToken: this.jwtService.sign(payload, { expiresIn: '7d' }),
-      user: {
-        id: updatedUser.id,
-        name: updatedUser.name,
-        role: updatedUser.role,
-        organization: updatedUser.organization ? { id: updatedUser.organization.id, name: updatedUser.organization.name } : null,
-        isActive: updatedUser.isActive,
-        isEmailVerified: updatedUser.isEmailVerified,
-      },
-    };
+    try {
+      const existingUser = await this.usersService.findByEmail(registerInput.email);
+      if (existingUser) throw new ConflictException('User with this email already exists');
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        const user = await this.usersService.create(registerInput);
+        const organizationData = { name: `${user.name}'s Organization` };
+        const organization = await this.organizationsService.createOrganization(organizationData, user.id);
+        await this.usersService.update(user.id, { organizationId: organization.id, role: UserRole.ORGANIZATION_OWNER });
+        return this.authResponse(user, organization);
+      }
+      throw error;
+    }
   }
 
   async refreshToken(refreshToken: string) {

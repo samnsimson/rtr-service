@@ -42,10 +42,7 @@ export class UsersService {
 
   async findByEmail(email: string): Promise<User> {
     if (!email) throw new BadRequestException('Email is required');
-    const user = await this.userRepository.findOne({
-      where: { email },
-      relations: ['organization'],
-    });
+    const user = await this.userRepository.findOne({ where: { email }, relations: ['organization'] });
     if (!user) throw new NotFoundException(`User with email ${email} not found`);
     return user;
   }
@@ -73,11 +70,10 @@ export class UsersService {
 
   async validateUser(email: string, password: string): Promise<User> {
     if (!email || !password) throw new BadRequestException('Email and password are required');
-    const user = await this.userRepository.findOne({ where: { email } });
+    const user = await this.userRepository.findOne({ where: { email }, relations: ['organization'] });
     if (!user) throw new NotFoundException('Invalid credentials');
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) throw new NotFoundException('Invalid credentials');
-
     return user;
   }
 
