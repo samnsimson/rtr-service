@@ -7,6 +7,9 @@ import { UserRole } from '../common/enums';
 import { Organization } from 'src/organizations/entities/organization.entity';
 import { User } from 'src/users/entities/user.entity';
 import { RecruiterProfileService } from 'src/recruiter-profile/recruiter-profile.service';
+import { Auth, AuthUser, Org } from './entities/auth.entity';
+import { add } from 'date-fns';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +17,7 @@ export class AuthService {
     private usersService: UsersService,
     private organizationsService: OrganizationsService,
     private recruiterProfileService: RecruiterProfileService,
+    private configService: ConfigService,
     private jwtService: JwtService,
   ) {}
 
@@ -29,18 +33,15 @@ export class AuthService {
 
   authResponse(user: User, organization: Organization) {
     const payload = { email: user.email, sub: user.id, role: user.role, organizationId: organization.id };
-    return {
-      accessToken: this.jwtService.sign(payload),
+    const org = new Org({ id: organization.id, name: organization.name });
+    const authUser = new AuthUser({ ...user, organization: org });
+    return new Auth({
+      tokenType: 'Bearer',
+      accessToken: this.jwtService.sign(payload, { expiresIn: '60s' }),
       refreshToken: this.jwtService.sign(payload, { expiresIn: '7d' }),
-      user: {
-        id: user.id,
-        name: user.name,
-        role: user.role,
-        organization: organization ? { id: organization.id, name: organization.name } : null,
-        isActive: user.isActive,
-        isEmailVerified: user.isEmailVerified,
-      },
-    };
+      expiresAt: add(new Date(), { seconds: 60 }),
+      user: authUser,
+    });
   }
 
   async login(loginInput: LoginInput) {
@@ -71,19 +72,7 @@ export class AuthService {
       const payload = this.jwtService.verify(refreshToken);
       const user = await this.usersService.findOne(payload.sub);
       if (!user) throw new UnauthorizedException('User not found');
-      const newPayload = { email: user.email, sub: user.id, role: user.role, organizationId: user.organizationId };
-      return {
-        accessToken: this.jwtService.sign(newPayload),
-        refreshToken: this.jwtService.sign(newPayload, { expiresIn: '7d' }),
-        user: {
-          id: user.id,
-          name: user.name,
-          role: user.role,
-          organization: user.organization ? { id: user.organization.id, name: user.organization.name } : null,
-          isActive: user.isActive,
-          isEmailVerified: user.isEmailVerified,
-        },
-      };
+      return this.authResponse(user, user.organization);
     } catch (error) {
       console.log('🚀 ~ AuthService ~ refreshToken ~ error:', error);
       throw new UnauthorizedException('Invalid refresh token');

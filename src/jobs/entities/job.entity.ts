@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn, BeforeInsert } from 'typeorm';
 import { RecruiterProfile } from '../../recruiter-profile/entities/recruiter-profile.entity';
 import { Organization } from '../../organizations/entities/organization.entity';
 import { RTR } from '../../rtr/entities/rtr.entity';
@@ -12,6 +12,10 @@ export class Job {
   @Field(() => String)
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Field(() => String)
+  @Column({ unique: true, default: null })
+  jobId: string;
 
   @Field(() => String)
   @Column()
@@ -34,24 +38,15 @@ export class Job {
   location: string;
 
   @Field(() => WorkType)
-  @Column({
-    type: 'enum',
-    enum: WorkType,
-  })
+  @Column({ type: 'enum', enum: WorkType })
   workType: WorkType;
 
   @Field(() => JobType)
-  @Column({
-    type: 'enum',
-    enum: JobType,
-  })
+  @Column({ type: 'enum', enum: JobType })
   jobType: JobType;
 
   @Field(() => CompensationType)
-  @Column({
-    type: 'enum',
-    enum: CompensationType,
-  })
+  @Column({ type: 'enum', enum: CompensationType })
   compensation: CompensationType;
 
   @Field(() => Number, { nullable: true })
@@ -75,11 +70,7 @@ export class Job {
   organizationId: string;
 
   @Field(() => JobStatus)
-  @Column({
-    type: 'enum',
-    enum: JobStatus,
-    default: JobStatus.ACTIVE,
-  })
+  @Column({ type: 'enum', enum: JobStatus, default: JobStatus.ACTIVE })
   status: JobStatus;
 
   @Field(() => Date, { nullable: true })
@@ -112,4 +103,11 @@ export class Job {
   @Field(() => [JobApplication], { nullable: true })
   @OneToMany(() => JobApplication, (application) => application.job)
   applications: JobApplication[];
+
+  @BeforeInsert()
+  generateJobId() {
+    const randomId = Math.floor(100000 + Math.random() * 900000);
+    const randomPrefix = Math.floor(100 + Math.random() * 900);
+    this.jobId = `JOB${randomPrefix}${randomId}`;
+  }
 }

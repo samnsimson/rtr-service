@@ -145,6 +145,7 @@ enum RTRStatus {
 
 type Job {
   id: String!
+  jobId: String!
   title: String!
   company: String!
   description: String!
@@ -449,6 +450,8 @@ type AuthUser {
 type Auth {
   accessToken: String!
   refreshToken: String!
+  tokenType: String!
+  expiresAt: DateTime!
   user: AuthUser!
 }
 
