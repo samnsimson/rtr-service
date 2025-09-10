@@ -603,7 +603,7 @@ type Query {
   recruiterProfile(id: String!): RecruiterProfileResponse!
   candidateProfiles: [CandidateProfileResponse!]!
   candidateProfile(id: String!): CandidateProfileResponse!
-  jobs(pagination: PaginationDto): JobResponsePaginated!
+  jobs(filters: JobListFiltersInput!): JobResponsePaginated!
   job(id: String!): JobResponse!
   jobsByOrganization(organizationId: String!): [JobResponse!]!
   jobsByRecruiter(recruiterId: String!): [JobResponse!]!
@@ -652,6 +652,15 @@ type Query {
 input PaginationDto {
   limit: Int = 10
   page: Int = 1
+}
+
+input JobListFiltersInput {
+  limit: Int = 10
+  page: Int = 1
+  query: String
+  workType: WorkType
+  jobType: JobType
+  compensation: CompensationType
 }
 
 input SearchOptionsInput {

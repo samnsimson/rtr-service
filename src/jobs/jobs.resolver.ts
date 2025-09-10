@@ -9,7 +9,7 @@ import { CurrentUser } from 'src/common/types';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { AuthUser } from 'src/common/decorators/current-user.decorator';
 import { CreateJobInput } from './dto/create-job.input';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { JobListFiltersInput } from './dto/job-list-filters.input';
 
 @Resolver(() => JobResponse)
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -23,9 +23,9 @@ export class JobsResolver {
   }
 
   @Query(() => JobResponsePaginated, { name: 'jobs' })
-  async findAll(@AuthUser() user: CurrentUser, @Args('pagination', { type: () => PaginationDto, nullable: true }) pagination: PaginationDto) {
-    const [data, total] = await this.jobsService.findAll(user, pagination);
-    return new JobResponsePaginated({ data, total, ...pagination });
+  async findAll(@AuthUser() user: CurrentUser, @Args('filters', { type: () => JobListFiltersInput }) filters: JobListFiltersInput) {
+    const [data, total] = await this.jobsService.findAll(user, filters);
+    return new JobResponsePaginated({ data, total, ...filters });
   }
 
   @Query(() => JobResponse, { name: 'job' })
