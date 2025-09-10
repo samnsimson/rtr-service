@@ -31,4 +31,8 @@ export class RecruiterProfileResponse {
 
   @Field()
   updatedAt: Date;
+
+  constructor(props: Partial<RecruiterProfileResponse>) {
+    Object.assign(this, props);
+  }
 }

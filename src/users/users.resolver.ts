@@ -9,6 +9,8 @@ import { Roles } from '../common/decorators/roles.decorator';
 import { AuthUser } from '../common/decorators/current-user.decorator';
 import { UserRole } from '../common/enums';
 import { CurrentUser } from '../common/types';
+import { PaginatedUserResponse } from './dto/paginated-user-response.dto';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Resolver(() => UserResponse)
 export class UsersResolver {
@@ -24,9 +26,11 @@ export class UsersResolver {
   @Query(() => [UserResponse], { name: 'users' })
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ORGANIZATION_OWNER, UserRole.ADMIN, UserRole.CANDIDATE)
-  async findAll(): Promise<UserResponse[]> {
-    const users = await this.usersService.findAll();
-    return users.map((user) => new UserResponse(user));
+  async findAll(@Args('pagination', { type: () => PaginationDto, nullable: true }) pagination: PaginationDto): Promise<PaginatedUserResponse> {
+    const take = pagination.limit;
+    const skip = (pagination.page - 1) * pagination.limit;
+    const users = await this.usersService.findAll({ relations: ['organization', 'recruiterProfile'], skip, take });
+    return new PaginatedUserResponse({ data: users.map((user) => new UserResponse(user)), ...pagination });
   }
 
   @Query(() => UserResponse, { name: 'user' })

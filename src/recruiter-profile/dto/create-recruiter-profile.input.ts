@@ -1,6 +1,5 @@
-import { IsString, IsOptional, IsEnum, IsUUID } from 'class-validator';
+import { IsString, IsOptional, IsUUID } from 'class-validator';
 import { InputType, Field } from '@nestjs/graphql';
-import { CompanySize } from '../../common/enums';
 
 @InputType()
 export class CreateRecruiterProfileInput {
@@ -8,37 +7,23 @@ export class CreateRecruiterProfileInput {
   @IsUUID()
   userId: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   @IsString()
-  companyName: string;
-
-  @Field({ nullable: true })
   @IsOptional()
+  title?: string;
+
+  @Field(() => String, { nullable: true })
   @IsString()
-  companyWebsite?: string;
-
-  @Field({ nullable: true })
   @IsOptional()
-  @IsString()
-  industry?: string;
-
-  @Field(() => CompanySize, { nullable: true })
-  @IsOptional()
-  @IsEnum(CompanySize)
-  companySize?: CompanySize;
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
-  location?: string;
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
   bio?: string;
 
-  @Field({ nullable: true })
-  @IsOptional()
+  @Field(() => String, { nullable: true })
   @IsString()
+  @IsOptional()
   linkedinUrl?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  avatar?: string;
 }

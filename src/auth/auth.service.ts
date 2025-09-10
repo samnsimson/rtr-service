@@ -6,12 +6,14 @@ import { LoginInput, RegisterInput } from './dto';
 import { UserRole } from '../common/enums';
 import { Organization } from 'src/organizations/entities/organization.entity';
 import { User } from 'src/users/entities/user.entity';
+import { RecruiterProfileService } from 'src/recruiter-profile/recruiter-profile.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private organizationsService: OrganizationsService,
+    private recruiterProfileService: RecruiterProfileService,
     private jwtService: JwtService,
   ) {}
 
@@ -57,6 +59,7 @@ export class AuthService {
         const organizationData = { name: `${user.name}'s Organization` };
         const organization = await this.organizationsService.createOrganization(organizationData, user.id);
         const updatedUser = await this.usersService.update(user.id, { organizationId: organization.id, role: UserRole.ORGANIZATION_OWNER });
+        await this.recruiterProfileService.create({ userId: user.id });
         return this.authResponse(updatedUser, organization);
       }
       throw error;

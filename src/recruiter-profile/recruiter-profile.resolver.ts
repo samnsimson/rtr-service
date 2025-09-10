@@ -17,20 +17,20 @@ export class RecruiterProfileResolver {
   async createRecruiterProfile(
     @Args('createRecruiterProfileInput') createRecruiterProfileInput: CreateRecruiterProfileInput,
   ): Promise<RecruiterProfileResponse> {
-    const profile = this.recruiterProfileService.create(createRecruiterProfileInput);
-    return profile;
+    const profile = await this.recruiterProfileService.create(createRecruiterProfileInput);
+    return new RecruiterProfileResponse(profile);
   }
 
   @Query(() => [RecruiterProfileResponse], { name: 'recruiterProfiles' })
   async findAll(): Promise<RecruiterProfileResponse[]> {
-    const profiles = this.recruiterProfileService.findAll();
-    return profiles;
+    const profiles = await this.recruiterProfileService.findAll();
+    return profiles.map((profile) => new RecruiterProfileResponse(profile));
   }
 
   @Query(() => RecruiterProfileResponse, { name: 'recruiterProfile' })
   async findOne(@Args('id', { type: () => String }) id: string): Promise<RecruiterProfileResponse> {
-    const profile = this.recruiterProfileService.findOne(id);
-    return profile;
+    const profile = await this.recruiterProfileService.findOne(id);
+    return new RecruiterProfileResponse(profile);
   }
 
   @Mutation(() => RecruiterProfileResponse)
@@ -38,8 +38,8 @@ export class RecruiterProfileResolver {
     @Args('id', { type: () => String }) id: string,
     @Args('updateRecruiterProfileInput') updateRecruiterProfileInput: UpdateRecruiterProfileInput,
   ): Promise<RecruiterProfileResponse> {
-    const profile = this.recruiterProfileService.update(id, updateRecruiterProfileInput);
-    return profile;
+    const profile = await this.recruiterProfileService.update(id, updateRecruiterProfileInput);
+    return new RecruiterProfileResponse(profile);
   }
 
   @Mutation(() => Boolean)

@@ -1,18 +1,17 @@
+import * as bcrypt from 'bcrypt';
 import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindManyOptions, Repository } from 'typeorm';
 import { CreateUserInput, UpdateUserInput } from './dto';
 import { User } from './entities/user.entity';
-import { Organization } from '../organizations/entities/organization.entity';
 import { UserRole } from '../common/enums';
-import * as bcrypt from 'bcrypt';
+import { UserServiceHelper } from './helpers/user-service.helper';
 
 @Injectable()
-export class UsersService {
-  constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
-    @InjectRepository(Organization) private readonly organizationRepository: Repository<Organization>,
-  ) {}
+export class UsersService extends UserServiceHelper {
+  constructor(@InjectRepository(User) private readonly userRepository: Repository<User>) {
+    super();
+  }
 
   async create(createUserInput: CreateUserInput): Promise<User> {
     const existingUser = await this.userRepository.findOne({ where: { email: createUserInput.email } });
@@ -22,20 +21,13 @@ export class UsersService {
     return this.userRepository.save(user);
   }
 
-  async findAll(): Promise<User[]> {
-    return this.userRepository.find({
-      select: ['id', 'email', 'name', 'role', 'avatar', 'phone', 'createdAt', 'updatedAt'],
-      order: { createdAt: 'DESC' },
-    });
+  async findAll(options: FindManyOptions<User> = {}): Promise<User[]> {
+    return this.userRepository.find({ ...options, order: { createdAt: 'DESC' } });
   }
 
   async findOne(id: string): Promise<User> {
     if (!id) throw new BadRequestException('User ID is required');
-    const user = await this.userRepository.findOne({
-      where: { id },
-      select: ['id', 'email', 'name', 'role', 'avatar', 'phone', 'organizationId', 'isActive', 'isEmailVerified', 'createdAt', 'updatedAt'],
-      relations: ['organization'],
-    });
+    const user = await this.userRepository.findOne({ where: { id }, relations: ['organization'] });
     if (!user) throw new NotFoundException(`User with ID ${id} not found`);
     return user;
   }
@@ -87,10 +79,6 @@ export class UsersService {
   }
 
   async findByRole(role: UserRole): Promise<User[]> {
-    return this.userRepository.find({
-      where: { role },
-      select: ['id', 'email', 'name', 'role', 'avatar', 'phone', 'createdAt', 'updatedAt'],
-      order: { createdAt: 'DESC' },
-    });
+    return this.userRepository.find({ where: { role }, order: { createdAt: 'DESC' } });
   }
 }
