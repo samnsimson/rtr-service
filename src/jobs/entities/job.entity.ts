@@ -30,7 +30,7 @@ export class Job {
   description: string;
 
   @Field(() => [String])
-  @Column('simple-array')
+  @Column('json')
   requirements: string[];
 
   @Field(() => String)
@@ -58,7 +58,7 @@ export class Job {
   salaryMax: number;
 
   @Field(() => [String])
-  @Column('simple-array')
+  @Column('json')
   benefits: string[];
 
   @Field(() => String)

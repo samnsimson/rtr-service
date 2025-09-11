@@ -30,7 +30,7 @@ export class CandidateProfile {
   experience: number; // Years of experience
 
   @Field(() => [String], { nullable: true })
-  @Column('simple-array', { nullable: true })
+  @Column('json', { nullable: true })
   skills: string[]; // Array of skills
 
   @Field(() => String, { nullable: true })
