@@ -487,6 +487,7 @@ type CandidateProfileResponse {
 
 type JobResponse {
   id: String!
+  jobId: String
   title: String!
   company: String!
   description: String!
@@ -504,6 +505,8 @@ type JobResponse {
   expiresAt: DateTime
   createdAt: DateTime!
   updatedAt: DateTime!
+  recruiter: User!
+  organization: Organization!
 }
 
 type JobResponsePaginated {

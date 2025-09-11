@@ -1,7 +1,7 @@
 import * as bcrypt from 'bcrypt';
 import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindManyOptions, Repository } from 'typeorm';
+import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
 import { CreateUserInput, UpdateUserInput } from './dto';
 import { User } from './entities/user.entity';
 import { UserRole } from '../common/enums';
@@ -25,9 +25,9 @@ export class UsersService extends UserServiceHelper {
     return this.userRepository.find({ ...options, order: { createdAt: 'DESC' } });
   }
 
-  async findOne(id: string): Promise<User> {
+  async findOne(id: string, options: FindOneOptions<User> = {}): Promise<User> {
     if (!id) throw new BadRequestException('User ID is required');
-    const user = await this.userRepository.findOne({ where: { id }, relations: ['organization'] });
+    const user = await this.userRepository.findOne({ where: { id, ...options.where }, relations: ['organization'] });
     if (!user) throw new NotFoundException(`User with ID ${id} not found`);
     return user;
   }

@@ -37,9 +37,9 @@ export class AuthService {
     const authUser = new AuthUser({ ...user, organization: org });
     return new Auth({
       tokenType: 'Bearer',
-      accessToken: this.jwtService.sign(payload, { expiresIn: '60s' }),
+      accessToken: this.jwtService.sign(payload, { expiresIn: '1h' }),
       refreshToken: this.jwtService.sign(payload, { expiresIn: '7d' }),
-      expiresAt: add(new Date(), { seconds: 60 }),
+      expiresAt: add(new Date(), { hours: 1 }),
       user: authUser,
     });
   }

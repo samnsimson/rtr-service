@@ -7,6 +7,9 @@ export class JobResponse {
   @Field()
   id: string;
 
+  @Field({ nullable: true })
+  jobId?: string;
+
   @Field()
   title: string;
 
@@ -57,6 +60,10 @@ export class JobResponse {
 
   @Field()
   updatedAt: Date;
+
+  constructor(partial?: Partial<JobResponse>) {
+    Object.assign(this, partial);
+  }
 }
 
 @ObjectType()
