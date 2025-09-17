@@ -33,7 +33,6 @@ export class JobsService {
   async findAll(user: CurrentUser, filters: JobListFiltersInput): Promise<[JobResponse[], number]> {
     let query = this.jobsRepo.createQueryBuilder('job');
     const { page, limit, query: queryString, workType, jobType, compensation } = filters;
-    console.log('user.organizationId', user.organizationId);
     if (user.organizationId) query = query.where('job.organizationId = :organizationId', { organizationId: user.organizationId });
     if (queryString) query = query.andWhere('job.title ILIKE :query', { query: `%${queryString}%` });
     if (workType) query = query.andWhere('job.workType = :workType', { workType });

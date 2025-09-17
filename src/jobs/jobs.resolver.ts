@@ -35,7 +35,6 @@ export class JobsResolver {
 
   @Query(() => JobResponsePaginated, { name: 'jobs' })
   async findAll(@AuthUser() user: CurrentUser, @Args('filters', { type: () => JobListFiltersInput }) filters: JobListFiltersInput) {
-    console.log('🚀 ~ JobsResolver ~ findAll ~ user:', user);
     const [data, total] = await this.jobsService.findAll(user, filters);
     return new JobResponsePaginated({ data, total, ...filters });
   }
