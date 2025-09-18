@@ -6,6 +6,8 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { UserRole } from 'src/common/enums';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import { AuthUser } from 'src/common/decorators/current-user.decorator';
+import { CurrentUser } from 'src/common/types';
 
 @Resolver(() => RecruiterProfileResponse)
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -28,8 +30,8 @@ export class RecruiterProfileResolver {
   }
 
   @Query(() => RecruiterProfileResponse, { name: 'recruiterProfile' })
-  async findOne(@Args('id', { type: () => String }) id: string): Promise<RecruiterProfileResponse> {
-    const profile = await this.recruiterProfileService.findOne(id);
+  async findOne(@Args('id', { type: () => String }) id: string, @AuthUser() user: CurrentUser): Promise<RecruiterProfileResponse> {
+    const profile = await this.recruiterProfileService.findOne(id, user.organizationId);
     return new RecruiterProfileResponse(profile);
   }
 
@@ -37,8 +39,9 @@ export class RecruiterProfileResolver {
   async updateRecruiterProfile(
     @Args('id', { type: () => String }) id: string,
     @Args('updateRecruiterProfileInput') updateRecruiterProfileInput: UpdateRecruiterProfileInput,
+    @AuthUser() user: CurrentUser,
   ): Promise<RecruiterProfileResponse> {
-    const profile = await this.recruiterProfileService.update(id, updateRecruiterProfileInput);
+    const profile = await this.recruiterProfileService.update(id, user.organizationId, updateRecruiterProfileInput);
     return new RecruiterProfileResponse(profile);
   }
 

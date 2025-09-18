@@ -10,9 +10,23 @@ import { Job } from '../jobs/entities/job.entity';
 import { Organization } from '../organizations/entities/organization.entity';
 import { RTRHistory } from '../rtr-history/entities/rtr-history.entity';
 import { EmailModule } from '../email/email.module';
+import { JobsModule } from 'src/jobs/jobs.module';
+import { OrganizationsModule } from 'src/organizations/organizations.module';
+import { CandidateProfileModule } from 'src/candidate-profile/candidate-profile.module';
+import { RecruiterProfileModule } from 'src/recruiter-profile/recruiter-profile.module';
+import { RtrTemplateModule } from 'src/rtr-template/rtr-template.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([RTR, CandidateProfile, RecruiterProfile, Job, Organization, RTRHistory]), ConfigModule, EmailModule],
+  imports: [
+    TypeOrmModule.forFeature([RTR, CandidateProfile, RecruiterProfile, Job, Organization, RTRHistory]),
+    ConfigModule,
+    EmailModule,
+    JobsModule,
+    OrganizationsModule,
+    CandidateProfileModule,
+    RecruiterProfileModule,
+    RtrTemplateModule,
+  ],
   providers: [RTRResolver, RTRService],
   exports: [RTRService],
 })

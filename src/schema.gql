@@ -124,27 +124,33 @@ type RtrTemplate {
 
 type RTR {
   id: String!
-  candidateId: String!
-  recruiterId: String!
-  jobId: String
-  organizationId: String
+  candidateFirstName: String!
+  candidateLastName: String
+  candidateEmail: String!
+  candidatePhone: String
   status: RTRStatus!
   notes: String
+  compensation: Float
+  compensationType: CompensationType
   expiresAt: DateTime
   signedAt: DateTime
   viewedAt: DateTime
-  userId: String
-  rtrTemplateId: String!
+  resumeRequired: Boolean
+  photoIdRequired: Boolean
+  employerDetailsRequired: Boolean
+  referencesRequired: Boolean
+  skillsRequired: Boolean
   createdAt: DateTime!
   updatedAt: DateTime!
   candidate: CandidateProfile!
+  rtrTemplate: RtrTemplate!
   recruiter: RecruiterProfile!
   organization: Organization
   job: Job
   history: [RTRHistory!]
   documents: [Document!]
+  createdBy: User
   user: User
-  rtrTemplate: RtrTemplate!
 }
 
 """The status of a Right to Represent agreement"""
@@ -156,6 +162,14 @@ enum RTRStatus {
   SIGNED
   EXPIRED
   REJECTED
+}
+
+"""The type of compensation for a job"""
+enum CompensationType {
+  SALARY
+  HOURLY
+  PROJECT_BASED
+  COMMISSION
 }
 
 type Job {
@@ -198,14 +212,6 @@ enum JobType {
   CONTRACT
   INTERNSHIP
   FREELANCE
-}
-
-"""The type of compensation for a job"""
-enum CompensationType {
-  SALARY
-  HOURLY
-  PROJECT_BASED
-  COMMISSION
 }
 
 """The current status of a job posting"""
@@ -534,6 +540,37 @@ type JobResponsePaginated {
   totalPages: Int!
 }
 
+type CompiledRtrTemplateResponse {
+  id: String!
+  name: String!
+  description: String!
+  text: String!
+  html: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type RtrResponse {
+  id: String!
+  status: RTRStatus!
+  notes: String
+  expiresAt: DateTime
+  signedAt: DateTime
+  viewedAt: DateTime
+  resumeRequired: Boolean!
+  photoIdRequired: Boolean!
+  employerDetailsRequired: Boolean!
+  referencesRequired: Boolean!
+  skillsRequired: Boolean!
+  candidate: CandidateProfileResponse
+  recruiter: RecruiterProfile!
+  job: JobResponse!
+  organization: Organization!
+  rtrTemplate: RtrTemplate!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type RTRHistoryResponse {
   id: String!
   rtrId: String!
@@ -613,16 +650,6 @@ type IndexType {
   sortableAttributes: [String!]
 }
 
-type CompiledRtrTemplateResponse {
-  id: String!
-  name: String!
-  description: String!
-  text: String!
-  html: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
 type Query {
   users(pagination: PaginationDto): [UserResponse!]!
   user(id: String!): UserResponse!
@@ -645,6 +672,9 @@ type Query {
   rtrsByCandidate(candidateId: String!): [RTR!]!
   rtrsByRecruiter(recruiterId: String!): [RTR!]!
   rtrsByJob(jobId: String!): [RTR!]!
+  rtrTemplates: [RtrTemplate!]!
+  rtrTemplate(id: String!): RtrTemplate!
+  compiledRtrTemplate(compiledTemplateInput: CompiledRtrTemplateInput!): CompiledRtrTemplateResponse!
   rtrHistories: [RTRHistoryResponse!]!
   rtrHistory(id: Int!): RTRHistoryResponse!
   jobApplications: [JobApplication!]!
@@ -680,9 +710,6 @@ type Query {
   subscriptionPlans: [SubscriptionPlan!]!
   subscriptionPlan(id: String!): SubscriptionPlan!
   subscriptionPlansByType(planType: PlanType!): [SubscriptionPlan!]!
-  rtrTemplates: [RtrTemplate!]!
-  rtrTemplate(id: String!): RtrTemplate!
-  compiledRtrTemplate(compiledTemplateInput: CompiledRtrTemplateInput!): CompiledRtrTemplateResponse!
 }
 
 input PaginationDto {
@@ -697,6 +724,19 @@ input JobListFiltersInput {
   workType: WorkType
   jobType: JobType
   compensation: CompensationType
+}
+
+input CompiledRtrTemplateInput {
+  templateId: String!
+  jobId: String!
+  candidate: RtrTemplateCandidateInput
+}
+
+input RtrTemplateCandidateInput {
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
 }
 
 input SearchOptionsInput {
@@ -757,19 +797,6 @@ input JobSearchFiltersInput {
   salaryMax: Int
 }
 
-input CompiledRtrTemplateInput {
-  templateId: String!
-  jobId: String!
-  candidate: RtrTemplateCandidateInput
-}
-
-input RtrTemplateCandidateInput {
-  firstName: String
-  lastName: String
-  email: String
-  phone: String
-}
-
 type Mutation {
   createUser(createUserInput: CreateUserInput!): UserResponse!
   updateUser(id: String!, updateUserInput: UpdateUserInput!): UserResponse!
@@ -792,12 +819,15 @@ type Mutation {
   createJob(createJobInput: CreateJobInput!): JobResponse!
   updateJob(id: String!, updateJobInput: UpdateJobInput!): JobResponse!
   removeJob(id: String!): JobResponse!
-  createRTR(createRtrInput: CreateRTRInput!): RTR!
+  createRtr(createRtrInput: CreateRtrInput!): RtrResponse!
   updateRTR(id: String!, updateRtrInput: UpdateRTRInput!): RTR!
   removeRTR(id: String!): Boolean!
   approveRTR(id: String!): RTR!
   rejectRTR(id: String!, reason: String!): RTR!
   markRTRAsViewed(id: String!): RTR!
+  createRtrTemplate(createRtrTemplateInput: CreateRtrTemplateInput!): RtrTemplate!
+  updateRtrTemplate(updateRtrTemplateInput: UpdateRtrTemplateInput!): RtrTemplate!
+  removeRtrTemplate(id: String!): RtrTemplate!
   createRTRHistory(createRTRHistoryInput: CreateRTRHistoryInput!): RTRHistoryResponse!
   updateRTRHistory(id: Int!, updateRTRHistoryInput: CreateRTRHistoryInput!): RTRHistoryResponse!
   removeRTRHistory(id: Int!): RTRHistoryResponse!
@@ -830,9 +860,6 @@ type Mutation {
   createSubscription(createSubscriptionInput: CreateSubscriptionInput!): Subscription!
   updateSubscription(id: String!, updateSubscriptionInput: UpdateSubscriptionInput!): Subscription!
   cancelSubscription(id: String!, reason: String): Subscription!
-  createRtrTemplate(createRtrTemplateInput: CreateRtrTemplateInput!): RtrTemplate!
-  updateRtrTemplate(updateRtrTemplateInput: UpdateRtrTemplateInput!): RtrTemplate!
-  removeRtrTemplate(id: String!): RtrTemplate!
 }
 
 input CreateUserInput {
@@ -955,17 +982,41 @@ input UpdateJobInput {
   id: String!
 }
 
-input CreateRTRInput {
-  candidateId: String!
-  recruiterId: String!
-  jobId: String
-  status: RTRStatus
+input CreateRtrInput {
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String!
+  jobId: String!
+  rtrTemplateId: String!
+  status: RTRStatus = PENDING
   notes: String
+  compensation: Int!
+  compensationType: CompensationType!
   expiresAt: String
-  userId: String
+  resumeRequired: Boolean
+  photoIdRequired: Boolean
+  employerDetailsRequired: Boolean
+  referencesRequired: Boolean
+  skillsRequired: Boolean
 }
 
 input UpdateRTRInput {
+  id: String!
+}
+
+input CreateRtrTemplateInput {
+  name: String!
+  description: String
+  text: String
+  html: String
+}
+
+input UpdateRtrTemplateInput {
+  name: String
+  description: String
+  text: String
+  html: String
   id: String!
 }
 
@@ -1075,19 +1126,4 @@ input UpdateSubscriptionInput {
   autoRenew: Boolean
   cancellationReason: String
   cancelledAt: String
-}
-
-input CreateRtrTemplateInput {
-  name: String!
-  description: String
-  text: String
-  html: String
-}
-
-input UpdateRtrTemplateInput {
-  name: String
-  description: String
-  text: String
-  html: String
-  id: String!
 }

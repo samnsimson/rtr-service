@@ -4,5 +4,5 @@ export interface CurrentUser {
   id: string;
   email: string;
   role: UserRole;
-  organizationId?: string;
+  organizationId: string;
 }

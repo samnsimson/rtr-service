@@ -77,7 +77,7 @@ export class User {
   candidateProfile: CandidateProfile;
 
   @Field(() => [RTR], { nullable: true })
-  @OneToMany(() => RTR, (rtr) => rtr.user)
+  @OneToMany(() => RTR, (rtr) => rtr.createdBy)
   rtrs: RTR[];
 
   @Field(() => [RTRHistory], { nullable: true })

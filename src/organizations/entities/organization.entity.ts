@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { ObjectType, Field } from '@nestjs/graphql';
 import { User } from '../../users/entities/user.entity';
 import { Job } from '../../jobs/entities/job.entity';

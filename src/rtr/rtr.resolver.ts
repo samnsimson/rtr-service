@@ -1,7 +1,7 @@
 import { Resolver, Query, Mutation, Args, ResolveField, Parent } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { RTRService } from './rtr.service';
-import { CreateRTRInput, UpdateRTRInput } from './dto';
+import { CreateRtrInput, RtrResponse, UpdateRTRInput } from './dto';
 import { RTR } from './entities/rtr.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -22,10 +22,11 @@ import { User } from '../users/entities/user.entity';
 export class RTRResolver {
   constructor(private readonly rtrService: RTRService) {}
 
-  @Mutation(() => RTR, { name: 'createRTR' })
+  @Mutation(() => RtrResponse, { name: 'createRtr' })
   @Roles(UserRole.RECRUITER, UserRole.ORGANIZATION_OWNER, UserRole.ORGANIZATION_ADMIN, UserRole.RECRUITER_MANAGER, UserRole.ADMIN)
-  createRTR(@Args('createRtrInput') createRtrInput: CreateRTRInput, @AuthUser() user: CurrentUserType): Promise<RTR> {
-    return this.rtrService.create(createRtrInput, user);
+  async createRTR(@Args('createRtrInput') createRtrInput: CreateRtrInput, @AuthUser() user: CurrentUserType): Promise<RtrResponse> {
+    const rtr = await this.rtrService.create(createRtrInput, user);
+    return new RtrResponse({ ...rtr });
   }
 
   @Query(() => [RTR], { name: 'rtrs' })
@@ -128,6 +129,6 @@ export class RTRResolver {
 
   @ResolveField(() => User, { nullable: true })
   user(@Parent() rtr: RTR): User | null {
-    return rtr.user || null;
+    return rtr.createdBy || null;
   }
 }

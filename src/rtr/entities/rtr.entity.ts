@@ -7,7 +7,7 @@ import { RTRHistory } from '../../rtr-history/entities/rtr-history.entity';
 import { Document } from '../../documents/entities/document.entity';
 import { User } from '../../users/entities/user.entity';
 import { RtrTemplate } from '../../rtr-template/entities/rtr-template.entity';
-import { RTRStatus } from '../../common/enums';
+import { CompensationType, RTRStatus } from '../../common/enums';
 import { ObjectType, Field } from '@nestjs/graphql';
 
 @ObjectType()
@@ -19,19 +19,19 @@ export class RTR {
 
   @Field(() => String)
   @Column()
-  candidateId: string;
+  candidateFirstName: string;
+
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
+  candidateLastName: string;
 
   @Field(() => String)
   @Column()
-  recruiterId: string;
+  candidateEmail: string;
 
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
-  jobId: string;
-
-  @Field(() => String, { nullable: true })
-  @Column({ nullable: true })
-  organizationId: string;
+  candidatePhone: string;
 
   @Field(() => RTRStatus)
   @Column({ type: 'enum', enum: RTRStatus, default: RTRStatus.PENDING })
@@ -41,25 +41,45 @@ export class RTR {
   @Column({ nullable: true })
   notes: string;
 
-  @Field(() => Date, { nullable: true })
-  @Column({ type: 'timestamptz', nullable: true })
-  expiresAt: Date | null;
-
-  @Field(() => Date, { nullable: true })
-  @Column({ type: 'timestamptz', nullable: true })
-  signedAt: Date | null;
-
-  @Field(() => Date, { nullable: true })
-  @Column({ type: 'timestamptz', nullable: true })
-  viewedAt: Date | null;
-
-  @Field(() => String, { nullable: true })
+  @Field(() => Number, { nullable: true })
   @Column({ nullable: true })
-  userId: string;
+  compensation: number;
 
-  @Field(() => String)
-  @Column()
-  rtrTemplateId: string;
+  @Field(() => CompensationType, { nullable: true })
+  @Column({ type: 'enum', enum: CompensationType, nullable: true })
+  compensationType: CompensationType;
+
+  @Field(() => Date, { nullable: true })
+  @Column({ type: 'timestamptz', nullable: true })
+  expiresAt: Date;
+
+  @Field(() => Date, { nullable: true })
+  @Column({ type: 'timestamptz', nullable: true })
+  signedAt: Date;
+
+  @Field(() => Date, { nullable: true })
+  @Column({ type: 'timestamptz', nullable: true })
+  viewedAt: Date;
+
+  @Field(() => Boolean, { nullable: true, defaultValue: false })
+  @Column({ default: false, nullable: true })
+  resumeRequired: boolean;
+
+  @Field(() => Boolean, { nullable: true, defaultValue: false })
+  @Column({ default: false, nullable: true })
+  photoIdRequired: boolean;
+
+  @Field(() => Boolean, { nullable: true, defaultValue: false })
+  @Column({ default: false, nullable: true })
+  employerDetailsRequired: boolean;
+
+  @Field(() => Boolean, { nullable: true, defaultValue: false })
+  @Column({ default: false, nullable: true })
+  referencesRequired: boolean;
+
+  @Field(() => Boolean, { nullable: true, defaultValue: false })
+  @Column({ default: false, nullable: true })
+  skillsRequired: boolean;
 
   @Field(() => Date)
   @CreateDateColumn()
@@ -74,6 +94,11 @@ export class RTR {
   @ManyToOne(() => CandidateProfile, (candidate) => candidate.rtrs)
   @JoinColumn({ name: 'candidateId' })
   candidate: CandidateProfile;
+
+  @Field(() => RtrTemplate)
+  @ManyToOne(() => RtrTemplate, (template) => template.rtrs)
+  @JoinColumn({ name: 'rtrTemplateId' })
+  rtrTemplate: RtrTemplate;
 
   @Field(() => RecruiterProfile)
   @ManyToOne(() => RecruiterProfile, (recruiter) => recruiter.rtrs)
@@ -100,11 +125,6 @@ export class RTR {
 
   @Field(() => User, { nullable: true })
   @ManyToOne(() => User, (user) => user.rtrs)
-  @JoinColumn({ name: 'userId' })
-  user: User;
-
-  @Field(() => RtrTemplate)
-  @ManyToOne(() => RtrTemplate, (template) => template.rtrs)
-  @JoinColumn({ name: 'rtrTemplateId' })
-  rtrTemplate: RtrTemplate;
+  @JoinColumn({ name: 'createdBy' })
+  createdBy: User;
 }

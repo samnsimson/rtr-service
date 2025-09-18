@@ -1,23 +1,34 @@
-import { IsString, IsOptional, IsEnum, IsUUID, IsDateString } from 'class-validator';
-import { InputType, Field } from '@nestjs/graphql';
-import { RTRStatus } from '../../common/enums';
+import { IsString, IsOptional, IsEnum, IsUUID, IsDateString, IsBoolean, IsNumber, Min } from 'class-validator';
+import { InputType, Field, Int } from '@nestjs/graphql';
+import { CompensationType, RTRStatus } from '../../common/enums';
 
 @InputType()
 export class CreateRtrInput {
   @Field()
-  @IsUUID()
-  candidateId: string;
+  @IsString()
+  firstName: string;
+
+  @Field()
+  @IsString()
+  lastName: string;
+
+  @Field()
+  @IsString()
+  email: string;
+
+  @Field()
+  @IsString()
+  phone: string;
 
   @Field()
   @IsUUID()
-  recruiterId: string;
+  jobId: string;
 
-  @Field({ nullable: true })
-  @IsOptional()
+  @Field()
   @IsUUID()
-  jobId?: string;
+  rtrTemplateId: string;
 
-  @Field(() => RTRStatus, { nullable: true })
+  @Field(() => RTRStatus, { nullable: true, defaultValue: RTRStatus.PENDING })
   @IsOptional()
   @IsEnum(RTRStatus)
   status?: RTRStatus;
@@ -27,13 +38,42 @@ export class CreateRtrInput {
   @IsString()
   notes?: string;
 
+  @Field(() => Int)
+  @IsNumber()
+  @Min(0)
+  compensation?: number;
+
+  @Field(() => CompensationType)
+  @IsEnum(CompensationType)
+  compensationType?: CompensationType;
+
   @Field({ nullable: true })
   @IsOptional()
   @IsDateString()
   expiresAt?: string;
 
-  @Field({ nullable: true })
+  @Field(() => Boolean, { nullable: true })
   @IsOptional()
-  @IsUUID()
-  userId?: string;
+  @IsBoolean()
+  resumeRequired?: boolean;
+
+  @Field(() => Boolean, { nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  photoIdRequired?: boolean;
+
+  @Field(() => Boolean, { nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  employerDetailsRequired?: boolean;
+
+  @Field(() => Boolean, { nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  referencesRequired?: boolean;
+
+  @Field(() => Boolean, { nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  skillsRequired?: boolean;
 }

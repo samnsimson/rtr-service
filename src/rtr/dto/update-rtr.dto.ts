@@ -1,9 +1,9 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { Field, InputType } from '@nestjs/graphql';
-import { CreateRTRInput } from './create-rtr.dto';
+import { CreateRtrInput } from './create-rtr.input';
 
 @InputType()
-export class UpdateRTRInput extends PartialType(CreateRTRInput) {
+export class UpdateRTRInput extends PartialType(CreateRtrInput) {
   @Field()
   id: string;
 }

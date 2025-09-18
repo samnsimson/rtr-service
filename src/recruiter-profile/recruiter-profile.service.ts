@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateRecruiterProfileInput, UpdateRecruiterProfileInput } from './dto';
 import { RecruiterProfile } from './entities/recruiter-profile.entity';
+import { CurrentUser } from 'src/common';
 
 @Injectable()
 export class RecruiterProfileService {
@@ -21,16 +22,22 @@ export class RecruiterProfileService {
     return profiles;
   }
 
-  async findOne(id: string): Promise<RecruiterProfile> {
+  async findOne(id: string, organizationId: string): Promise<RecruiterProfile> {
     if (!id) throw new BadRequestException('Profile ID is required');
-    const profile = await this.recruiterProfileRepository.findOne({ where: { id } });
+    const profile = await this.recruiterProfileRepository.findOne({ where: { id, organizationId } });
     if (!profile) throw new NotFoundException(`Recruiter profile with ID ${id} not found`);
     return profile;
   }
 
-  async update(id: string, updateRecruiterProfileInput: UpdateRecruiterProfileInput): Promise<RecruiterProfile> {
+  async findOneByUserId(userId: string, { organizationId }: CurrentUser): Promise<RecruiterProfile> {
+    const profile = await this.recruiterProfileRepository.findOne({ where: { user: { id: userId }, organizationId } });
+    if (!profile) throw new NotFoundException(`Recruiter profile with user ID ${userId} not found`);
+    return profile;
+  }
+
+  async update(id: string, organizationId: string, updateRecruiterProfileInput: UpdateRecruiterProfileInput): Promise<RecruiterProfile> {
     if (!id) throw new BadRequestException('Profile ID is required');
-    const profile = await this.findOne(id);
+    const profile = await this.findOne(id, organizationId);
     Object.assign(profile, updateRecruiterProfileInput);
     const saved = await this.recruiterProfileRepository.save(profile);
     return saved;

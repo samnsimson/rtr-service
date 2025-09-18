@@ -67,8 +67,8 @@ export class JobsResolver {
 
   @ResolveField(() => User, { name: 'recruiter' })
   @Roles(UserRole.ORGANIZATION_OWNER, UserRole.ORGANIZATION_ADMIN, UserRole.ADMIN, UserRole.RECRUITER, UserRole.RECRUITER_MANAGER)
-  async findRecruiter(@Parent() job: Job) {
-    const recruiter = await this.recruiterProfileService.findOne(job.recruiterId);
+  async findRecruiter(@Parent() job: Job, @AuthUser() user: CurrentUser) {
+    const recruiter = await this.recruiterProfileService.findOne(job.recruiterId, user.organizationId);
     return this.usersService.findOne(job.recruiterId, { where: { id: recruiter.userId } });
   }
 

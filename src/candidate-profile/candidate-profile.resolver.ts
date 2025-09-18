@@ -6,6 +6,7 @@ import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { UserRole } from 'src/common/enums';
+import { AuthUser, CurrentUser } from 'src/common';
 
 @Resolver(() => CandidateProfileResponse)
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -24,21 +25,22 @@ export class CandidateProfileResolver {
   }
 
   @Query(() => CandidateProfileResponse, { name: 'candidateProfile' })
-  findOne(@Args('id', { type: () => String }) id: string) {
-    return this.candidateProfileService.findOne(id);
+  findOne(@Args('id', { type: () => String }) id: string, @AuthUser() user: CurrentUser) {
+    return this.candidateProfileService.findOne(id, user);
   }
 
   @Mutation(() => CandidateProfileResponse)
   updateCandidateProfile(
     @Args('id', { type: () => String }) id: string,
     @Args('updateCandidateProfileInput') updateCandidateProfileInput: UpdateCandidateProfileInput,
+    @AuthUser() user: CurrentUser,
   ) {
-    return this.candidateProfileService.update(id, updateCandidateProfileInput);
+    return this.candidateProfileService.update(id, user, updateCandidateProfileInput);
   }
 
   @Mutation(() => Boolean)
-  async removeCandidateProfile(@Args('id', { type: () => String }) id: string) {
-    await this.candidateProfileService.remove(id);
+  async removeCandidateProfile(@Args('id', { type: () => String }) id: string, @AuthUser() user: CurrentUser) {
+    await this.candidateProfileService.remove(id, user);
     return true;
   }
 }

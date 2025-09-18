@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { UpdateJobInput, JobResponse } from './dto';
 import { Job } from './entities/job.entity';
 import { RecruiterProfile } from '../recruiter-profile/entities/recruiter-profile.entity';
@@ -44,9 +44,10 @@ export class JobsService {
     return [jobs.map((job) => new JobResponse(job)), count];
   }
 
-  async findOne(id: string, user?: CurrentUser): Promise<JobResponse> {
+  async findOne(id: string, user?: CurrentUser, options?: FindOptionsWhere<Job>): Promise<JobResponse> {
     let query = this.jobsRepo.createQueryBuilder('job').where('job.id = :id', { id });
     if (user?.organizationId) query = query.andWhere('job.organizationId = :organizationId', { organizationId: user.organizationId });
+    if (options) query = query.andWhere(options);
     const job = await query.getOne();
     if (!job) throw new NotFoundException('Job not found');
     return new JobResponse(job);
