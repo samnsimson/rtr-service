@@ -109,6 +109,19 @@ enum DocumentType {
   OTHER
 }
 
+type RtrTemplate {
+  id: String!
+  name: String!
+  description: String
+  text: String
+  html: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  organization: Organization!
+  rtrs: [RTR!]
+  author: User!
+}
+
 type RTR {
   id: String!
   candidateId: String!
@@ -121,6 +134,7 @@ type RTR {
   signedAt: DateTime
   viewedAt: DateTime
   userId: String
+  rtrTemplateId: String!
   createdAt: DateTime!
   updatedAt: DateTime!
   candidate: CandidateProfile!
@@ -130,6 +144,7 @@ type RTR {
   history: [RTRHistory!]
   documents: [Document!]
   user: User
+  rtrTemplate: RtrTemplate!
 }
 
 """The status of a Right to Represent agreement"""
@@ -358,6 +373,7 @@ type Organization {
   notifications: [Notification!]
   subscriptions: [Subscription!]
   payments: [Payment!]
+  rtrTemplates: [RtrTemplate!]
 }
 
 """The size of the company"""
@@ -410,6 +426,7 @@ type User {
   createdUsers: [User!]
   createdBy: User
   createdById: String
+  createdRtrTemplates: [RtrTemplate!]
 }
 
 """The role of the user in the system"""
@@ -596,6 +613,16 @@ type IndexType {
   sortableAttributes: [String!]
 }
 
+type CompiledRtrTemplateResponse {
+  id: String!
+  name: String!
+  description: String!
+  text: String!
+  html: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type Query {
   users(pagination: PaginationDto): [UserResponse!]!
   user(id: String!): UserResponse!
@@ -653,6 +680,9 @@ type Query {
   subscriptionPlans: [SubscriptionPlan!]!
   subscriptionPlan(id: String!): SubscriptionPlan!
   subscriptionPlansByType(planType: PlanType!): [SubscriptionPlan!]!
+  rtrTemplates: [RtrTemplate!]!
+  rtrTemplate(id: String!): RtrTemplate!
+  compiledRtrTemplate(compiledTemplateInput: CompiledRtrTemplateInput!): CompiledRtrTemplateResponse!
 }
 
 input PaginationDto {
@@ -727,6 +757,19 @@ input JobSearchFiltersInput {
   salaryMax: Int
 }
 
+input CompiledRtrTemplateInput {
+  templateId: String!
+  jobId: String!
+  candidate: RtrTemplateCandidateInput
+}
+
+input RtrTemplateCandidateInput {
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
+}
+
 type Mutation {
   createUser(createUserInput: CreateUserInput!): UserResponse!
   updateUser(id: String!, updateUserInput: UpdateUserInput!): UserResponse!
@@ -787,6 +830,9 @@ type Mutation {
   createSubscription(createSubscriptionInput: CreateSubscriptionInput!): Subscription!
   updateSubscription(id: String!, updateSubscriptionInput: UpdateSubscriptionInput!): Subscription!
   cancelSubscription(id: String!, reason: String): Subscription!
+  createRtrTemplate(createRtrTemplateInput: CreateRtrTemplateInput!): RtrTemplate!
+  updateRtrTemplate(updateRtrTemplateInput: UpdateRtrTemplateInput!): RtrTemplate!
+  removeRtrTemplate(id: String!): RtrTemplate!
 }
 
 input CreateUserInput {
@@ -1029,4 +1075,19 @@ input UpdateSubscriptionInput {
   autoRenew: Boolean
   cancellationReason: String
   cancelledAt: String
+}
+
+input CreateRtrTemplateInput {
+  name: String!
+  description: String
+  text: String
+  html: String
+}
+
+input UpdateRtrTemplateInput {
+  name: String
+  description: String
+  text: String
+  html: String
+  id: String!
 }

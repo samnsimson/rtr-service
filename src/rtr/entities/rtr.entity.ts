@@ -6,6 +6,7 @@ import { Job } from '../../jobs/entities/job.entity';
 import { RTRHistory } from '../../rtr-history/entities/rtr-history.entity';
 import { Document } from '../../documents/entities/document.entity';
 import { User } from '../../users/entities/user.entity';
+import { RtrTemplate } from '../../rtr-template/entities/rtr-template.entity';
 import { RTRStatus } from '../../common/enums';
 import { ObjectType, Field } from '@nestjs/graphql';
 
@@ -56,6 +57,10 @@ export class RTR {
   @Column({ nullable: true })
   userId: string;
 
+  @Field(() => String)
+  @Column()
+  rtrTemplateId: string;
+
   @Field(() => Date)
   @CreateDateColumn()
   createdAt: Date;
@@ -97,4 +102,9 @@ export class RTR {
   @ManyToOne(() => User, (user) => user.rtrs)
   @JoinColumn({ name: 'userId' })
   user: User;
+
+  @Field(() => RtrTemplate)
+  @ManyToOne(() => RtrTemplate, (template) => template.rtrs)
+  @JoinColumn({ name: 'rtrTemplateId' })
+  rtrTemplate: RtrTemplate;
 }

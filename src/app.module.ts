@@ -21,6 +21,7 @@ import { PaymentsModule } from './payments/payments.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { EmailModule } from './email/email.module';
 import { JwtModule } from '@nestjs/jwt';
+import { RtrTemplateModule } from './rtr-template/rtr-template.module';
 import './common/enums';
 
 @Module({
@@ -67,6 +68,7 @@ import './common/enums';
     forwardRef(() => PaymentsModule),
     forwardRef(() => SubscriptionsModule),
     forwardRef(() => EmailModule),
+    RtrTemplateModule,
   ],
 })
 export class AppModule {}

@@ -9,6 +9,7 @@ import { Subscription } from '../../subscriptions/entities/subscription.entity';
 import { Payment } from '../../payments/entities/payment.entity';
 import { UserRole } from '../../common/enums';
 import { ObjectType, Field } from '@nestjs/graphql';
+import { RtrTemplate } from 'src/rtr-template/entities/rtr-template.entity';
 
 @ObjectType()
 @Entity('users')
@@ -107,4 +108,8 @@ export class User {
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
   createdById: string;
+
+  @Field(() => [RtrTemplate], { nullable: true })
+  @OneToMany(() => RtrTemplate, (template) => template.author)
+  createdRtrTemplates: RtrTemplate[];
 }

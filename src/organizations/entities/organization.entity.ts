@@ -11,6 +11,7 @@ import { Document } from '../../documents/entities/document.entity';
 import { Notification } from '../../notifications/entities/notification.entity';
 import { Subscription } from '../../subscriptions/entities/subscription.entity';
 import { Payment } from '../../payments/entities/payment.entity';
+import { RtrTemplate } from '../../rtr-template/entities/rtr-template.entity';
 import { CompanySize } from '../../common/enums';
 
 @ObjectType()
@@ -112,4 +113,8 @@ export class Organization {
   @Field(() => [Payment], { nullable: true })
   @OneToMany(() => Payment, (payment) => payment.organization)
   payments: Payment[];
+
+  @Field(() => [RtrTemplate], { nullable: true })
+  @OneToMany(() => RtrTemplate, (template) => template.organization)
+  rtrTemplates: RtrTemplate[];
 }

@@ -17,5 +17,6 @@ import { RecruiterProfileModule } from 'src/recruiter-profile/recruiter-profile.
     forwardRef(() => RecruiterProfileModule),
   ],
   providers: [JobsResolver, JobsService],
+  exports: [JobsService],
 })
 export class JobsModule {}
