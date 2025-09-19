@@ -820,7 +820,7 @@ type Mutation {
   updateOrganization(id: String!, updateOrganizationInput: UpdateOrganizationInput!): Organization!
   removeOrganization(id: String!): Boolean!
   createOrganizationUser(organizationId: String!, createUserInput: CreateOrganizationUserInput!): User!
-  updateUserRole(organizationId: String!, userId: String!, newRole: String!): User!
+  updateUserRole(organizationId: String!, userId: String!, newRole: UserRole!): User!
   removeUserFromOrganization(organizationId: String!, userId: String!): Boolean!
   createRecruiterProfile(createRecruiterProfileInput: CreateRecruiterProfileInput!): RecruiterProfileResponse!
   updateRecruiterProfile(id: String!, updateRecruiterProfileInput: UpdateRecruiterProfileInput!): RecruiterProfileResponse!
@@ -1048,7 +1048,7 @@ input CreateJobApplicationInput {
 }
 
 input UpdateJobApplicationInput {
-  status: String
+  status: ApplicationStatus
   coverLetter: String
   notes: String
 }

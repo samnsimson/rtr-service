@@ -4,7 +4,7 @@ import { ApplicationStatus } from '../../common/enums';
 
 @InputType()
 export class UpdateJobApplicationInput {
-  @Field({ nullable: true })
+  @Field(() => ApplicationStatus, { nullable: true })
   @IsOptional()
   @IsEnum(ApplicationStatus)
   status?: ApplicationStatus;

@@ -72,7 +72,7 @@ export class OrganizationsResolver {
   async updateUserRole(
     @Args('organizationId') organizationId: string,
     @Args('userId') userId: string,
-    @Args('newRole') newRole: UserRole,
+    @Args('newRole', { type: () => UserRole }) newRole: UserRole,
     @AuthUser() user: CurrentUserType,
   ): Promise<User> {
     return this.organizationsService.updateUserRole(organizationId, userId, newRole, user.id);

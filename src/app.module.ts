@@ -22,6 +22,7 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { EmailModule } from './email/email.module';
 import { JwtModule } from '@nestjs/jwt';
 import { RtrTemplateModule } from './rtr-template/rtr-template.module';
+import { LoggerService } from './common/logger/logger.service';
 import './common/enums';
 
 @Module({
@@ -33,7 +34,7 @@ import './common/enums';
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
         url: configService.get<string>('DATABASE_URL'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        entities: [join(__dirname, '**', '*.entity.{ts,js}')],
         synchronize: configService.get<string>('NODE_ENV') !== 'production',
         logging: configService.get<string>('NODE_ENV') === 'development',
       }),
@@ -70,5 +71,6 @@ import './common/enums';
     forwardRef(() => EmailModule),
     RtrTemplateModule,
   ],
+  providers: [LoggerService],
 })
 export class AppModule {}
