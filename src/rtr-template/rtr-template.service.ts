@@ -6,7 +6,7 @@ import { CreateRtrTemplateInput } from './dto/create-rtr-template.input';
 import { UpdateRtrTemplateInput } from './dto/update-rtr-template.input';
 import { RtrTemplate } from './entities/rtr-template.entity';
 import { CurrentUser } from '../common/types';
-import { CompiledRtrTemplateResponse } from './dto/compiled-rtr-template.response';
+import { RtrTemplateResponse } from './dto/rtr-template.response';
 import { OrganizationsService } from 'src/organizations/organizations.service';
 import { JobsService } from 'src/jobs/jobs.service';
 import { RtrTemplateCandidateInput } from './dto/compiled-rtr-template.input';
@@ -61,7 +61,7 @@ export class RtrTemplateService extends RtrTemplateServiceHelper {
     return rtrTemplate;
   }
 
-  async compiledTemplate(templateId: string, jobId: string, user: CurrentUser, candidate?: RtrTemplateCandidateInput): Promise<CompiledRtrTemplateResponse> {
+  async compiledTemplate(templateId: string, jobId: string, user: CurrentUser, candidate?: RtrTemplateCandidateInput): Promise<RtrTemplateResponse> {
     if (!user.organizationId) throw new ForbiddenException('Permission denied');
     this.registerHandlebarsHelpers();
 
@@ -75,7 +75,7 @@ export class RtrTemplateService extends RtrTemplateServiceHelper {
     const compiledText = Handlebars.compile(safeTextTemplate);
     const compiledHtml = Handlebars.compile(safeHtmlTemplate);
 
-    return new CompiledRtrTemplateResponse({
+    return new RtrTemplateResponse({
       ...template,
       text: compiledText({ context: this.getTextContext(jobData, orgData, candidate) }),
       html: compiledHtml({ context: this.getHtmlContext(jobData, orgData, candidate) }),

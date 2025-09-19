@@ -150,7 +150,6 @@ type RTR {
   history: [RTRHistory!]
   documents: [Document!]
   createdBy: User
-  user: User
 }
 
 """The status of a Right to Represent agreement"""
@@ -540,7 +539,7 @@ type JobResponsePaginated {
   totalPages: Int!
 }
 
-type CompiledRtrTemplateResponse {
+type RtrTemplateResponse {
   id: String!
   name: String!
   description: String!
@@ -552,6 +551,12 @@ type CompiledRtrTemplateResponse {
 
 type RtrResponse {
   id: String!
+  candidateFirstName: String!
+  candidateLastName: String!
+  candidateEmail: String!
+  candidatePhone: String!
+  compensation: Float!
+  compensationType: CompensationType!
   status: RTRStatus!
   notes: String
   expiresAt: DateTime
@@ -562,13 +567,20 @@ type RtrResponse {
   employerDetailsRequired: Boolean!
   referencesRequired: Boolean!
   skillsRequired: Boolean!
-  candidate: CandidateProfileResponse
-  recruiter: RecruiterProfile!
-  job: JobResponse!
-  organization: Organization!
-  rtrTemplate: RtrTemplate!
+  createdById: String!
+  candidateId: String
+  recruiterId: String!
+  jobId: String!
+  organizationId: String!
+  rtrTemplateId: String!
   createdAt: DateTime!
   updatedAt: DateTime!
+  candidate: CandidateProfile!
+  recruiter: RecruiterProfile!
+  job: JobResponse
+  organization: Organization
+  createdBy: User
+  rtrTemplate: RtrTemplateResponse
 }
 
 type RTRHistoryResponse {
@@ -667,14 +679,14 @@ type Query {
   job(id: String!): JobResponse!
   jobsByOrganization(organizationId: String!): [JobResponse!]!
   jobsByRecruiter(recruiterId: String!): [JobResponse!]!
-  rtrs: [RTR!]!
-  rtr(id: String!): RTR!
-  rtrsByCandidate(candidateId: String!): [RTR!]!
-  rtrsByRecruiter(recruiterId: String!): [RTR!]!
-  rtrsByJob(jobId: String!): [RTR!]!
+  rtrs: [RtrResponse!]!
+  rtr(id: String!): RtrResponse!
+  rtrsByCandidate(candidateId: String!): [RtrResponse!]!
+  rtrsByRecruiter(recruiterId: String!): [RtrResponse!]!
+  rtrsByJob(jobId: String!): [RtrResponse!]!
   rtrTemplates: [RtrTemplate!]!
   rtrTemplate(id: String!): RtrTemplate!
-  compiledRtrTemplate(compiledTemplateInput: CompiledRtrTemplateInput!): CompiledRtrTemplateResponse!
+  compiledRtrTemplate(compiledTemplateInput: CompiledRtrTemplateInput!): RtrTemplateResponse!
   rtrHistories: [RTRHistoryResponse!]!
   rtrHistory(id: Int!): RTRHistoryResponse!
   jobApplications: [JobApplication!]!
@@ -820,11 +832,11 @@ type Mutation {
   updateJob(id: String!, updateJobInput: UpdateJobInput!): JobResponse!
   removeJob(id: String!): JobResponse!
   createRtr(createRtrInput: CreateRtrInput!): RtrResponse!
-  updateRTR(id: String!, updateRtrInput: UpdateRTRInput!): RTR!
-  removeRTR(id: String!): Boolean!
-  approveRTR(id: String!): RTR!
-  rejectRTR(id: String!, reason: String!): RTR!
-  markRTRAsViewed(id: String!): RTR!
+  updateRTR(id: String!, updateRtrInput: UpdateRTRInput!): RtrResponse!
+  removeRtr(id: String!): Boolean!
+  approveRtr(id: String!): RtrResponse!
+  rejectRtr(id: String!, reason: String!): RtrResponse!
+  markRtrAsViewed(id: String!): RtrResponse!
   createRtrTemplate(createRtrTemplateInput: CreateRtrTemplateInput!): RtrTemplate!
   updateRtrTemplate(updateRtrTemplateInput: UpdateRtrTemplateInput!): RtrTemplate!
   removeRtrTemplate(id: String!): RtrTemplate!

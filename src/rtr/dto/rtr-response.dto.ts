@@ -1,15 +1,28 @@
 import { ObjectType, Field } from '@nestjs/graphql';
-import { RTRStatus } from '../../common/enums';
-import { CandidateProfileResponse } from 'src/candidate-profile/dto';
-import { RecruiterProfile } from 'src/recruiter-profile/entities/recruiter-profile.entity';
-import { JobResponse } from 'src/jobs/dto';
-import { Organization } from 'src/organizations/entities/organization.entity';
-import { RtrTemplate } from 'src/rtr-template/entities/rtr-template.entity';
+import { CompensationType, RTRStatus } from '../../common/enums';
 
 @ObjectType()
 export class RtrResponse {
   @Field()
   id: string;
+
+  @Field()
+  candidateFirstName: string;
+
+  @Field()
+  candidateLastName: string;
+
+  @Field()
+  candidateEmail: string;
+
+  @Field()
+  candidatePhone: string;
+
+  @Field()
+  compensation: number;
+
+  @Field(() => CompensationType)
+  compensationType: CompensationType;
 
   @Field(() => RTRStatus)
   status: RTRStatus;
@@ -41,20 +54,23 @@ export class RtrResponse {
   @Field(() => Boolean)
   skillsRequired: boolean;
 
-  @Field(() => CandidateProfileResponse, { nullable: true })
-  candidate?: CandidateProfileResponse;
+  @Field(() => String)
+  createdById: string;
 
-  @Field(() => RecruiterProfile)
-  recruiter: RecruiterProfile;
+  @Field(() => String, { nullable: true })
+  candidateId?: string;
 
-  @Field(() => JobResponse)
-  job: JobResponse;
+  @Field(() => String)
+  recruiterId: string;
 
-  @Field(() => Organization)
-  organization: Organization;
+  @Field(() => String)
+  jobId: string;
 
-  @Field(() => RtrTemplate)
-  rtrTemplate: RtrTemplate;
+  @Field(() => String)
+  organizationId: string;
+
+  @Field(() => String)
+  rtrTemplateId: string;
 
   @Field()
   createdAt: Date;

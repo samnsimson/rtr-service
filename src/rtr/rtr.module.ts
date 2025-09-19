@@ -15,6 +15,7 @@ import { OrganizationsModule } from 'src/organizations/organizations.module';
 import { CandidateProfileModule } from 'src/candidate-profile/candidate-profile.module';
 import { RecruiterProfileModule } from 'src/recruiter-profile/recruiter-profile.module';
 import { RtrTemplateModule } from 'src/rtr-template/rtr-template.module';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { RtrTemplateModule } from 'src/rtr-template/rtr-template.module';
     CandidateProfileModule,
     RecruiterProfileModule,
     RtrTemplateModule,
+    UsersModule,
   ],
   providers: [RTRResolver, RTRService],
   exports: [RTRService],

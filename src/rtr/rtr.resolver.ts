@@ -8,93 +8,116 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { UserRole } from '../common/enums';
 import { AuthUser } from '../common/decorators/current-user.decorator';
-import { CurrentUser as CurrentUserType } from '../common/types';
+import { CurrentUser, CurrentUser as CurrentUserType } from '../common/types';
 import { CandidateProfile } from '../candidate-profile/entities/candidate-profile.entity';
 import { RecruiterProfile } from '../recruiter-profile/entities/recruiter-profile.entity';
-import { Job } from '../jobs/entities/job.entity';
 import { Organization } from '../organizations/entities/organization.entity';
-import { RTRHistory } from '../rtr-history/entities/rtr-history.entity';
-import { Document } from '../documents/entities/document.entity';
-import { User } from '../users/entities/user.entity';
+import { UsersService } from 'src/users/users.service';
+import { JobResponse } from 'src/jobs/dto';
+import { JobsService } from 'src/jobs/jobs.service';
+import { OrganizationsService } from 'src/organizations/organizations.service';
+import { User } from 'src/users/entities/user.entity';
+import { RtrServiceHelper } from './helpers/rtr-service.helper';
+import { RecruiterProfileService } from 'src/recruiter-profile/recruiter-profile.service';
+import { RtrTemplateService } from 'src/rtr-template/rtr-template.service';
+import { RtrTemplateResponse } from 'src/rtr-template/dto/rtr-template.response';
 
-@Resolver(() => RTR)
+@Resolver(() => RtrResponse)
 @UseGuards(JwtAuthGuard, RolesGuard)
-export class RTRResolver {
-  constructor(private readonly rtrService: RTRService) {}
+export class RTRResolver extends RtrServiceHelper {
+  constructor(
+    private readonly rtrService: RTRService,
+    private readonly jobsService: JobsService,
+    private readonly organizationsService: OrganizationsService,
+    private readonly usersService: UsersService,
+    private readonly recruiterProfileService: RecruiterProfileService,
+    private readonly rtrTemplateService: RtrTemplateService,
+  ) {
+    super();
+  }
 
   @Mutation(() => RtrResponse, { name: 'createRtr' })
   @Roles(UserRole.RECRUITER, UserRole.ORGANIZATION_OWNER, UserRole.ORGANIZATION_ADMIN, UserRole.RECRUITER_MANAGER, UserRole.ADMIN)
   async createRTR(@Args('createRtrInput') createRtrInput: CreateRtrInput, @AuthUser() user: CurrentUserType): Promise<RtrResponse> {
     const rtr = await this.rtrService.create(createRtrInput, user);
-    return new RtrResponse({ ...rtr });
+    return this.toRtrResponse(rtr);
   }
 
-  @Query(() => [RTR], { name: 'rtrs' })
+  @Query(() => [RtrResponse], { name: 'rtrs' })
   @Roles(UserRole.RECRUITER, UserRole.ORGANIZATION_OWNER, UserRole.ORGANIZATION_ADMIN, UserRole.RECRUITER_MANAGER, UserRole.ADMIN, UserRole.CANDIDATE)
-  findAll(@AuthUser() user: CurrentUserType): Promise<RTR[]> {
-    return this.rtrService.findAll(user);
+  async findAll(@AuthUser() user: CurrentUserType): Promise<RtrResponse[]> {
+    const rtrs = await this.rtrService.findAll(user);
+    return rtrs.map((rtr) => this.toRtrResponse(rtr));
   }
 
-  @Query(() => RTR, { name: 'rtr' })
+  @Query(() => RtrResponse, { name: 'rtr' })
   @Roles(UserRole.RECRUITER, UserRole.ORGANIZATION_OWNER, UserRole.ORGANIZATION_ADMIN, UserRole.RECRUITER_MANAGER, UserRole.ADMIN, UserRole.CANDIDATE)
-  findOne(@Args('id', { type: () => String }) id: string, @AuthUser() user: CurrentUserType): Promise<RTR> {
-    return this.rtrService.findOne(id, user);
+  async findOne(@Args('id', { type: () => String }) id: string, @AuthUser() user: CurrentUserType): Promise<RtrResponse> {
+    const rtr = await this.rtrService.findOne(id, user);
+    return this.toRtrResponse(rtr);
   }
 
-  @Mutation(() => RTR, { name: 'updateRTR' })
+  @Mutation(() => RtrResponse, { name: 'updateRTR' })
   @Roles(UserRole.RECRUITER, UserRole.ORGANIZATION_OWNER, UserRole.ORGANIZATION_ADMIN, UserRole.RECRUITER_MANAGER, UserRole.ADMIN)
-  updateRTR(
+  async updateRTR(
     @Args('id', { type: () => String }) id: string,
     @Args('updateRtrInput') updateRtrInput: UpdateRTRInput,
     @AuthUser() user: CurrentUserType,
-  ): Promise<RTR> {
-    return this.rtrService.update(id, updateRtrInput, user);
+  ): Promise<RtrResponse> {
+    const rtr = await this.rtrService.update(id, updateRtrInput, user);
+    return this.toRtrResponse(rtr);
   }
 
-  @Mutation(() => Boolean, { name: 'removeRTR' })
+  @Mutation(() => Boolean, { name: 'removeRtr' })
   @Roles(UserRole.RECRUITER, UserRole.ORGANIZATION_OWNER, UserRole.ORGANIZATION_ADMIN, UserRole.RECRUITER_MANAGER, UserRole.ADMIN)
   removeRTR(@Args('id', { type: () => String }) id: string, @AuthUser() user: CurrentUserType): Promise<boolean> {
     return this.rtrService.remove(id, user);
   }
 
-  @Mutation(() => RTR, { name: 'approveRTR' })
+  @Mutation(() => RtrResponse, { name: 'approveRtr' })
   @Roles(UserRole.CANDIDATE, UserRole.ADMIN)
-  approveRTR(@Args('id', { type: () => String }) id: string, @AuthUser() user: CurrentUserType): Promise<RTR> {
-    return this.rtrService.approveRTR(id, user);
+  async approveRTR(@Args('id', { type: () => String }) id: string, @AuthUser() user: CurrentUserType): Promise<RtrResponse> {
+    const rtr = await this.rtrService.approveRTR(id, user);
+    return this.toRtrResponse(rtr);
   }
 
-  @Mutation(() => RTR, { name: 'rejectRTR' })
+  @Mutation(() => RtrResponse, { name: 'rejectRtr' })
   @Roles(UserRole.CANDIDATE, UserRole.ADMIN)
-  rejectRTR(
+  async rejectRTR(
     @Args('id', { type: () => String }) id: string,
     @Args('reason', { type: () => String }) reason: string,
     @AuthUser() user: CurrentUserType,
-  ): Promise<RTR> {
-    return this.rtrService.rejectRTR(id, reason, user);
+  ): Promise<RtrResponse> {
+    const rtr = await this.rtrService.rejectRTR(id, reason, user);
+    return this.toRtrResponse(rtr);
   }
 
-  @Mutation(() => RTR, { name: 'markRTRAsViewed' })
+  @Mutation(() => RtrResponse, { name: 'markRtrAsViewed' })
   @Roles(UserRole.CANDIDATE, UserRole.RECRUITER, UserRole.ORGANIZATION_OWNER, UserRole.ORGANIZATION_ADMIN, UserRole.RECRUITER_MANAGER, UserRole.ADMIN)
-  markRTRAsViewed(@Args('id', { type: () => String }) id: string, @AuthUser() user: CurrentUserType): Promise<RTR> {
-    return this.rtrService.markAsViewed(id, user);
+  async markRTRAsViewed(@Args('id', { type: () => String }) id: string, @AuthUser() user: CurrentUserType): Promise<RtrResponse> {
+    const rtr = await this.rtrService.markAsViewed(id, user);
+    return this.toRtrResponse(rtr);
   }
 
-  @Query(() => [RTR], { name: 'rtrsByCandidate' })
+  @Query(() => [RtrResponse], { name: 'rtrsByCandidate' })
   @Roles(UserRole.RECRUITER, UserRole.ORGANIZATION_OWNER, UserRole.ORGANIZATION_ADMIN, UserRole.RECRUITER_MANAGER, UserRole.ADMIN, UserRole.CANDIDATE)
-  getRTRsByCandidate(@Args('candidateId', { type: () => String }) candidateId: string, @AuthUser() user: CurrentUserType): Promise<RTR[]> {
-    return this.rtrService.getRTRsByCandidate(candidateId, user);
+  async getRTRsByCandidate(@Args('candidateId', { type: () => String }) candidateId: string, @AuthUser() user: CurrentUserType): Promise<RtrResponse[]> {
+    const rtrs = await this.rtrService.getRTRsByCandidate(candidateId, user);
+    return rtrs.map((rtr) => this.toRtrResponse(rtr));
   }
 
-  @Query(() => [RTR], { name: 'rtrsByRecruiter' })
+  @Query(() => [RtrResponse], { name: 'rtrsByRecruiter' })
   @Roles(UserRole.RECRUITER, UserRole.ORGANIZATION_OWNER, UserRole.ORGANIZATION_ADMIN, UserRole.RECRUITER_MANAGER, UserRole.ADMIN)
-  getRTRsByRecruiter(@Args('recruiterId', { type: () => String }) recruiterId: string, @AuthUser() user: CurrentUserType): Promise<RTR[]> {
-    return this.rtrService.getRTRsByRecruiter(recruiterId, user);
+  async getRTRsByRecruiter(@Args('recruiterId', { type: () => String }) recruiterId: string, @AuthUser() user: CurrentUserType): Promise<RtrResponse[]> {
+    const rtrs = await this.rtrService.getRTRsByRecruiter(recruiterId, user);
+    return rtrs.map((rtr) => this.toRtrResponse(rtr));
   }
 
-  @Query(() => [RTR], { name: 'rtrsByJob' })
+  @Query(() => [RtrResponse], { name: 'rtrsByJob' })
   @Roles(UserRole.RECRUITER, UserRole.ORGANIZATION_OWNER, UserRole.ORGANIZATION_ADMIN, UserRole.RECRUITER_MANAGER, UserRole.ADMIN)
-  getRTRsByJob(@Args('jobId', { type: () => String }) jobId: string, @AuthUser() user: CurrentUserType): Promise<RTR[]> {
-    return this.rtrService.getRTRsByJob(jobId, user);
+  async getRTRsByJob(@Args('jobId', { type: () => String }) jobId: string, @AuthUser() user: CurrentUserType): Promise<RtrResponse[]> {
+    const rtrs = await this.rtrService.getRTRsByJob(jobId, user);
+    return rtrs.map((rtr) => this.toRtrResponse(rtr));
   }
 
   @ResolveField(() => CandidateProfile)
@@ -103,32 +126,41 @@ export class RTRResolver {
   }
 
   @ResolveField(() => RecruiterProfile)
-  recruiter(@Parent() rtr: RTR): RecruiterProfile {
-    return rtr.recruiter;
+  async recruiter(@Parent() rtr: RtrResponse, @AuthUser() user: CurrentUser): Promise<RecruiterProfile> {
+    return await this.recruiterProfileService.findOne(rtr.recruiterId, user.organizationId);
   }
 
-  @ResolveField(() => Job, { nullable: true })
-  job(@Parent() rtr: RTR): Job | null {
-    return rtr.job || null;
+  @ResolveField(() => JobResponse, { name: 'job', nullable: true })
+  async job(@Parent() rtr: RtrResponse, @AuthUser() user: CurrentUser): Promise<JobResponse> {
+    const job = await this.jobsService.findOne(rtr.jobId, user);
+    return new JobResponse(job);
   }
 
   @ResolveField(() => Organization, { nullable: true })
-  organization(@Parent() rtr: RTR): Organization | null {
-    return rtr.organization || null;
+  async organization(@Parent() rtr: RtrResponse): Promise<Organization | null> {
+    const organization = await this.organizationsService.findOne(rtr.organizationId);
+    return organization;
   }
 
-  @ResolveField(() => [RTRHistory], { nullable: true })
-  history(@Parent() rtr: RTR): RTRHistory[] {
-    return rtr.history || [];
+  // @ResolveField(() => [RTRHistory], { nullable: true })
+  // history(@Parent() rtr: RtrResponse): RTRHistory[] {
+  //   return rtr.history || [];
+  // }
+
+  // @ResolveField(() => [Document], { nullable: true })
+  // documents(@Parent() rtr: RtrResponse): Document[] {
+  //   return rtr.documents || [];
+  // }
+
+  @ResolveField(() => User, { name: 'createdBy', nullable: true })
+  async user(@Parent() rtr: RtrResponse): Promise<User | null> {
+    const user = await this.usersService.findOne(rtr.createdById);
+    return user;
   }
 
-  @ResolveField(() => [Document], { nullable: true })
-  documents(@Parent() rtr: RTR): Document[] {
-    return rtr.documents || [];
-  }
-
-  @ResolveField(() => User, { nullable: true })
-  user(@Parent() rtr: RTR): User | null {
-    return rtr.createdBy || null;
+  @ResolveField(() => RtrTemplateResponse, { name: 'rtrTemplate', nullable: true })
+  async rtrTemplate(@Parent() rtr: RtrResponse, @AuthUser() user: CurrentUser): Promise<RtrTemplateResponse> {
+    const rtrTemplate = await this.rtrTemplateService.findOne(rtr.rtrTemplateId, user.organizationId);
+    return new RtrTemplateResponse(rtrTemplate);
   }
 }

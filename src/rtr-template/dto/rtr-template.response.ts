@@ -1,7 +1,20 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
-export class CompiledRtrTemplateResponse {
+export class RtrTemplateFormattedResponse {
+  @Field(() => String)
+  text: string;
+
+  @Field(() => String)
+  html: string;
+
+  constructor(partial?: Partial<RtrTemplateFormattedResponse>) {
+    Object.assign(this, partial);
+  }
+}
+
+@ObjectType()
+export class RtrTemplateResponse {
   @Field(() => String)
   id: string;
 
@@ -23,7 +36,7 @@ export class CompiledRtrTemplateResponse {
   @Field(() => Date)
   updatedAt: Date;
 
-  constructor(partial?: Partial<CompiledRtrTemplateResponse>) {
+  constructor(partial?: Partial<RtrTemplateResponse>) {
     Object.assign(this, partial);
   }
 }

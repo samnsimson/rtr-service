@@ -10,7 +10,7 @@ import { CurrentUser } from '../common/types';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { UserRole } from 'src/common/enums';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { CompiledRtrTemplateResponse } from './dto/compiled-rtr-template.response';
+import { RtrTemplateResponse } from './dto/rtr-template.response';
 import { CompiledRtrTemplateInput } from './dto/compiled-rtr-template.input';
 
 @Resolver(() => RtrTemplate)
@@ -49,7 +49,7 @@ export class RtrTemplateResolver {
     return this.rtrTemplateService.remove(id, user.organizationId);
   }
 
-  @Query(() => CompiledRtrTemplateResponse, { name: 'compiledRtrTemplate' })
+  @Query(() => RtrTemplateResponse, { name: 'compiledRtrTemplate' })
   compiledTemplate(@Args('compiledTemplateInput') { templateId, jobId, candidate }: CompiledRtrTemplateInput, @AuthUser() user: CurrentUser) {
     if (!user.organizationId) throw new Error('Permission denied');
     return this.rtrTemplateService.compiledTemplate(templateId, jobId, user, candidate);

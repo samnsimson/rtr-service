@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { RTR } from './entities/rtr.entity';
 import { CandidateProfile } from '../candidate-profile/entities/candidate-profile.entity';
 import { RecruiterProfile } from '../recruiter-profile/entities/recruiter-profile.entity';
@@ -75,16 +75,14 @@ export class RTRService extends RtrServiceHelper {
     return await this.rtrRepo.save(rtr);
   }
 
-  async findAll(user?: CurrentUser): Promise<RTR[]> {
-    const where: any = {};
-    if (user) where.organizationId = user.organizationId;
-    return this.rtrRepo.find({ where, order: { createdAt: 'DESC' } });
+  async findAll(user: CurrentUser, options?: FindOptionsWhere<RTR>): Promise<RTR[]> {
+    const where: FindOptionsWhere<RTR> = { organization: { id: user.organizationId }, ...options };
+    return this.rtrRepo.find({ where, relations: ['candidate', 'recruiter', 'job', 'rtrTemplate', 'organization', 'createdBy'], order: { createdAt: 'DESC' } });
   }
 
-  async findOne(id: string, user?: CurrentUser): Promise<RTR> {
-    const where: any = { id };
-    if (user) where.organizationId = user.organizationId;
-    const rtr = await this.rtrRepo.findOne({ where, relations: ['candidate', 'recruiter', 'job', 'rtrTemplate', 'organization'] });
+  async findOne(id: string, user: CurrentUser): Promise<RTR> {
+    const where: FindOptionsWhere<RTR> = { id, organization: { id: user.organizationId } };
+    const rtr = await this.rtrRepo.findOne({ where, relations: ['candidate', 'recruiter', 'job', 'rtrTemplate', 'organization', 'createdBy'] });
     if (!rtr) throw new NotFoundException('RTR not found');
     return rtr;
   }
@@ -96,7 +94,7 @@ export class RTRService extends RtrServiceHelper {
     Object.assign(rtr, updateRtrInput);
     if (updateRtrInput.expiresAt) rtr.expiresAt = new Date(updateRtrInput.expiresAt);
     const savedRTR = await this.rtrRepo.save(rtr);
-    if (oldStatus !== savedRTR.status) await this.createHistoryEntry(savedRTR.id, `Status changed from ${oldStatus} to ${savedRTR.status}`, user.id);
+    if (oldStatus !== savedRTR.status) await this.createHistoryEntry(savedRTR.id, `Status changed from ${oldStatus} to ${savedRTR.status}`, user);
     return this.findOne(savedRTR.id, user);
   }
 
@@ -114,7 +112,7 @@ export class RTRService extends RtrServiceHelper {
     rtr.signedAt = new Date();
     rtr.viewedAt = new Date();
     const savedRTR = await this.rtrRepo.save(rtr);
-    await this.createHistoryEntry(savedRTR.id, 'RTR approved by candidate', user.id);
+    await this.createHistoryEntry(savedRTR.id, 'RTR approved by candidate', user);
     await this.sendRTRStatusUpdate(savedRTR, 'approved');
     return this.findOne(savedRTR.id, user);
   }
@@ -127,7 +125,7 @@ export class RTRService extends RtrServiceHelper {
     rtr.viewedAt = new Date();
 
     const savedRTR = await this.rtrRepo.save(rtr);
-    await this.createHistoryEntry(savedRTR.id, `RTR rejected by candidate. Reason: ${reason}`, user.id);
+    await this.createHistoryEntry(savedRTR.id, `RTR rejected by candidate. Reason: ${reason}`, user);
     await this.sendRTRStatusUpdate(savedRTR, 'rejected');
     return this.findOne(savedRTR.id, user);
   }
@@ -157,9 +155,9 @@ export class RTRService extends RtrServiceHelper {
     return this.rtrRepo.find({ where, order: { createdAt: 'DESC' } });
   }
 
-  private async createHistoryEntry(rtrId: string, action: string, userId: string): Promise<void> {
-    const rtr = await this.findOne(rtrId);
-    const history = this.historyRepo.create({ rtrId, action, userId, organizationId: rtr.organization.id });
+  private async createHistoryEntry(rtrId: string, action: string, user: CurrentUser): Promise<void> {
+    const rtr = await this.findOne(rtrId, user);
+    const history = this.historyRepo.create({ rtrId, action, userId: user.id, organizationId: rtr.organization.id });
     await this.historyRepo.save(history);
   }
 
