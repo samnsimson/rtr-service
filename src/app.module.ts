@@ -23,8 +23,9 @@ import { EmailModule } from './email/email.module';
 import { JwtModule } from '@nestjs/jwt';
 import { RtrTemplateModule } from './rtr-template/rtr-template.module';
 import { LoggerService } from './common/logger/logger.service';
+import { LoggingInterceptor } from './common/interceptors/logging.intercetor';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import './common/enums';
-
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
@@ -71,6 +72,6 @@ import './common/enums';
     forwardRef(() => EmailModule),
     RtrTemplateModule,
   ],
-  providers: [LoggerService],
+  providers: [LoggerService, { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor }],
 })
 export class AppModule {}

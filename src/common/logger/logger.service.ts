@@ -87,7 +87,7 @@ export class LoggerService implements NestLoggerService {
     }
   }
 
-  log(message: string, context?: string) {
+  log(message: string, ...context: string[]) {
     this.logger.info(message, { context });
   }
 
