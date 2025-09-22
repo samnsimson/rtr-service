@@ -18,19 +18,11 @@ export class OrganizationsService {
 
   async createOrganization(createOrganizationInput: CreateOrganizationInput, ownerId: string): Promise<Organization> {
     const organization = this.organizationRepo.create(createOrganizationInput);
-    const savedOrganization = await this.organizationRepo.save(organization);
-    await this.userRepo.update(ownerId, { organizationId: savedOrganization.id, role: UserRole.ORGANIZATION_OWNER });
-
-    // Emit event for creating overview (non-blocking)
-    const event: OrganizationCreatedEvent = {
-      organizationId: savedOrganization.id,
-      organizationName: savedOrganization.name,
-      ownerId,
-      createdAt: savedOrganization.createdAt,
-    };
+    const org = await this.organizationRepo.save(organization);
+    await this.userRepo.update(ownerId, { organizationId: org.id, role: UserRole.ORGANIZATION_OWNER });
+    const event: OrganizationCreatedEvent = { organizationId: org.id, organizationName: org.name, ownerId, createdAt: org.createdAt };
     this.eventEmitter.emit(EVENTS.ORGANIZATION_CREATED, event);
-
-    return savedOrganization;
+    return org;
   }
 
   async findAll(): Promise<Organization[]> {
@@ -46,22 +38,12 @@ export class OrganizationsService {
   async updateOrganization(id: string, updateOrganizationInput: UpdateOrganizationInput, userId: string): Promise<Organization> {
     const organization = await this.findOne(id);
     const user = await this.userRepo.findOne({ where: { id: userId } });
-    if (!user || user.organizationId !== id || ![UserRole.ORGANIZATION_OWNER, UserRole.ORGANIZATION_ADMIN].includes(user.role)) {
-      throw new ForbiddenException('Insufficient permissions to update organization');
-    }
-
+    if (!user || user.organizationId !== id) throw new ForbiddenException('Insufficient permissions to update organization');
     Object.assign(organization, updateOrganizationInput);
-    const updatedOrganization = await this.organizationRepo.save(organization);
-
-    // Emit event for organization update (non-blocking)
-    const event: OrganizationUpdatedEvent = {
-      organizationId: updatedOrganization.id,
-      organizationName: updatedOrganization.name,
-      updatedAt: updatedOrganization.updatedAt,
-    };
+    const org = await this.organizationRepo.save(organization);
+    const event: OrganizationUpdatedEvent = { organizationId: org.id, organizationName: org.name, updatedAt: org.updatedAt };
     this.eventEmitter.emit(EVENTS.ORGANIZATION_UPDATED, event);
-
-    return updatedOrganization;
+    return org;
   }
 
   async removeOrganization(id: string, userId: string): Promise<boolean> {
@@ -74,15 +56,8 @@ export class OrganizationsService {
     organization.isActive = false;
     await this.organizationRepo.save(organization);
     await this.userRepo.update({ organizationId: id }, { organizationId: null as any });
-
-    // Emit event for organization deletion (non-blocking)
-    const event: OrganizationDeletedEvent = {
-      organizationId: organization.id,
-      organizationName: organization.name,
-      deletedAt: new Date(),
-    };
+    const event: OrganizationDeletedEvent = { organizationId: organization.id, organizationName: organization.name, deletedAt: new Date() };
     this.eventEmitter.emit(EVENTS.ORGANIZATION_DELETED, event);
-
     return true;
   }
 
@@ -146,12 +121,7 @@ export class OrganizationsService {
     return { totalUsers: userCount, recruiters: recruiterCount, candidates: candidateCount };
   }
 
-  // Count method for overview service (no user validation required)
-  async getOrganizationStatsForOverview(organizationId: string): Promise<{
-    totalUsers: number;
-    totalRecruiters: number;
-    totalCandidates: number;
-  }> {
+  async getOrganizationStatsForOverview(organizationId: string): Promise<{ totalUsers: number; totalRecruiters: number; totalCandidates: number }> {
     const [userCount, recruiterCount, candidateCount] = await Promise.all([
       this.userRepo.count({ where: { organizationId, isActive: true } }),
       this.userRepo.count({ where: { organizationId, isActive: true, role: UserRole.RECRUITER } }),
