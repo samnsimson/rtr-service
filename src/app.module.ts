@@ -25,6 +25,8 @@ import { RtrTemplateModule } from './rtr-template/rtr-template.module';
 import { LoggerService } from './common/logger/logger.service';
 import { LoggingInterceptor } from './common/interceptors/logging.intercetor';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { OverviewModule } from './overview/overview.module';
+import { EventsModule } from './common/events/events.module';
 import './common/enums';
 @Module({
   imports: [
@@ -55,6 +57,7 @@ import './common/enums';
         signOptions: { expiresIn: '1h' },
       }),
     }),
+    EventsModule,
     forwardRef(() => UsersModule),
     forwardRef(() => AuthModule),
     forwardRef(() => RecruiterProfileModule),
@@ -70,7 +73,8 @@ import './common/enums';
     forwardRef(() => PaymentsModule),
     forwardRef(() => SubscriptionsModule),
     forwardRef(() => EmailModule),
-    RtrTemplateModule,
+    forwardRef(() => RtrTemplateModule),
+    forwardRef(() => OverviewModule),
   ],
   providers: [LoggerService, { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor }],
 })

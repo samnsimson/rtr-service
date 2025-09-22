@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOptionsWhere } from 'typeorm';
+import { Repository, FindOptionsWhere, MoreThanOrEqual } from 'typeorm';
 import { CreateJobApplicationInput, UpdateJobApplicationInput } from './dto';
 import { JobApplication } from './entities/job-application.entity';
 import { Job } from '../jobs/entities/job.entity';
@@ -245,5 +245,21 @@ export class JobApplicationsService {
     } catch (error) {
       console.error('Failed to send status update notification:', error);
     }
+  }
+
+  // Count methods for overview service
+  async countByOrganization(organizationId: string): Promise<number> {
+    return this.jobApplicationRepo.count({ where: { organizationId } });
+  }
+
+  async countByOrganizationAndStatus(organizationId: string, status: ApplicationStatus): Promise<number> {
+    return this.jobApplicationRepo.count({ where: { organizationId, status } });
+  }
+
+  async countByOrganizationThisMonth(organizationId: string): Promise<number> {
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+    return this.jobApplicationRepo.count({ where: { organizationId, appliedAt: MoreThanOrEqual(startOfMonth) } });
   }
 }

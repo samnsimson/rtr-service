@@ -21,6 +21,7 @@ import { RtrServiceHelper } from './helpers/rtr-service.helper';
 import { RecruiterProfileService } from 'src/recruiter-profile/recruiter-profile.service';
 import { RtrTemplateService } from 'src/rtr-template/rtr-template.service';
 import { RtrTemplateResponse } from 'src/rtr-template/dto/rtr-template.response';
+import { RtrFiltersInput } from './dto/rtr-filters.input';
 
 @Resolver(() => RtrResponse)
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -45,8 +46,11 @@ export class RTRResolver extends RtrServiceHelper {
 
   @Query(() => [RtrResponse], { name: 'rtrs' })
   @Roles(UserRole.RECRUITER, UserRole.ORGANIZATION_OWNER, UserRole.ORGANIZATION_ADMIN, UserRole.RECRUITER_MANAGER, UserRole.ADMIN, UserRole.CANDIDATE)
-  async findAll(@AuthUser() user: CurrentUserType): Promise<RtrResponse[]> {
-    const rtrs = await this.rtrService.findAll(user);
+  async findAll(
+    @AuthUser() user: CurrentUserType,
+    @Args('filters', { type: () => RtrFiltersInput, nullable: true }) filters: RtrFiltersInput,
+  ): Promise<RtrResponse[]> {
+    const rtrs = await this.rtrService.findAll(user, filters);
     return rtrs.map((rtr) => this.toRtrResponse(rtr));
   }
 

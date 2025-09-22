@@ -5,18 +5,31 @@ import { Organization } from './entities/organization.entity';
 import { User } from '../users/entities/user.entity';
 import { UserRole } from '../common/enums';
 import { CreateOrganizationInput, UpdateOrganizationInput, CreateOrganizationUserInput } from './dto';
+import { EventEmitterService } from '../common/events/event-emitter.service';
+import { OrganizationCreatedEvent, OrganizationUpdatedEvent, OrganizationDeletedEvent, EVENTS } from '../common/events/events.types';
 
 @Injectable()
 export class OrganizationsService {
   constructor(
     @InjectRepository(Organization) private readonly organizationRepo: Repository<Organization>,
     @InjectRepository(User) private readonly userRepo: Repository<User>,
+    private readonly eventEmitter: EventEmitterService,
   ) {}
 
   async createOrganization(createOrganizationInput: CreateOrganizationInput, ownerId: string): Promise<Organization> {
     const organization = this.organizationRepo.create(createOrganizationInput);
     const savedOrganization = await this.organizationRepo.save(organization);
     await this.userRepo.update(ownerId, { organizationId: savedOrganization.id, role: UserRole.ORGANIZATION_OWNER });
+
+    // Emit event for creating overview (non-blocking)
+    const event: OrganizationCreatedEvent = {
+      organizationId: savedOrganization.id,
+      organizationName: savedOrganization.name,
+      ownerId,
+      createdAt: savedOrganization.createdAt,
+    };
+    this.eventEmitter.emit(EVENTS.ORGANIZATION_CREATED, event);
+
     return savedOrganization;
   }
 
@@ -38,7 +51,17 @@ export class OrganizationsService {
     }
 
     Object.assign(organization, updateOrganizationInput);
-    return this.organizationRepo.save(organization);
+    const updatedOrganization = await this.organizationRepo.save(organization);
+
+    // Emit event for organization update (non-blocking)
+    const event: OrganizationUpdatedEvent = {
+      organizationId: updatedOrganization.id,
+      organizationName: updatedOrganization.name,
+      updatedAt: updatedOrganization.updatedAt,
+    };
+    this.eventEmitter.emit(EVENTS.ORGANIZATION_UPDATED, event);
+
+    return updatedOrganization;
   }
 
   async removeOrganization(id: string, userId: string): Promise<boolean> {
@@ -51,6 +74,15 @@ export class OrganizationsService {
     organization.isActive = false;
     await this.organizationRepo.save(organization);
     await this.userRepo.update({ organizationId: id }, { organizationId: null as any });
+
+    // Emit event for organization deletion (non-blocking)
+    const event: OrganizationDeletedEvent = {
+      organizationId: organization.id,
+      organizationName: organization.name,
+      deletedAt: new Date(),
+    };
+    this.eventEmitter.emit(EVENTS.ORGANIZATION_DELETED, event);
+
     return true;
   }
 
@@ -112,5 +144,19 @@ export class OrganizationsService {
       this.userRepo.count({ where: { organizationId, isActive: true, role: UserRole.CANDIDATE } }),
     ]);
     return { totalUsers: userCount, recruiters: recruiterCount, candidates: candidateCount };
+  }
+
+  // Count method for overview service (no user validation required)
+  async getOrganizationStatsForOverview(organizationId: string): Promise<{
+    totalUsers: number;
+    totalRecruiters: number;
+    totalCandidates: number;
+  }> {
+    const [userCount, recruiterCount, candidateCount] = await Promise.all([
+      this.userRepo.count({ where: { organizationId, isActive: true } }),
+      this.userRepo.count({ where: { organizationId, isActive: true, role: UserRole.RECRUITER } }),
+      this.userRepo.count({ where: { organizationId, isActive: true, role: UserRole.CANDIDATE } }),
+    ]);
+    return { totalUsers: userCount, totalRecruiters: recruiterCount, totalCandidates: candidateCount };
   }
 }

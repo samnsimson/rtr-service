@@ -1,11 +1,12 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { FindOptionsWhere, Repository, MoreThanOrEqual } from 'typeorm';
 import { UpdateJobInput, JobResponse } from './dto';
 import { Job } from './entities/job.entity';
 import { RecruiterProfile } from '../recruiter-profile/entities/recruiter-profile.entity';
 import { CurrentUser } from '../common/types';
 import { CreateJobInput } from './dto/create-job.input';
+import { JobStatus } from '../common/enums';
 import { JobListFiltersInput } from './dto/job-list-filters.input';
 
 @Injectable()
@@ -81,4 +82,20 @@ export class JobsService {
   }
 
   private toResponse = (job: Job): JobResponse => new JobResponse(job);
+
+  // Count methods for overview service
+  async countByOrganization(organizationId: string): Promise<number> {
+    return this.jobsRepo.count({ where: { organizationId } });
+  }
+
+  async countByOrganizationAndStatus(organizationId: string, status: JobStatus): Promise<number> {
+    return this.jobsRepo.count({ where: { organizationId, status } });
+  }
+
+  async countByOrganizationThisMonth(organizationId: string): Promise<number> {
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+    return this.jobsRepo.count({ where: { organizationId, createdAt: MoreThanOrEqual(startOfMonth) } });
+  }
 }

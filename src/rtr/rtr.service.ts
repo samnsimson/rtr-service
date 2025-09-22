@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { FindOptionsWhere, Repository, MoreThanOrEqual } from 'typeorm';
 import { RTR } from './entities/rtr.entity';
 import { CandidateProfile } from '../candidate-profile/entities/candidate-profile.entity';
 import { RecruiterProfile } from '../recruiter-profile/entities/recruiter-profile.entity';
@@ -18,6 +18,9 @@ import { RtrTemplateService } from 'src/rtr-template/rtr-template.service';
 import { RtrServiceHelper } from './helpers/rtr-service.helper';
 import { JobResponse } from 'src/jobs/dto';
 import { add } from 'date-fns';
+import { RtrFiltersInput } from './dto/rtr-filters.input';
+import { EventEmitterService } from '../common/events/event-emitter.service';
+import { RTRCreatedEvent, EVENTS } from '../common/events/events.types';
 
 @Injectable()
 export class RTRService extends RtrServiceHelper {
@@ -29,6 +32,7 @@ export class RTRService extends RtrServiceHelper {
     private readonly organizationsService: OrganizationsService,
     private readonly candidateProfileService: CandidateProfileService,
     private readonly recruiterProfileService: RecruiterProfileService,
+    private readonly eventEmitter: EventEmitterService,
     @InjectRepository(RTR) private readonly rtrRepo: Repository<RTR>,
     @InjectRepository(RTRHistory) private readonly historyRepo: Repository<RTRHistory>,
   ) {
@@ -72,12 +76,48 @@ export class RTRService extends RtrServiceHelper {
       skillsRequired,
     });
 
-    return await this.rtrRepo.save(rtr);
+    const savedRtr = await this.rtrRepo.save(rtr);
+
+    // Emit event for RTR creation (non-blocking)
+    const event: RTRCreatedEvent = {
+      rtrId: savedRtr.id,
+      organizationId: savedRtr.organization?.id || '',
+      candidateId: savedRtr.candidate?.id || '',
+      recruiterId: savedRtr.recruiter?.id || '',
+      createdAt: savedRtr.createdAt,
+    };
+    this.eventEmitter.emit(EVENTS.RTR_CREATED, event);
+
+    return savedRtr;
   }
 
-  async findAll(user: CurrentUser, options?: FindOptionsWhere<RTR>): Promise<RTR[]> {
-    const where: FindOptionsWhere<RTR> = { organization: { id: user.organizationId }, ...options };
-    return this.rtrRepo.find({ where, relations: ['candidate', 'recruiter', 'job', 'rtrTemplate', 'organization', 'createdBy'], order: { createdAt: 'DESC' } });
+  async findAll(user: CurrentUser, filters: RtrFiltersInput, options?: FindOptionsWhere<RTR>): Promise<RTR[]> {
+    const { candidateName, company, jobTitle, status } = filters;
+    const qb = this.rtrRepo.createQueryBuilder('rtr');
+    qb.leftJoinAndSelect('rtr.candidate', 'candidate');
+    qb.leftJoinAndSelect('rtr.recruiter', 'recruiter');
+    qb.leftJoinAndSelect('rtr.job', 'job');
+    qb.leftJoinAndSelect('rtr.rtrTemplate', 'rtrTemplate');
+    qb.leftJoinAndSelect('rtr.organization', 'organization');
+    qb.leftJoinAndSelect('rtr.createdBy', 'createdBy');
+    qb.where('rtr.organizationId = :organizationId', { organizationId: user.organizationId });
+
+    if (candidateName) qb.andWhere('rtr.candidateFirstName ILIKE :candidateName', { candidateName: `%${candidateName}%` });
+    if (company) qb.andWhere('job.company ILIKE :company', { company: `%${company}%` });
+    if (jobTitle) qb.andWhere('job.title ILIKE :jobTitle', { jobTitle: `%${jobTitle}%` });
+    if (status) qb.andWhere('rtr.status = :status', { status });
+
+    // If there are extra options, apply them (e.g., id, etc.)
+    if (options) {
+      Object.entries(options).forEach(([key, value]) => {
+        if (!key.startsWith('organization')) {
+          qb.andWhere(`rtr.${key} = :${key}`, { [key]: value });
+        }
+      });
+    }
+
+    qb.orderBy('rtr.createdAt', 'DESC');
+    return qb.getMany();
   }
 
   async findOne(id: string, user: CurrentUser): Promise<RTR> {
@@ -204,5 +244,21 @@ export class RTRService extends RtrServiceHelper {
 
   private isOrganizationAdmin(user: CurrentUser): boolean {
     return [UserRole.ORGANIZATION_OWNER, UserRole.ORGANIZATION_ADMIN, UserRole.ADMIN].includes(user.role as any);
+  }
+
+  // Count methods for overview service
+  async countByOrganization(organizationId: string): Promise<number> {
+    return this.rtrRepo.count({ where: { organization: { id: organizationId } } });
+  }
+
+  async countByOrganizationAndStatus(organizationId: string, status: RTRStatus): Promise<number> {
+    return this.rtrRepo.count({ where: { organization: { id: organizationId }, status } });
+  }
+
+  async countByOrganizationThisMonth(organizationId: string): Promise<number> {
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+    return this.rtrRepo.count({ where: { organization: { id: organizationId }, createdAt: MoreThanOrEqual(startOfMonth) } });
   }
 }

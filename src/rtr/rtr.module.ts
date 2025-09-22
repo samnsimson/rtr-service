@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { RTRService } from './rtr.service';
@@ -16,20 +16,23 @@ import { CandidateProfileModule } from 'src/candidate-profile/candidate-profile.
 import { RecruiterProfileModule } from 'src/recruiter-profile/recruiter-profile.module';
 import { RtrTemplateModule } from 'src/rtr-template/rtr-template.module';
 import { UsersModule } from 'src/users/users.module';
+import { EventsModule } from '../common/events/events.module';
+import { RTREventsListener } from './events/rtr.events';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([RTR, CandidateProfile, RecruiterProfile, Job, Organization, RTRHistory]),
-    ConfigModule,
-    EmailModule,
-    JobsModule,
-    OrganizationsModule,
-    CandidateProfileModule,
-    RecruiterProfileModule,
-    RtrTemplateModule,
-    UsersModule,
+    EventsModule,
+    forwardRef(() => ConfigModule),
+    forwardRef(() => EmailModule),
+    forwardRef(() => JobsModule),
+    forwardRef(() => OrganizationsModule),
+    forwardRef(() => CandidateProfileModule),
+    forwardRef(() => RecruiterProfileModule),
+    forwardRef(() => RtrTemplateModule),
+    forwardRef(() => UsersModule),
   ],
-  providers: [RTRResolver, RTRService],
+  providers: [RTRResolver, RTRService, RTREventsListener],
   exports: [RTRService],
 })
 export class RTRModule {}

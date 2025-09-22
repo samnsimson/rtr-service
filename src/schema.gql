@@ -477,34 +477,72 @@ type Auth {
   user: AuthUser!
 }
 
-type RecruiterProfileResponse {
-  id: String!
-  userId: String!
-  title: String
-  bio: String
-  linkedinUrl: String
-  avatar: String
-  organizationId: String
-  isActive: Boolean!
+type Overview {
+  id: ID!
+  organizationId: String!
   createdAt: DateTime!
   updatedAt: DateTime!
-}
+  organization: Organization!
 
-type CandidateProfileResponse {
-  id: String!
-  userId: String!
-  title: String
-  experience: Int
-  skills: [String!]
-  resumeUrl: String
-  linkedinUrl: String
-  portfolioUrl: String
-  location: String
-  willingToRelocate: Boolean!
-  remotePreference: RemotePreference!
-  expectedSalary: Int
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  """Total number of RTRs"""
+  totalRtrs: Int!
+
+  """Number of pending RTRs"""
+  pendingRtrs: Int!
+
+  """Number of signed RTRs"""
+  signedRtrs: Int!
+
+  """Number of expired RTRs"""
+  expiredRtrs: Int!
+
+  """Number of rejected RTRs"""
+  rejectedRtrs: Int!
+
+  """Total number of candidates"""
+  totalCandidates: Int!
+
+  """Total number of recruiters"""
+  totalRecruiters: Int!
+
+  """Total number of organizations"""
+  totalOrganizations: Int!
+
+  """Total number of jobs"""
+  totalJobs: Int!
+
+  """Number of active jobs"""
+  activeJobs: Int!
+
+  """Number of closed jobs"""
+  closedJobs: Int!
+
+  """Total number of job applications"""
+  totalJobApplications: Int!
+
+  """Number of applications under review"""
+  reviewingApplications: Int!
+
+  """Number of applications in interview stage"""
+  interviewingApplications: Int!
+
+  """Number of accepted applications"""
+  acceptedApplications: Int!
+
+  """Number of rejected applications"""
+  rejectedApplications: Int!
+
+  """Total number of users"""
+  totalUsers: Int!
+
+  """RTRs created this month"""
+  rtrsThisMonth: Int!
+
+  """Jobs created this month"""
+  jobsThisMonth: Int!
+
+  """Applications this month"""
+  applicationsThisMonth: Int!
 }
 
 type JobResponse {
@@ -581,6 +619,36 @@ type RtrResponse {
   organization: Organization
   createdBy: User
   rtrTemplate: RtrTemplateResponse
+}
+
+type RecruiterProfileResponse {
+  id: String!
+  userId: String!
+  title: String
+  bio: String
+  linkedinUrl: String
+  avatar: String
+  organizationId: String
+  isActive: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type CandidateProfileResponse {
+  id: String!
+  userId: String!
+  title: String
+  experience: Int
+  skills: [String!]
+  resumeUrl: String
+  linkedinUrl: String
+  portfolioUrl: String
+  location: String
+  willingToRelocate: Boolean!
+  remotePreference: RemotePreference!
+  expectedSalary: Int
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type RTRHistoryResponse {
@@ -671,29 +739,51 @@ type Query {
   organization(id: String!): Organization!
   organizationUsers(organizationId: String!): [User!]!
   organizationStats(organizationId: String!): String!
-  recruiterProfiles: [RecruiterProfileResponse!]!
-  recruiterProfile(id: String!): RecruiterProfileResponse!
-  candidateProfiles: [CandidateProfileResponse!]!
-  candidateProfile(id: String!): CandidateProfileResponse!
-  jobs(filters: JobListFiltersInput!): JobResponsePaginated!
-  job(id: String!): JobResponse!
-  jobsByOrganization(organizationId: String!): [JobResponse!]!
-  jobsByRecruiter(recruiterId: String!): [JobResponse!]!
-  rtrs: [RtrResponse!]!
+
+  """Get comprehensive overview metrics for an organization"""
+  overview(query: OverviewQueryInput): Overview!
+
+  """Get overview for the authenticated user's organization"""
+  overviewByOrganization: Overview!
+
+  """
+  Get basic overview metrics without detailed breakdowns for the authenticated user's organization
+  """
+  overviewMetrics: Overview!
+
+  """
+  Get dashboard overview with all metrics for the authenticated user's organization
+  """
+  overviewDashboard: Overview!
+
+  """Get all overview data for the authenticated user's organization"""
+  overviews: [Overview!]!
+
+  """Get overview by ID for the authenticated user's organization"""
+  overviewById(id: String!): Overview!
+  rtrs(filters: RtrFiltersInput): [RtrResponse!]!
   rtr(id: String!): RtrResponse!
   rtrsByCandidate(candidateId: String!): [RtrResponse!]!
   rtrsByRecruiter(recruiterId: String!): [RtrResponse!]!
   rtrsByJob(jobId: String!): [RtrResponse!]!
+  jobs(filters: JobListFiltersInput!): JobResponsePaginated!
+  job(id: String!): JobResponse!
+  jobsByOrganization(organizationId: String!): [JobResponse!]!
+  jobsByRecruiter(recruiterId: String!): [JobResponse!]!
+  recruiterProfiles: [RecruiterProfileResponse!]!
+  recruiterProfile(id: String!): RecruiterProfileResponse!
+  candidateProfiles: [CandidateProfileResponse!]!
+  candidateProfile(id: String!): CandidateProfileResponse!
   rtrTemplates: [RtrTemplate!]!
   rtrTemplate(id: String!): RtrTemplate!
   compiledRtrTemplate(compiledTemplateInput: CompiledRtrTemplateInput!): RtrTemplateResponse!
-  rtrHistories: [RTRHistoryResponse!]!
-  rtrHistory(id: Int!): RTRHistoryResponse!
   jobApplications: [JobApplication!]!
   jobApplication(id: String!): JobApplication!
   jobApplicationsByJob(jobId: String!): [JobApplication!]!
   jobApplicationsByCandidate(candidateId: String!): [JobApplication!]!
   applicationStats: String!
+  rtrHistories: [RTRHistoryResponse!]!
+  rtrHistory(id: Int!): RTRHistoryResponse!
   documents: [DocumentResponse!]!
   document(id: Int!): DocumentResponse!
   notifications: [NotificationResponse!]!
@@ -727,6 +817,24 @@ type Query {
 input PaginationDto {
   limit: Int = 10
   page: Int = 1
+}
+
+input OverviewQueryInput {
+  includeMonthlyMetrics: Boolean = true
+  includeDetailedBreakdowns: Boolean = true
+  includeRtrMetrics: Boolean = true
+  includeJobMetrics: Boolean = true
+  includeApplicationMetrics: Boolean = true
+  includeUserMetrics: Boolean = true
+}
+
+input RtrFiltersInput {
+  limit: Int = 10
+  page: Int = 1
+  candidateName: String
+  company: String
+  jobTitle: String
+  status: RTRStatus
 }
 
 input JobListFiltersInput {
@@ -822,30 +930,47 @@ type Mutation {
   createOrganizationUser(organizationId: String!, createUserInput: CreateOrganizationUserInput!): User!
   updateUserRole(organizationId: String!, userId: String!, newRole: UserRole!): User!
   removeUserFromOrganization(organizationId: String!, userId: String!): Boolean!
-  createRecruiterProfile(createRecruiterProfileInput: CreateRecruiterProfileInput!): RecruiterProfileResponse!
-  updateRecruiterProfile(id: String!, updateRecruiterProfileInput: UpdateRecruiterProfileInput!): RecruiterProfileResponse!
-  removeRecruiterProfile(id: String!): Boolean!
-  createCandidateProfile(createCandidateProfileInput: CreateCandidateProfileInput!): CandidateProfileResponse!
-  updateCandidateProfile(id: String!, updateCandidateProfileInput: UpdateCandidateProfileInput!): CandidateProfileResponse!
-  removeCandidateProfile(id: String!): Boolean!
-  createJob(createJobInput: CreateJobInput!): JobResponse!
-  updateJob(id: String!, updateJobInput: UpdateJobInput!): JobResponse!
-  removeJob(id: String!): JobResponse!
+
+  """
+  Create overview with custom parameters for the authenticated user's organization
+  """
+  createOverview(createOverviewInput: CreateOverviewInput!): Overview!
+
+  """Update overview parameters for the authenticated user's organization"""
+  updateOverview(updateOverviewInput: UpdateOverviewInput!): Overview!
+
+  """Remove overview for the authenticated user's organization"""
+  removeOverview(id: String!): Overview!
+
+  """Refresh overview data for the authenticated user's organization"""
+  refreshOverview: Overview!
+
+  """Delete overview data for the authenticated user's organization"""
+  deleteOverview: Boolean!
   createRtr(createRtrInput: CreateRtrInput!): RtrResponse!
   updateRTR(id: String!, updateRtrInput: UpdateRTRInput!): RtrResponse!
   removeRtr(id: String!): Boolean!
   approveRtr(id: String!): RtrResponse!
   rejectRtr(id: String!, reason: String!): RtrResponse!
   markRtrAsViewed(id: String!): RtrResponse!
+  createJob(createJobInput: CreateJobInput!): JobResponse!
+  updateJob(id: String!, updateJobInput: UpdateJobInput!): JobResponse!
+  removeJob(id: String!): JobResponse!
+  createRecruiterProfile(createRecruiterProfileInput: CreateRecruiterProfileInput!): RecruiterProfileResponse!
+  updateRecruiterProfile(id: String!, updateRecruiterProfileInput: UpdateRecruiterProfileInput!): RecruiterProfileResponse!
+  removeRecruiterProfile(id: String!): Boolean!
+  createCandidateProfile(createCandidateProfileInput: CreateCandidateProfileInput!): CandidateProfileResponse!
+  updateCandidateProfile(id: String!, updateCandidateProfileInput: UpdateCandidateProfileInput!): CandidateProfileResponse!
+  removeCandidateProfile(id: String!): Boolean!
   createRtrTemplate(createRtrTemplateInput: CreateRtrTemplateInput!): RtrTemplate!
   updateRtrTemplate(updateRtrTemplateInput: UpdateRtrTemplateInput!): RtrTemplate!
   removeRtrTemplate(id: String!): RtrTemplate!
-  createRTRHistory(createRTRHistoryInput: CreateRTRHistoryInput!): RTRHistoryResponse!
-  updateRTRHistory(id: Int!, updateRTRHistoryInput: CreateRTRHistoryInput!): RTRHistoryResponse!
-  removeRTRHistory(id: Int!): RTRHistoryResponse!
   createJobApplication(createJobApplicationInput: CreateJobApplicationInput!): JobApplication!
   updateJobApplication(id: String!, updateJobApplicationInput: UpdateJobApplicationInput!): JobApplication!
   removeJobApplication(id: String!): JobApplication!
+  createRTRHistory(createRTRHistoryInput: CreateRTRHistoryInput!): RTRHistoryResponse!
+  updateRTRHistory(id: Int!, updateRTRHistoryInput: CreateRTRHistoryInput!): RTRHistoryResponse!
+  removeRTRHistory(id: Int!): RTRHistoryResponse!
   createDocument(createDocumentInput: CreateDocumentInput!): DocumentResponse!
   updateDocument(id: Int!, updateDocumentInput: CreateDocumentInput!): DocumentResponse!
   removeDocument(id: Int!): DocumentResponse!
@@ -944,6 +1069,74 @@ input CreateOrganizationUserInput {
   avatar: String
 }
 
+input CreateOverviewInput {
+  """Organization ID"""
+  organizationId: String!
+
+  """Include monthly metrics"""
+  includeMonthlyMetrics: Boolean! = true
+
+  """Include detailed breakdowns"""
+  includeDetailedBreakdowns: Boolean! = true
+}
+
+input UpdateOverviewInput {
+  """Organization ID"""
+  organizationId: String
+
+  """Include monthly metrics"""
+  includeMonthlyMetrics: Boolean = true
+
+  """Include detailed breakdowns"""
+  includeDetailedBreakdowns: Boolean = true
+
+  """Overview ID"""
+  id: String!
+}
+
+input CreateRtrInput {
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String!
+  jobId: String!
+  rtrTemplateId: String!
+  status: RTRStatus = PENDING
+  notes: String
+  compensation: Int!
+  compensationType: CompensationType!
+  expiresAt: String
+  resumeRequired: Boolean
+  photoIdRequired: Boolean
+  employerDetailsRequired: Boolean
+  referencesRequired: Boolean
+  skillsRequired: Boolean
+}
+
+input UpdateRTRInput {
+  id: String!
+}
+
+input CreateJobInput {
+  title: String!
+  company: String!
+  description: String!
+  requirements: [String!]!
+  location: String!
+  workType: WorkType!
+  jobType: JobType!
+  compensation: CompensationType!
+  salaryMin: Int
+  salaryMax: Int
+  benefits: [String!]!
+  status: JobStatus
+  expiresAt: String
+}
+
+input UpdateJobInput {
+  id: String!
+}
+
 input CreateRecruiterProfileInput {
   userId: String!
   title: String
@@ -974,49 +1167,6 @@ input UpdateCandidateProfileInput {
   id: String!
 }
 
-input CreateJobInput {
-  title: String!
-  company: String!
-  description: String!
-  requirements: [String!]!
-  location: String!
-  workType: WorkType!
-  jobType: JobType!
-  compensation: CompensationType!
-  salaryMin: Int
-  salaryMax: Int
-  benefits: [String!]!
-  status: JobStatus
-  expiresAt: String
-}
-
-input UpdateJobInput {
-  id: String!
-}
-
-input CreateRtrInput {
-  firstName: String!
-  lastName: String!
-  email: String!
-  phone: String!
-  jobId: String!
-  rtrTemplateId: String!
-  status: RTRStatus = PENDING
-  notes: String
-  compensation: Int!
-  compensationType: CompensationType!
-  expiresAt: String
-  resumeRequired: Boolean
-  photoIdRequired: Boolean
-  employerDetailsRequired: Boolean
-  referencesRequired: Boolean
-  skillsRequired: Boolean
-}
-
-input UpdateRTRInput {
-  id: String!
-}
-
 input CreateRtrTemplateInput {
   name: String!
   description: String
@@ -1032,13 +1182,6 @@ input UpdateRtrTemplateInput {
   id: String!
 }
 
-input CreateRTRHistoryInput {
-  rtrId: String!
-  userId: String!
-  action: String!
-  details: String
-}
-
 input CreateJobApplicationInput {
   jobId: String!
   candidateId: String!
@@ -1051,6 +1194,13 @@ input UpdateJobApplicationInput {
   status: ApplicationStatus
   coverLetter: String
   notes: String
+}
+
+input CreateRTRHistoryInput {
+  rtrId: String!
+  userId: String!
+  action: String!
+  details: String
 }
 
 input CreateDocumentInput {
