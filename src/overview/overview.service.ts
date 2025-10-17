@@ -91,14 +91,12 @@ export class OverviewService {
     // RTR Metrics
     if (options.includeRtrMetrics) {
       overview.totalRtrs = await this.getRtrCount(organizationId);
-
       if (options.includeDetailedBreakdowns) {
         overview.pendingRtrs = await this.getRtrCountByStatus(organizationId, RTRStatus.PENDING);
         overview.signedRtrs = await this.getRtrCountByStatus(organizationId, RTRStatus.SIGNED);
         overview.expiredRtrs = await this.getRtrCountByStatus(organizationId, RTRStatus.EXPIRED);
         overview.rejectedRtrs = await this.getRtrCountByStatus(organizationId, RTRStatus.REJECTED);
       }
-
       if (options.includeMonthlyMetrics) {
         overview.rtrsThisMonth = await this.getRtrCountThisMonth(organizationId);
       }

@@ -134,13 +134,13 @@ export class RTRResolver extends RtrServiceHelper {
     return await this.recruiterProfileService.findOne(rtr.recruiterId, user.organizationId);
   }
 
-  @ResolveField(() => JobResponse, { name: 'job', nullable: true })
+  @ResolveField(() => JobResponse, { name: 'job' })
   async job(@Parent() rtr: RtrResponse, @AuthUser() user: CurrentUser): Promise<JobResponse> {
     const job = await this.jobsService.findOne(rtr.jobId, user);
     return new JobResponse(job);
   }
 
-  @ResolveField(() => Organization, { nullable: true })
+  @ResolveField(() => Organization)
   async organization(@Parent() rtr: RtrResponse): Promise<Organization | null> {
     const organization = await this.organizationsService.findOne(rtr.organizationId);
     return organization;
@@ -156,13 +156,13 @@ export class RTRResolver extends RtrServiceHelper {
   //   return rtr.documents || [];
   // }
 
-  @ResolveField(() => User, { name: 'createdBy', nullable: true })
+  @ResolveField(() => User, { name: 'createdBy' })
   async user(@Parent() rtr: RtrResponse): Promise<User | null> {
     const user = await this.usersService.findOne(rtr.createdById);
     return user;
   }
 
-  @ResolveField(() => RtrTemplateResponse, { name: 'rtrTemplate', nullable: true })
+  @ResolveField(() => RtrTemplateResponse, { name: 'rtrTemplate' })
   async rtrTemplate(@Parent() rtr: RtrResponse, @AuthUser() user: CurrentUser): Promise<RtrTemplateResponse> {
     const rtrTemplate = await this.rtrTemplateService.findOne(rtr.rtrTemplateId, user.organizationId);
     return new RtrTemplateResponse(rtrTemplate);

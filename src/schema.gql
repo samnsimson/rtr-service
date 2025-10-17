@@ -615,10 +615,10 @@ type RtrResponse {
   updatedAt: DateTime!
   candidate: CandidateProfile!
   recruiter: RecruiterProfile!
-  job: JobResponse
-  organization: Organization
-  createdBy: User
-  rtrTemplate: RtrTemplateResponse
+  job: JobResponse!
+  organization: Organization!
+  createdBy: User!
+  rtrTemplate: RtrTemplateResponse!
 }
 
 type RecruiterProfileResponse {
@@ -739,27 +739,11 @@ type Query {
   organization(id: String!): Organization!
   organizationUsers(organizationId: String!): [User!]!
   organizationStats(organizationId: String!): String!
-
-  """Get comprehensive overview metrics for an organization"""
   overview(query: OverviewQueryInput): Overview!
-
-  """Get overview for the authenticated user's organization"""
   overviewByOrganization: Overview!
-
-  """
-  Get basic overview metrics without detailed breakdowns for the authenticated user's organization
-  """
   overviewMetrics: Overview!
-
-  """
-  Get dashboard overview with all metrics for the authenticated user's organization
-  """
   overviewDashboard: Overview!
-
-  """Get all overview data for the authenticated user's organization"""
   overviews: [Overview!]!
-
-  """Get overview by ID for the authenticated user's organization"""
   overviewById(id: String!): Overview!
   rtrs(filters: RtrFiltersInput): [RtrResponse!]!
   rtr(id: String!): RtrResponse!
@@ -930,22 +914,10 @@ type Mutation {
   createOrganizationUser(organizationId: String!, createUserInput: CreateOrganizationUserInput!): User!
   updateUserRole(organizationId: String!, userId: String!, newRole: UserRole!): User!
   removeUserFromOrganization(organizationId: String!, userId: String!): Boolean!
-
-  """
-  Create overview with custom parameters for the authenticated user's organization
-  """
   createOverview(createOverviewInput: CreateOverviewInput!): Overview!
-
-  """Update overview parameters for the authenticated user's organization"""
   updateOverview(updateOverviewInput: UpdateOverviewInput!): Overview!
-
-  """Remove overview for the authenticated user's organization"""
   removeOverview(id: String!): Overview!
-
-  """Refresh overview data for the authenticated user's organization"""
   refreshOverview: Overview!
-
-  """Delete overview data for the authenticated user's organization"""
   deleteOverview: Boolean!
   createRtr(createRtrInput: CreateRtrInput!): RtrResponse!
   updateRTR(id: String!, updateRtrInput: UpdateRTRInput!): RtrResponse!
