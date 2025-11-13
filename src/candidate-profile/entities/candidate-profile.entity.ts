@@ -62,11 +62,7 @@ export class CandidateProfile {
   willingToRelocate: boolean;
 
   @Field(() => RemotePreference)
-  @Column({
-    type: 'enum',
-    enum: RemotePreference,
-    default: RemotePreference.ANY,
-  })
+  @Column({ type: 'enum', enum: RemotePreference, default: RemotePreference.ANY })
   remotePreference: RemotePreference;
 
   @Field(() => Number, { nullable: true })

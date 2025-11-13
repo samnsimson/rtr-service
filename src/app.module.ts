@@ -1,10 +1,10 @@
+import { join } from 'path';
 import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { join } from 'path';
 import { RecruiterProfileModule } from './recruiter-profile/recruiter-profile.module';
 import { CandidateProfileModule } from './candidate-profile/candidate-profile.module';
 import { JobsModule } from './jobs/jobs.module';
@@ -27,6 +27,8 @@ import { LoggingInterceptor } from './common/interceptors/logging.intercetor';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { OverviewModule } from './overview/overview.module';
 import { EventsModule } from './common/events/events.module';
+import { CandidateListsModule } from './candidate-list/candidate-list.module';
+import { EmployerListModule } from './employer-list/employer-list.module';
 import './common/enums';
 @Module({
   imports: [
@@ -57,7 +59,7 @@ import './common/enums';
         signOptions: { expiresIn: '1h' },
       }),
     }),
-    EventsModule,
+    forwardRef(() => EventsModule),
     forwardRef(() => UsersModule),
     forwardRef(() => AuthModule),
     forwardRef(() => RecruiterProfileModule),
@@ -75,6 +77,8 @@ import './common/enums';
     forwardRef(() => EmailModule),
     forwardRef(() => RtrTemplateModule),
     forwardRef(() => OverviewModule),
+    forwardRef(() => CandidateListsModule),
+    EmployerListModule,
   ],
   providers: [LoggerService, { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor }],
 })

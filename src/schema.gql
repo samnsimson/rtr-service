@@ -730,6 +730,33 @@ type IndexType {
   sortableAttributes: [String!]
 }
 
+type CandidateList {
+  id: String!
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String!
+  resumeUrl: String
+  photoIdUrl: String
+  linkedinUrl: String
+  portfolioUrl: String
+  experience: Int
+  experiencePeriod: ExperiencePeriod!
+}
+
+"""The period of experience (days, weeks, months, years)"""
+enum ExperiencePeriod {
+  DAYS
+  WEEKS
+  MONTHS
+  YEARS
+}
+
+type EmployerList {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
 type Query {
   users(pagination: PaginationDto): [UserResponse!]!
   user(id: String!): UserResponse!
@@ -796,6 +823,9 @@ type Query {
   subscriptionPlans: [SubscriptionPlan!]!
   subscriptionPlan(id: String!): SubscriptionPlan!
   subscriptionPlansByType(planType: PlanType!): [SubscriptionPlan!]!
+  organizationCandidates: [CandidateList!]!
+  organizationCandidate(id: Int!): CandidateList!
+  employerList(id: Int!): EmployerList!
 }
 
 input PaginationDto {
@@ -969,6 +999,12 @@ type Mutation {
   createSubscription(createSubscriptionInput: CreateSubscriptionInput!): Subscription!
   updateSubscription(id: String!, updateSubscriptionInput: UpdateSubscriptionInput!): Subscription!
   cancelSubscription(id: String!, reason: String): Subscription!
+  createCandidateList(createCandidateListInput: CreateCandidateListInput!): CandidateList!
+  updateCandidateList(updateCandidateListInput: UpdateCandidateListInput!): CandidateList!
+  removeCandidateList(id: Int!): CandidateList!
+  createEmployerList(createEmployerListInput: CreateEmployerListInput!): EmployerList!
+  updateEmployerList(updateEmployerListInput: UpdateEmployerListInput!): EmployerList!
+  removeEmployerList(id: Int!): EmployerList!
 }
 
 input CreateUserInput {
@@ -1260,4 +1296,26 @@ input UpdateSubscriptionInput {
   autoRenew: Boolean
   cancellationReason: String
   cancelledAt: String
+}
+
+input CreateCandidateListInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateCandidateListInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input CreateEmployerListInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateEmployerListInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
 }

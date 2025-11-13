@@ -97,6 +97,13 @@ export enum NotificationType {
   JOB_UPDATE = 'JOB_UPDATE',
 }
 
+export enum ExperiencePeriod {
+  DAYS = 'DAYS',
+  WEEKS = 'WEEKS',
+  MONTHS = 'MONTHS',
+  YEARS = 'YEARS',
+}
+
 // Register all enums with GraphQL
 registerEnumType(UserRole, {
   name: 'UserRole',
@@ -151,4 +158,9 @@ registerEnumType(DocumentType, {
 registerEnumType(NotificationType, {
   name: 'NotificationType',
   description: 'The type of notification being sent',
+});
+
+registerEnumType(ExperiencePeriod, {
+  name: 'ExperiencePeriod',
+  description: 'The period of experience (days, weeks, months, years)',
 });

@@ -34,11 +34,7 @@ export class Organization {
   industry: string;
 
   @Field(() => CompanySize, { nullable: true })
-  @Column({
-    type: 'enum',
-    enum: CompanySize,
-    nullable: true,
-  })
+  @Column({ type: 'enum', enum: CompanySize, nullable: true })
   companySize: CompanySize;
 
   @Field(() => String, { nullable: true })
