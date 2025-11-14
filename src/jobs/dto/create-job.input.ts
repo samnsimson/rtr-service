@@ -1,6 +1,26 @@
 import { IsString, IsOptional, IsEnum, IsNumber, IsArray, IsDateString, Min, IsBoolean } from 'class-validator';
 import { InputType, Field, Int } from '@nestjs/graphql';
-import { WorkType, JobType, CompensationType, JobStatus } from '../../common/enums';
+import { WorkType, JobType, CompensationType, JobStatus, ExperiencePeriod } from '../../common/enums';
+
+@InputType()
+export class SkillRequirementInput {
+  @Field(() => String)
+  @IsString()
+  skill: string;
+
+  @Field(() => Number)
+  @IsNumber()
+  @Min(0)
+  experience: number;
+
+  @Field(() => ExperiencePeriod, { defaultValue: ExperiencePeriod.YEARS })
+  @IsEnum(ExperiencePeriod)
+  experiencePeriod: ExperiencePeriod;
+
+  constructor(partial?: Partial<SkillRequirementInput>) {
+    Object.assign(this, partial);
+  }
+}
 
 @InputType()
 export class CreateJobInput {
@@ -20,6 +40,11 @@ export class CreateJobInput {
   @IsArray()
   @IsString({ each: true })
   requirements: string[];
+
+  @Field(() => [SkillRequirementInput])
+  @IsString({ each: true })
+  @IsArray()
+  skillsRequired: SkillRequirementInput[];
 
   @Field()
   @IsString()

@@ -171,6 +171,20 @@ enum CompensationType {
   COMMISSION
 }
 
+type SkillRequirement {
+  skill: String!
+  experience: Float!
+  experiencePeriod: ExperiencePeriod!
+}
+
+"""The period of experience (days, weeks, months, years)"""
+enum ExperiencePeriod {
+  DAYS
+  WEEKS
+  MONTHS
+  YEARS
+}
+
 type Job {
   id: String!
   jobId: String!
@@ -178,6 +192,7 @@ type Job {
   company: String!
   description: String!
   requirements: [String!]!
+  skillsRequired: [SkillRequirement!]
   location: String!
   workType: WorkType!
   jobType: JobType!
@@ -553,6 +568,7 @@ type JobResponse {
   company: String!
   description: String!
   requirements: [String!]!
+  skillsRequired: [SkillRequirement!]
   location: String!
   workType: WorkType!
   jobType: JobType!
@@ -744,14 +760,6 @@ type CandidateList {
   portfolioUrl: String
   experience: Int
   experiencePeriod: ExperiencePeriod!
-}
-
-"""The period of experience (days, weeks, months, years)"""
-enum ExperiencePeriod {
-  DAYS
-  WEEKS
-  MONTHS
-  YEARS
 }
 
 type EmployerList {
@@ -1133,6 +1141,7 @@ input CreateJobInput {
   company: String!
   description: String!
   requirements: [String!]!
+  skillsRequired: [SkillRequirementInput!]!
   location: String!
   workType: WorkType!
   jobType: JobType!
@@ -1143,6 +1152,12 @@ input CreateJobInput {
   status: JobStatus
   expiresAt: String
   starred: Boolean
+}
+
+input SkillRequirementInput {
+  skill: String!
+  experience: Float!
+  experiencePeriod: ExperiencePeriod! = YEARS
 }
 
 input UpdateJobInput {

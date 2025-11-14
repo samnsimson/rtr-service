@@ -1,7 +1,8 @@
 import { Resolver, Query, Args } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { SubscriptionPlansService } from './subscription-plans.service';
-import { SubscriptionPlan, PlanType } from './entities/subscription-plan.entity';
+import { SubscriptionPlan } from './entities/subscription-plan.entity';
+import { PlanType } from 'src/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Resolver(() => SubscriptionPlan)

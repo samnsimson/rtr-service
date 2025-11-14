@@ -104,6 +104,29 @@ export enum ExperiencePeriod {
   YEARS = 'YEARS',
 }
 
+export enum PlanType {
+  STANDARD = 'STANDARD',
+  PREMIUM = 'PREMIUM',
+}
+
+export enum BillingInterval {
+  MONTHLY = 'MONTHLY',
+  YEARLY = 'YEARLY',
+}
+export enum SubscriptionStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  CANCELLED = 'CANCELLED',
+  PAST_DUE = 'PAST_DUE',
+  UNPAID = 'UNPAID',
+}
+
+registerEnumType(SubscriptionStatus, { name: 'SubscriptionStatus' });
+
+registerEnumType(PlanType, { name: 'PlanType' });
+
+registerEnumType(BillingInterval, { name: 'BillingInterval' });
+
 // Register all enums with GraphQL
 registerEnumType(UserRole, {
   name: 'UserRole',

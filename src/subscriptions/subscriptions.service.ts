@@ -1,11 +1,12 @@
 import { Injectable, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Subscription, SubscriptionStatus } from './entities/subscription.entity';
+import { Subscription } from './entities/subscription.entity';
 import { SubscriptionPlan } from './entities/subscription-plan.entity';
 import { Organization } from '../organizations/entities/organization.entity';
 import { CreateSubscriptionInput, UpdateSubscriptionInput } from './dto';
 import { CurrentUser } from '../common/types';
+import { SubscriptionStatus } from 'src/common';
 
 @Injectable()
 export class SubscriptionsService {

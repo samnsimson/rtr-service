@@ -1,8 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { SubscriptionPlan, PlanType } from './entities/subscription-plan.entity';
+import { SubscriptionPlan } from './entities/subscription-plan.entity';
 import { DEFAULT_SUBSCRIPTION_PLANS } from '../common/constants';
+import { PlanType } from 'src/common';
 
 @Injectable()
 export class SubscriptionPlansService {

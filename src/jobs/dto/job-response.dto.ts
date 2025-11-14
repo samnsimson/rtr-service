@@ -1,6 +1,7 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
 import { WorkType, JobType, CompensationType, JobStatus } from '../../common/enums';
 import { PaginatedResponse } from 'src/common/dto/paginated-response.dto';
+import { SkillRequirement } from './skill-requirement.dto';
 
 @ObjectType()
 export class JobResponse {
@@ -21,6 +22,9 @@ export class JobResponse {
 
   @Field(() => [String])
   requirements: string[];
+
+  @Field(() => [SkillRequirement], { nullable: true })
+  skillsRequired?: SkillRequirement[];
 
   @Field()
   location: string;
@@ -66,6 +70,9 @@ export class JobResponse {
 
   constructor(partial?: Partial<JobResponse>) {
     Object.assign(this, partial);
+    this.benefits = partial?.['benefits'] || [];
+    this.requirements = partial?.['requirements'] || [];
+    this.skillsRequired = partial?.['skillsRequired'] || [];
   }
 }
 

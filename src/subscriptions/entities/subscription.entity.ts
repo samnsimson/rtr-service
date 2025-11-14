@@ -1,19 +1,10 @@
-import { ObjectType, Field, registerEnumType } from '@nestjs/graphql';
+import { ObjectType, Field } from '@nestjs/graphql';
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Organization } from '../../organizations/entities/organization.entity';
-import { SubscriptionPlan, PlanType, BillingInterval } from './subscription-plan.entity';
+import { SubscriptionPlan } from './subscription-plan.entity';
 import { Payment } from '../../payments/entities/payment.entity';
-
-export enum SubscriptionStatus {
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
-  CANCELLED = 'CANCELLED',
-  PAST_DUE = 'PAST_DUE',
-  UNPAID = 'UNPAID',
-}
-
-registerEnumType(SubscriptionStatus, { name: 'SubscriptionStatus' });
+import { BillingInterval, PlanType, SubscriptionStatus } from 'src/common';
 
 @ObjectType()
 @Entity('subscriptions')

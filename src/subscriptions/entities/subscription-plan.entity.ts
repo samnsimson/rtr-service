@@ -1,19 +1,7 @@
-import { ObjectType, Field, registerEnumType } from '@nestjs/graphql';
+import { ObjectType, Field } from '@nestjs/graphql';
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { Subscription } from './subscription.entity';
-
-export enum PlanType {
-  STANDARD = 'STANDARD',
-  PREMIUM = 'PREMIUM',
-}
-
-export enum BillingInterval {
-  MONTHLY = 'MONTHLY',
-  YEARLY = 'YEARLY',
-}
-
-registerEnumType(PlanType, { name: 'PlanType' });
-registerEnumType(BillingInterval, { name: 'BillingInterval' });
+import { BillingInterval, PlanType } from 'src/common';
 
 @ObjectType()
 @Entity('subscription_plans')

@@ -1,4 +1,4 @@
-import { PlanType, BillingInterval } from '../../subscriptions/entities/subscription-plan.entity';
+import { BillingInterval, PlanType } from 'src/common';
 
 export const DEFAULT_SUBSCRIPTION_PLANS = [
   {

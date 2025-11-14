@@ -1,6 +1,6 @@
 import { IsString, IsOptional, IsEnum, IsUUID } from 'class-validator';
 import { InputType, Field } from '@nestjs/graphql';
-import { PlanType, BillingInterval } from '../entities/subscription-plan.entity';
+import { PlanType, BillingInterval } from 'src/common';
 
 @InputType()
 export class CreateSubscriptionInput {

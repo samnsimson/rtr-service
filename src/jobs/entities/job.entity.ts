@@ -5,6 +5,7 @@ import { RTR } from '../../rtr/entities/rtr.entity';
 import { JobApplication } from '../../job-applications/entities/job-application.entity';
 import { WorkType, JobType, CompensationType, JobStatus } from '../../common/enums';
 import { ObjectType, Field } from '@nestjs/graphql';
+import { SkillRequirement } from '../dto/skill-requirement.dto';
 
 @ObjectType()
 @Entity('jobs')
@@ -32,6 +33,10 @@ export class Job {
   @Field(() => [String])
   @Column('json')
   requirements: string[];
+
+  @Field(() => [SkillRequirement], { nullable: true, defaultValue: [] })
+  @Column({ type: 'jsonb', nullable: true, default: [] })
+  skillsRequired: SkillRequirement[];
 
   @Field(() => String)
   @Column()
