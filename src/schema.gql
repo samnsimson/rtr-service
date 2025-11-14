@@ -188,6 +188,7 @@ type Job {
   recruiterId: String!
   organizationId: String
   status: JobStatus!
+  starred: Boolean!
   expiresAt: DateTime
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -562,6 +563,7 @@ type JobResponse {
   recruiterId: String!
   organizationId: String
   status: JobStatus!
+  starred: Boolean!
   expiresAt: DateTime
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -858,6 +860,7 @@ input JobListFiltersInput {
   workType: WorkType
   jobType: JobType
   compensation: CompensationType
+  starred: Boolean
 }
 
 input CompiledRtrTemplateInput {
@@ -956,7 +959,7 @@ type Mutation {
   rejectRtr(id: String!, reason: String!): RtrResponse!
   markRtrAsViewed(id: String!): RtrResponse!
   createJob(createJobInput: CreateJobInput!): JobResponse!
-  updateJob(id: String!, updateJobInput: UpdateJobInput!): JobResponse!
+  updateJob(updateJobInput: UpdateJobInput!): JobResponse!
   removeJob(id: String!): JobResponse!
   createRecruiterProfile(createRecruiterProfileInput: CreateRecruiterProfileInput!): RecruiterProfileResponse!
   updateRecruiterProfile(id: String!, updateRecruiterProfileInput: UpdateRecruiterProfileInput!): RecruiterProfileResponse!
@@ -1139,10 +1142,25 @@ input CreateJobInput {
   benefits: [String!]!
   status: JobStatus
   expiresAt: String
+  starred: Boolean
 }
 
 input UpdateJobInput {
   id: String!
+  title: String
+  company: String
+  description: String
+  requirements: [String!]
+  location: String
+  workType: WorkType
+  jobType: JobType
+  compensation: CompensationType
+  salaryMin: Int
+  salaryMax: Int
+  benefits: [String!]
+  status: JobStatus
+  expiresAt: String
+  starred: Boolean
 }
 
 input CreateRecruiterProfileInput {

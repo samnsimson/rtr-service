@@ -52,6 +52,9 @@ export class JobResponse {
   @Field(() => JobStatus)
   status: JobStatus;
 
+  @Field(() => Boolean)
+  starred: boolean;
+
   @Field({ nullable: true })
   expiresAt?: Date;
 

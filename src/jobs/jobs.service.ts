@@ -33,21 +33,22 @@ export class JobsService {
 
   async findAll(user: CurrentUser, filters: JobListFiltersInput): Promise<[JobResponse[], number]> {
     let query = this.jobsRepo.createQueryBuilder('job');
-    const { page, limit, query: queryString, workType, jobType, compensation } = filters;
+    const { page, limit, query: queryString, workType, jobType, compensation, starred } = filters;
     if (user.organizationId) query = query.where('job.organizationId = :organizationId', { organizationId: user.organizationId });
     if (queryString) query = query.andWhere('job.title ILIKE :query', { query: `%${queryString}%` });
     if (workType) query = query.andWhere('job.workType = :workType', { workType });
     if (jobType) query = query.andWhere('job.jobType = :jobType', { jobType });
     if (compensation) query = query.andWhere('job.compensation = :compensation', { compensation });
+    if (starred) query = query.andWhere('job.starred = :starred', { starred });
     query = query.skip((page - 1) * limit).take(limit);
     query = query.orderBy('job.createdAt', 'DESC');
     const [jobs, count] = await query.getManyAndCount();
     return [jobs.map((job) => new JobResponse(job)), count];
   }
 
-  async findOne(id: string, user?: CurrentUser, options?: FindOptionsWhere<Job>): Promise<JobResponse> {
+  async findOne(id: string, user: CurrentUser, options?: FindOptionsWhere<Job>): Promise<JobResponse> {
     let query = this.jobsRepo.createQueryBuilder('job').where('job.id = :id', { id });
-    if (user?.organizationId) query = query.andWhere('job.organizationId = :organizationId', { organizationId: user.organizationId });
+    if (user.organizationId) query = query.andWhere('job.organizationId = :organizationId', { organizationId: user.organizationId });
     if (options) query = query.andWhere(options);
     const job = await query.getOne();
     if (!job) throw new NotFoundException('Job not found');
@@ -55,11 +56,10 @@ export class JobsService {
   }
 
   async update(id: string, updateJobInput: UpdateJobInput, user: CurrentUser): Promise<JobResponse> {
+    const { affected } = await this.jobsRepo.update(id, updateJobInput);
+    if (!affected) throw new NotFoundException('Job not found');
     const job = await this.findOne(id, user);
-    const { expiresAt, ...rest } = updateJobInput;
-    const next = { ...job, ...rest, expiresAt: typeof expiresAt === 'string' ? new Date(expiresAt) : job.expiresAt };
-    const saved = await this.jobsRepo.save(next);
-    return new JobResponse(saved);
+    return new JobResponse(job);
   }
 
   async remove(id: string, user: CurrentUser): Promise<JobResponse> {

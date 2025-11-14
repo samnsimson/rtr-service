@@ -73,6 +73,10 @@ export class Job {
   @Column({ type: 'enum', enum: JobStatus, default: JobStatus.ACTIVE })
   status: JobStatus;
 
+  @Field(() => Boolean)
+  @Column({ default: false })
+  starred: boolean;
+
   @Field(() => Date, { nullable: true })
   @Column({ nullable: true })
   expiresAt: Date;

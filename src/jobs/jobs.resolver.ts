@@ -45,8 +45,8 @@ export class JobsResolver {
   }
 
   @Mutation(() => JobResponse)
-  updateJob(@Args('id', { type: () => String }) id: string, @Args('updateJobInput') updateJobInput: UpdateJobInput, @AuthUser() user: CurrentUser) {
-    return this.jobsService.update(id, updateJobInput, user);
+  updateJob(@Args('updateJobInput') updateJobInput: UpdateJobInput, @AuthUser() user: CurrentUser) {
+    return this.jobsService.update(updateJobInput.id, updateJobInput, user);
   }
 
   @Mutation(() => JobResponse)
