@@ -8,6 +8,7 @@ import { CurrentUser } from '../common/types';
 import { CreateJobInput } from './dto/create-job.input';
 import { JobStatus } from '../common/enums';
 import { JobListFiltersInput } from './dto/job-list-filters.input';
+import { CompanyResponse } from './dto/company-response.dto';
 
 @Injectable()
 export class JobsService {
@@ -44,6 +45,13 @@ export class JobsService {
     query = query.orderBy('job.createdAt', 'DESC');
     const [jobs, count] = await query.getManyAndCount();
     return [jobs.map((job) => new JobResponse(job)), count];
+  }
+
+  async findCompanies(user: CurrentUser): Promise<CompanyResponse[]> {
+    let query = this.jobsRepo.createQueryBuilder('job');
+    if (user.organizationId) query = query.where('job.organizationId = :organizationId', { organizationId: user.organizationId });
+    const companies = await query.select('DISTINCT job.company', 'company').getRawMany<{ company: string }>();
+    return companies.map(({ company }) => new CompanyResponse({ name: company }));
   }
 
   async findOne(id: string, user: CurrentUser, options?: FindOptionsWhere<Job>): Promise<JobResponse> {

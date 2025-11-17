@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsEnum, IsNumber, IsArray, IsDateString, Min, IsBoolean } from 'class-validator';
+import { IsString, IsOptional, IsEnum, IsNumber, IsArray, IsDateString, Min, IsBoolean, IsNotEmpty } from 'class-validator';
 import { InputType, Field, Int } from '@nestjs/graphql';
 import { WorkType, JobType, CompensationType, JobStatus, ExperiencePeriod } from '../../common/enums';
 
@@ -42,8 +42,8 @@ export class CreateJobInput {
   requirements: string[];
 
   @Field(() => [SkillRequirementInput])
-  @IsString({ each: true })
   @IsArray()
+  @IsNotEmpty({ each: true })
   skillsRequired: SkillRequirementInput[];
 
   @Field()

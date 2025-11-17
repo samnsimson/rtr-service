@@ -595,6 +595,10 @@ type JobResponsePaginated {
   totalPages: Int!
 }
 
+type CompanyResponse {
+  name: String!
+}
+
 type RtrTemplateResponse {
   id: String!
   name: String!
@@ -788,6 +792,7 @@ type Query {
   rtrsByRecruiter(recruiterId: String!): [RtrResponse!]!
   rtrsByJob(jobId: String!): [RtrResponse!]!
   jobs(filters: JobListFiltersInput!): JobResponsePaginated!
+  companies: [CompanyResponse!]!
   job(id: String!): JobResponse!
   jobsByOrganization(organizationId: String!): [JobResponse!]!
   jobsByRecruiter(recruiterId: String!): [JobResponse!]!

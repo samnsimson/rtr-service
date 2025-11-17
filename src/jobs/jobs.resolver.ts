@@ -16,6 +16,7 @@ import { UsersService } from 'src/users/users.service';
 import { Organization } from 'src/organizations/entities/organization.entity';
 import { OrganizationsService } from 'src/organizations/organizations.service';
 import { RecruiterProfileService } from 'src/recruiter-profile/recruiter-profile.service';
+import { CompanyResponse } from './dto/company-response.dto';
 
 @Resolver(() => JobResponse)
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -37,6 +38,11 @@ export class JobsResolver {
   async findAll(@AuthUser() user: CurrentUser, @Args('filters', { type: () => JobListFiltersInput }) filters: JobListFiltersInput) {
     const [data, total] = await this.jobsService.findAll(user, filters);
     return new JobResponsePaginated({ data, total, ...filters });
+  }
+
+  @Query(() => [CompanyResponse], { name: 'companies' })
+  findCompanies(@AuthUser() user: CurrentUser) {
+    return this.jobsService.findCompanies(user);
   }
 
   @Query(() => JobResponse, { name: 'job' })
