@@ -124,6 +124,7 @@ type RtrTemplate {
 
 type RTR {
   id: String!
+  rtrId: String
   candidateFirstName: String!
   candidateLastName: String
   candidateEmail: String!
@@ -611,6 +612,7 @@ type RtrTemplateResponse {
 
 type RtrResponse {
   id: String!
+  rtrId: String
   candidateFirstName: String!
   candidateLastName: String!
   candidateEmail: String!

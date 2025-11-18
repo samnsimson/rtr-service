@@ -6,6 +6,9 @@ export class RtrResponse {
   @Field()
   id: string;
 
+  @Field(() => String, { nullable: true })
+  rtrId?: string;
+
   @Field()
   candidateFirstName: string;
 

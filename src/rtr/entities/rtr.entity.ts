@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn, BeforeInsert, Index } from 'typeorm';
 import { CandidateProfile } from '../../candidate-profile/entities/candidate-profile.entity';
 import { RecruiterProfile } from '../../recruiter-profile/entities/recruiter-profile.entity';
 import { Organization } from '../../organizations/entities/organization.entity';
@@ -12,10 +12,15 @@ import { ObjectType, Field } from '@nestjs/graphql';
 
 @ObjectType()
 @Entity('rtrs')
+@Index(['rtrId'], { unique: true })
 export class RTR {
   @Field(() => String)
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
+  rtrId: string;
 
   @Field(() => String)
   @Column()
@@ -127,4 +132,11 @@ export class RTR {
   @ManyToOne(() => User, (user) => user.rtrs)
   @JoinColumn({ name: 'createdBy' })
   createdBy: User;
+
+  @BeforeInsert()
+  generateRtrId() {
+    const randomId = Math.floor(100000 + Math.random() * 900000);
+    const randomPrefix = Math.floor(100 + Math.random() * 900);
+    this.rtrId = `RTR${randomPrefix}${randomId}`;
+  }
 }
