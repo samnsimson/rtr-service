@@ -10,16 +10,16 @@ export class SearchService implements OnModuleInit {
   private client: MeiliSearch;
 
   constructor(private configService: ConfigService) {
-    this.client = new MeiliSearch({
-      host: this.configService.get<string>('MEILISEARCH_HOST', ''),
-      apiKey: this.configService.get<string>('MEILISEARCH_API_KEY', ''),
-      timeout: this.configService.get<number>('MEILISEARCH_TIMEOUT', 3000),
-    });
+    // this.client = new MeiliSearch({
+    //   host: this.configService.get<string>('MEILISEARCH_HOST', ''),
+    //   apiKey: this.configService.get<string>('MEILISEARCH_API_KEY', ''),
+    //   timeout: this.configService.get<number>('MEILISEARCH_TIMEOUT', 3000),
+    // });
   }
 
-  async onModuleInit() {
+  onModuleInit() {
     try {
-      await this.initializeIndexes();
+      // await this.initializeIndexes();
       this.logger.log('Search service initialized successfully');
     } catch (error) {
       this.logger.error('Failed to initialize search service', error);
