@@ -49,6 +49,7 @@ import './common/enums';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       graphiql: true,
+      introspection: true,
       ...graphqlValidationConfig,
     }),
     JwtModule.registerAsync({
