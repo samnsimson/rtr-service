@@ -121,6 +121,15 @@ export enum SubscriptionStatus {
   UNPAID = 'UNPAID',
 }
 
+export enum StripePaymentInterval {
+  DAY = 'day',
+  WEEK = 'week',
+  MONTH = 'month',
+  YEAR = 'year',
+}
+
+registerEnumType(StripePaymentInterval, { name: 'StripePaymentInterval' });
+
 registerEnumType(SubscriptionStatus, { name: 'SubscriptionStatus' });
 
 registerEnumType(PlanType, { name: 'PlanType' });

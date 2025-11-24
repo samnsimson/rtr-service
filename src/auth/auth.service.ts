@@ -10,6 +10,7 @@ import { RecruiterProfileService } from 'src/recruiter-profile/recruiter-profile
 import { Auth, AuthUser, Org } from './entities/auth.entity';
 import { add } from 'date-fns';
 import { ConfigService } from '@nestjs/config';
+import { CreateOrganizationInput } from 'src/organizations/dto';
 
 @Injectable()
 export class AuthService {
@@ -57,7 +58,7 @@ export class AuthService {
     } catch (error) {
       if (error instanceof NotFoundException) {
         const user = await this.usersService.create(registerInput);
-        const organizationData = { name: `${user.name}'s Organization` };
+        const organizationData: CreateOrganizationInput = { name: `${user.name}'s Organization` };
         const organization = await this.organizationsService.createOrganization(organizationData, user.id);
         const updatedUser = await this.usersService.update(user.id, { organizationId: organization.id, role: UserRole.ORGANIZATION_OWNER });
         await this.recruiterProfileService.create({ userId: user.id });

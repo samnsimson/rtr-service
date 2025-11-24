@@ -2,12 +2,15 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SubscriptionPlan } from './entities/subscription-plan.entity';
-import { DEFAULT_SUBSCRIPTION_PLANS } from '../common/constants';
 import { PlanType } from 'src/common';
+import { StripeService } from 'src/stripe/stripe.service';
 
 @Injectable()
 export class SubscriptionPlansService {
-  constructor(@InjectRepository(SubscriptionPlan) private readonly planRepo: Repository<SubscriptionPlan>) {}
+  constructor(
+    @InjectRepository(SubscriptionPlan) private readonly planRepo: Repository<SubscriptionPlan>,
+    private readonly stripeService: StripeService,
+  ) {}
 
   async findAll(): Promise<SubscriptionPlan[]> {
     return this.planRepo.find({ where: { isActive: true }, order: { planType: 'ASC', billingInterval: 'ASC' } });
@@ -26,7 +29,5 @@ export class SubscriptionPlansService {
   async createDefaultPlans(): Promise<void> {
     const existingPlans = await this.planRepo.count();
     if (existingPlans > 0) return; // Plans already exist
-    const plans = this.planRepo.create(DEFAULT_SUBSCRIPTION_PLANS);
-    await this.planRepo.save(plans);
   }
 }

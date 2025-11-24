@@ -43,7 +43,7 @@ export class OrganizationsService {
     const org = await this.organizationRepo.save(organization);
     const event: OrganizationUpdatedEvent = { organizationId: org.id, organizationName: org.name, updatedAt: org.updatedAt };
     this.eventEmitter.emit(EVENTS.ORGANIZATION_UPDATED, event);
-    return org;
+    return await this.findOne(id);
   }
 
   async removeOrganization(id: string, userId: string): Promise<boolean> {

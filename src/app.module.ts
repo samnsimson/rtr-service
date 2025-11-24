@@ -29,6 +29,7 @@ import { OverviewModule } from './overview/overview.module';
 import { EventsModule } from './common/events/events.module';
 import { CandidateListsModule } from './candidate-list/candidate-list.module';
 import { EmployerListModule } from './employer-list/employer-list.module';
+import { StripeModule } from './stripe/stripe.module';
 import './common/enums';
 @Module({
   imports: [
@@ -78,7 +79,8 @@ import './common/enums';
     forwardRef(() => RtrTemplateModule),
     forwardRef(() => OverviewModule),
     forwardRef(() => CandidateListsModule),
-    EmployerListModule,
+    forwardRef(() => EmployerListModule),
+    forwardRef(() => StripeModule),
   ],
   providers: [LoggerService, { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor }],
 })

@@ -26,6 +26,14 @@ export class Organization {
   name: string;
 
   @Field(() => String, { nullable: true })
+  @Column({ unique: true, nullable: true })
+  email: string;
+
+  @Field(() => String, { nullable: true })
+  @Column({ unique: true, nullable: true })
+  phone: string;
+
+  @Field(() => String, { nullable: true })
   @Column({ nullable: true })
   website: string;
 
@@ -39,7 +47,35 @@ export class Organization {
 
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
-  location: string;
+  stripeCustomerId: string;
+
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
+  address: string;
+
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
+  city: string;
+
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
+  state: string;
+
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
+  zipcode: string;
+
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
+  country: string;
+
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
+  latitude: string;
+
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
+  longitude: string;
 
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })

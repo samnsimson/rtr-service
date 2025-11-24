@@ -1,13 +1,13 @@
-import { InputType, Field } from '@nestjs/graphql';
-import { CompanySize } from '../../common/enums';
+import { CompanySize } from 'src/common';
+import { ObjectType, Field } from '@nestjs/graphql';
 
-@InputType()
-export class CreateOrganizationInput {
+@ObjectType()
+export class OrganizationResponseDto {
   @Field(() => String)
-  name: string;
+  id: string;
 
   @Field(() => String, { nullable: true })
-  website?: string;
+  name?: string;
 
   @Field(() => String, { nullable: true })
   email?: string;
@@ -16,10 +16,16 @@ export class CreateOrganizationInput {
   phone?: string;
 
   @Field(() => String, { nullable: true })
+  website?: string;
+
+  @Field(() => String, { nullable: true })
   industry?: string;
 
   @Field(() => CompanySize, { nullable: true })
   companySize?: CompanySize;
+
+  @Field(() => String, { nullable: true })
+  stripeCustomerId?: string;
 
   @Field(() => String, { nullable: true })
   address?: string;
@@ -33,7 +39,7 @@ export class CreateOrganizationInput {
   @Field(() => String, { nullable: true })
   zipcode?: string;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   country?: string;
 
   @Field(() => String, { nullable: true })
@@ -43,9 +49,6 @@ export class CreateOrganizationInput {
   longitude?: string;
 
   @Field(() => String, { nullable: true })
-  stripeCustomerId?: string;
-
-  @Field(() => String, { nullable: true })
   description?: string;
 
   @Field(() => String, { nullable: true })
@@ -53,4 +56,17 @@ export class CreateOrganizationInput {
 
   @Field(() => String, { nullable: true })
   logo?: string;
+
+  @Field(() => Boolean, { nullable: true })
+  isActive?: boolean;
+
+  @Field(() => Date)
+  createdAt: Date;
+
+  @Field(() => Date)
+  updatedAt: Date;
+
+  constructor(partial?: Partial<OrganizationResponseDto>) {
+    Object.assign(this, partial);
+  }
 }

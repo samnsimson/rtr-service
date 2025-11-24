@@ -4,6 +4,25 @@ import { Subscription } from './subscription.entity';
 import { BillingInterval, PlanType } from 'src/common';
 
 @ObjectType()
+export class PlanFeature {
+  @Field(() => String)
+  @Column()
+  name: string;
+
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
+  description?: string;
+
+  @Field(() => Boolean)
+  @Column({ default: false })
+  isEnabled: boolean;
+
+  constructor(data: Partial<PlanFeature>) {
+    Object.assign(this, data);
+  }
+}
+
+@ObjectType()
 @Entity('subscription_plans')
 export class SubscriptionPlan {
   @Field(() => String)
@@ -34,17 +53,25 @@ export class SubscriptionPlan {
   @Column()
   currency: string;
 
-  @Field(() => Number)
+  @Field(() => Number, { defaultValue: 0 })
   @Column({ type: 'int' })
   maxUsers: number;
 
-  @Field(() => Number)
-  @Column({ type: 'int' })
+  @Field(() => Number, { defaultValue: 0 })
+  @Column({ type: 'int', default: 0 })
   maxJobs: number;
 
-  @Field(() => Number)
-  @Column({ type: 'int' })
+  @Field(() => Number, { defaultValue: 0 })
+  @Column({ type: 'int', default: 0 })
   maxRTRs: number;
+
+  @Field(() => Number, { defaultValue: 0 })
+  @Column({ type: 'int', default: 0 })
+  maxEmails: number;
+
+  @Field(() => Number, { defaultValue: 0 })
+  @Column({ type: 'int', default: 0 })
+  maxSMS: number;
 
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
@@ -52,15 +79,15 @@ export class SubscriptionPlan {
 
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
-  stripeProductId?: string;
+  stripePaymentLink?: string;
 
   @Field(() => Boolean)
   @Column({ default: true })
   isActive: boolean;
 
-  @Field(() => [String])
-  @Column({ type: 'json', default: [] })
-  features: string[];
+  @Field(() => [PlanFeature], { nullable: true, defaultValue: [] })
+  @Column({ type: 'jsonb', nullable: true, default: [] })
+  features: PlanFeature[];
 
   @Field(() => Date)
   @CreateDateColumn()
@@ -73,4 +100,8 @@ export class SubscriptionPlan {
   @Field(() => [Subscription], { nullable: true })
   @OneToMany(() => Subscription, (subscription) => subscription.plan)
   subscriptions: Subscription[];
+
+  constructor(data: Partial<SubscriptionPlan>) {
+    Object.assign(this, data);
+  }
 }

@@ -264,6 +264,12 @@ enum NotificationType {
   JOB_UPDATE
 }
 
+type PlanFeature {
+  name: String!
+  description: String
+  isEnabled: Boolean!
+}
+
 type SubscriptionPlan {
   id: String!
   name: String!
@@ -275,10 +281,12 @@ type SubscriptionPlan {
   maxUsers: Float!
   maxJobs: Float!
   maxRTRs: Float!
+  maxEmails: Float!
+  maxSMS: Float!
   stripePriceId: String
-  stripeProductId: String
+  stripePaymentLink: String
   isActive: Boolean!
-  features: [String!]!
+  features: [PlanFeature!]
   createdAt: DateTime!
   updatedAt: DateTime!
   subscriptions: [Subscription!]
@@ -374,10 +382,19 @@ enum SubscriptionStatus {
 type Organization {
   id: String!
   name: String!
+  email: String
+  phone: String
   website: String
   industry: String
   companySize: CompanySize
-  location: String
+  stripeCustomerId: String
+  address: String
+  city: String
+  state: String
+  zipcode: String
+  country: String
+  latitude: String
+  longitude: String
   description: String
   linkedinUrl: String
   logo: String
@@ -492,6 +509,30 @@ type Auth {
   tokenType: String!
   expiresAt: DateTime!
   user: AuthUser!
+}
+
+type OrganizationResponseDto {
+  id: String!
+  name: String
+  email: String
+  phone: String
+  website: String
+  industry: String
+  companySize: CompanySize
+  stripeCustomerId: String
+  address: String
+  city: String
+  state: String
+  zipcode: String
+  country: String
+  latitude: String
+  longitude: String
+  description: String
+  linkedinUrl: String
+  logo: String
+  isActive: Boolean
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type Overview {
@@ -754,6 +795,19 @@ type IndexType {
   sortableAttributes: [String!]
 }
 
+type StripeProductResponse {
+  id: String!
+  active: Boolean!
+  created: Float!
+  description: String
+  images: [String!]!
+  livemode: Boolean!
+  name: String!
+  shippable: Boolean
+  tax_code: String
+  url: String
+}
+
 type CandidateList {
   id: String!
   firstName: String!
@@ -957,7 +1011,7 @@ type Mutation {
   register(registerInput: RegisterInput!): Auth!
   refreshToken(refreshTokenInput: RefreshTokenInput!): Auth!
   createOrganization(createOrganizationInput: CreateOrganizationInput!): Organization!
-  updateOrganization(id: String!, updateOrganizationInput: UpdateOrganizationInput!): Organization!
+  updateOrganization(updateOrganizationInput: UpdateOrganizationInput!): OrganizationResponseDto!
   removeOrganization(id: String!): Boolean!
   createOrganizationUser(organizationId: String!, createUserInput: CreateOrganizationUserInput!): User!
   updateUserRole(organizationId: String!, userId: String!, newRole: UserRole!): User!
@@ -1017,6 +1071,9 @@ type Mutation {
   createSubscription(createSubscriptionInput: CreateSubscriptionInput!): Subscription!
   updateSubscription(id: String!, updateSubscriptionInput: UpdateSubscriptionInput!): Subscription!
   cancelSubscription(id: String!, reason: String): Subscription!
+  createStripeProduct(createStripeProductInput: CreateStripeProductInput!): StripeProductResponse!
+  createStripeProductPrice(createStripePriceInput: CreateStripePriceInput!): StripeProductResponse!
+  createStripePaymentLink(createStripePaymentLinkInput: CreateStripePaymentLinkInput!): StripeProductResponse!
   createCandidateList(createCandidateListInput: CreateCandidateListInput!): CandidateList!
   updateCandidateList(updateCandidateListInput: UpdateCandidateListInput!): CandidateList!
   removeCandidateList(id: Int!): CandidateList!
@@ -1066,9 +1123,18 @@ input RefreshTokenInput {
 input CreateOrganizationInput {
   name: String!
   website: String
+  email: String
+  phone: String
   industry: String
   companySize: CompanySize
-  location: String
+  address: String
+  city: String
+  state: String
+  zipcode: String
+  country: String!
+  latitude: String
+  longitude: String
+  stripeCustomerId: String
   description: String
   linkedinUrl: String
   logo: String
@@ -1076,14 +1142,22 @@ input CreateOrganizationInput {
 
 input UpdateOrganizationInput {
   name: String
+  email: String
+  phone: String
   website: String
   industry: String
   companySize: CompanySize
-  location: String
+  address: String
+  city: String
+  state: String
+  zipcode: String
+  country: String!
+  latitude: String
+  longitude: String
+  stripeCustomerId: String
   description: String
   linkedinUrl: String
   logo: String
-  id: String!
 }
 
 input CreateOrganizationUserInput {
@@ -1336,6 +1410,30 @@ input UpdateSubscriptionInput {
   autoRenew: Boolean
   cancellationReason: String
   cancelledAt: String
+}
+
+input CreateStripeProductInput {
+  name: String!
+  description: String!
+}
+
+input CreateStripePriceInput {
+  name: String
+  productId: String!
+  amount: Float!
+  currency: String!
+  interval: StripePaymentInterval! = MONTH
+}
+
+enum StripePaymentInterval {
+  DAY
+  WEEK
+  MONTH
+  YEAR
+}
+
+input CreateStripePaymentLinkInput {
+  priceId: String!
 }
 
 input CreateCandidateListInput {

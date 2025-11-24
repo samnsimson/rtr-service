@@ -10,6 +10,7 @@ import { Roles } from '../common/decorators/roles.decorator';
 import { UserRole } from '../common/enums';
 import { AuthUser } from '../common/decorators/current-user.decorator';
 import { CurrentUser as CurrentUserType } from '../common/types';
+import { OrganizationResponseDto } from './dto/organization-response.dto';
 
 @Resolver(() => Organization)
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -40,13 +41,13 @@ export class OrganizationsResolver {
     return this.organizationsService.findOne(id);
   }
 
-  @Mutation(() => Organization, { name: 'updateOrganization' })
+  @Mutation(() => OrganizationResponseDto, { name: 'updateOrganization' })
   async updateOrganization(
-    @Args('id') id: string,
     @Args('updateOrganizationInput') updateOrganizationInput: UpdateOrganizationInput,
     @AuthUser() user: CurrentUserType,
-  ): Promise<Organization> {
-    return this.organizationsService.updateOrganization(id, updateOrganizationInput, user.id);
+  ): Promise<OrganizationResponseDto> {
+    const organization = await this.organizationsService.updateOrganization(user.organizationId, updateOrganizationInput, user.id);
+    return new OrganizationResponseDto(organization);
   }
 
   @Mutation(() => Boolean, { name: 'removeOrganization' })
