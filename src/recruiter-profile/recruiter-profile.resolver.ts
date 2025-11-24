@@ -11,7 +11,7 @@ import { CurrentUser } from 'src/common/types';
 
 @Resolver(() => RecruiterProfileResponse)
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(UserRole.RECRUITER, UserRole.ADMIN)
+@Roles(UserRole.RECRUITER, UserRole.ADMIN, UserRole.ORGANIZATION_OWNER, UserRole.ORGANIZATION_ADMIN)
 export class RecruiterProfileResolver {
   constructor(private readonly recruiterProfileService: RecruiterProfileService) {}
 
